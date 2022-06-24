@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'development') {
 } else if (process.env.VUE_APP_TITLE === 'pre') {
   baseUrl = 'https://test.cunwedu.com.cn/aq/' // 预发布环境
 } else {
-  baseUrl = 'http://172.31.21.3:8080/' // 生产环境
+  baseUrl = 'http://api.punengshuo.com/' // 生产环境
 }
 const ENVIRONMENT = {
   BASE_API: baseUrl, // api访问地址
