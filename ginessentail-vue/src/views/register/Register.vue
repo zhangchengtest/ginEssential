@@ -46,10 +46,12 @@
             </b-form-group>
             <b-form-group>
               <b-button
-                @click="register"
                 variant="outline-primary"
                 block
-              >注册</b-button>
+                @click="register"
+              >
+                注册
+              </b-button>
             </b-form-group>
           </b-form>
         </b-card>
@@ -60,7 +62,7 @@
 
 <script>
 import {
-  required, minLength,
+  required, minLength
 } from 'vuelidate/lib/validators'
 import customValidator from '../../helper/validator'
 
@@ -70,9 +72,9 @@ export default {
       user: {
         name: '',
         telephone: '',
-        password: '',
+        password: ''
       },
-      validation: null,
+      validation: null
     }
   },
   validations: {
@@ -84,13 +86,13 @@ export default {
         required,
         // minLength: minLength(11),
         // maxLength: maxLength(11),
-        telephone: customValidator.telephoneValidator,
+        telephone: customValidator.telephoneValidator
       },
       password: {
         required,
-        minLength: minLength(6),
-      },
-    },
+        minLength: minLength(6)
+      }
+    }
   },
   methods: {
     validateState(name) {
@@ -118,12 +120,12 @@ export default {
         this.$bvToast.toast(err.response.data.msg, {
           title: '出错啦',
           variant: 'danger',
-          solid: true,
+          solid: true
         })
       })
       console.log('register')
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -39,10 +39,12 @@
             </b-form-group>
             <b-form-group>
               <b-button
-                @click="login"
                 variant="outline-primary"
                 block
-              >登录</b-button>
+                @click="login"
+              >
+                登录
+              </b-button>
             </b-form-group>
           </b-form>
         </b-card>
@@ -53,7 +55,7 @@
 
 <script>
 import {
-  required, minLength,
+  required, minLength
 } from 'vuelidate/lib/validators'
 import customValidator from '../../helper/validator'
 
@@ -62,9 +64,9 @@ export default {
     return {
       user: {
         telephone: '',
-        password: '',
+        password: ''
       },
-      validation: null,
+      validation: null
     }
   },
   validations: {
@@ -73,13 +75,13 @@ export default {
         required,
         // minLength: minLength(11),
         // maxLength: maxLength(11),
-        telephone: customValidator.telephoneValidator,
+        telephone: customValidator.telephoneValidator
       },
       password: {
         required,
-        minLength: minLength(6),
-      },
-    },
+        minLength: minLength(6)
+      }
+    }
   },
   methods: {
     validateState(name) {
@@ -94,8 +96,8 @@ export default {
       this.validation = true
 
       console.log('login')
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -1,9 +1,11 @@
 <template>
   <b-navbar toggleable="lg" type="dark" variant="info">
     <b-container>
-      <b-navbar-brand href="/">OceanLearn</b-navbar-brand>
+      <b-navbar-brand href="/">
+        OceanLearn
+      </b-navbar-brand>
 
-      <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
+      <b-navbar-toggle target="nav-collapse" />
 
       <b-collapse id="nav-collapse" is-nav>
         <!-- <b-navbar-nav>
@@ -32,8 +34,12 @@
             <b-dropdown-item href="#">Profile</b-dropdown-item>
             <b-dropdown-item href="#">Sign Out</b-dropdown-item>
           </b-nav-item-dropdown> -->
-          <b-nav-item @click="$router.replace({ name: 'login' })">登录</b-nav-item>
-          <b-nav-item @click="$router.replace({ name: 'register' })">注册</b-nav-item>
+          <b-nav-item @click="$router.replace({ name: 'login' })">
+            登录
+          </b-nav-item>
+          <b-nav-item @click="$router.replace({ name: 'register' })">
+            注册
+          </b-nav-item>
         </b-navbar-nav>
       </b-collapse>
     </b-container>
