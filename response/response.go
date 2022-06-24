@@ -17,6 +17,14 @@ func Success(ctx *gin.Context, data gin.H, msg string) {
 	Response(ctx, http.StatusOK, 200, data, msg)
 }
 
+func Success2(ctx *gin.Context, data string, msg string) {
+	ctx.JSON(200, gin.H{
+		"code":  http.StatusOK,
+		"data": data,
+		"msg":  msg,
+	})
+}
+
 func Fail(ctx *gin.Context, data gin.H, msg string) {
 	Response(ctx, http.StatusOK, 400, data, msg)
 }

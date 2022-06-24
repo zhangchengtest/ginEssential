@@ -16,5 +16,6 @@ module.exports = {
     'quotes': ['error', 'single'],
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'linebreak-style': ["off", "windows"]
   },
 };

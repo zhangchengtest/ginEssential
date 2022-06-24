@@ -3,9 +3,9 @@ server:
 
 datasource:
   driverName: mysql
-  host: localhost
+  host: 172.31.21.3
   port: 3306
   database: ginessential
   username: root
-  password: 123456
+  password: abcd@1234
   charset: utf8

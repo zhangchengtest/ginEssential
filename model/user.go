@@ -8,3 +8,8 @@ type User struct {
 	Telephone string `gorm:"type:varchar(20);not null;unique"`
 	Password  string `gorm:"size:255;not null"`
 }
+
+type JavaBean struct {
+	OriginText      string
+	TableName string
+}

@@ -12,6 +12,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func Register(ctx *gin.Context) {
@@ -138,7 +139,7 @@ func Login(ctx *gin.Context) {
 	// 	"data":    gin.H{"token": token},
 	// 	"message": "注册成功",
 	// })
-	response.Success(ctx, gin.H{"token": token}, "注册成功")
+	response.Success(ctx, gin.H{"token": token}, "登录成功")
 }
 
 func Info(ctx *gin.Context) {
@@ -150,6 +151,72 @@ func Info(ctx *gin.Context) {
 	// 	},
 	// })
 	response.Success(ctx, gin.H{"user": dto.ToUserDto(user.(model.User))}, "")
+}
+
+func Javatosql(ctx *gin.Context) {
+	//1. 使用map获取application/json请求的参数
+
+
+	var javabean = model.JavaBean{}
+	ctx.Bind(&javabean)
+	fmt.Printf("javabean：%v", javabean)
+	originText := javabean.OriginText
+	tableName :=javabean.TableName
+
+	originText = strings.Trim(originText," ")
+	var arr []string
+	if strings.Contains(originText, "\n") {
+		fmt.Printf("change 1")
+		arr = strings.Split(originText, "\n")
+	}else if strings.Contains(originText, "\r") {
+		fmt.Printf("change 2")
+		arr = strings.Split(originText, "\r")
+	}else {
+		arr = strings.Split(originText, "\n\r")
+	}
+
+
+	var ret string
+	for _, s := range arr {
+		ret += split(tableName, s)+"\r\n"
+	}
+
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"code": 200,
+	// 	"data": gin.H{
+	// 		"user": dto.ToUserDto(user.(model.User)), // user转dto
+	// 	},
+	// })
+	response.Success2(ctx, ret, "")
+}
+
+func split(tableName string, originText string) string {
+	originText = strings.Trim(originText," ")
+	arr := strings.Split(originText, "//")
+
+
+	var ret string
+	if len(arr) == 2 {
+		ret = change(tableName, arr[0], arr[1])
+	} else {
+		ret = change(tableName, arr[0], "")
+	}
+
+	return ret
+}
+
+func change(tableName string, originText string, comment string) string {
+	fmt.Printf("originText：%v", originText)
+	originText = strings.Trim(originText," ")
+	arr := strings.Split(originText, " ")
+	fmt.Printf("%q\n", arr)
+	var ret string
+	if arr[1] == "String" {
+		/* 如果条件为 true 则执行以下语句 */
+		ret =   strings.Replace(arr[2], ";", "", -1 )
+		ret = fmt.Sprintf("ALTER TABLE `%s` ADD COLUMN `%s` varchar(10) DEFAULT NULL COMMENT '%s';", tableName, ret, comment);
+	}
+	return ret
 }
 
 func isTelephoneExist(db *gorm.DB, telephone string) bool {
