@@ -168,9 +168,9 @@ func Javatosql(ctx *gin.Context) {
 	if strings.Contains(originText, "\n") {
 		fmt.Printf("change 1")
 		arr = strings.Split(originText, "\n")
-	}else if strings.Contains(originText, "\r") {
+	}else if strings.Contains(originText, "\n\r") {
 		fmt.Printf("change 2")
-		arr = strings.Split(originText, "\r")
+		arr = strings.Split(originText, "\n\r")
 	}else {
 		arr = strings.Split(originText, "\n\r")
 	}
