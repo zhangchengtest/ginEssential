@@ -10,6 +10,7 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
+	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/spf13/viper v1.6.2
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/net v0.0.0-20220622184535-263ec571b305 // indirect

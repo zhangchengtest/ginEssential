@@ -13,3 +13,8 @@ type JavaBean struct {
 	OriginText      string
 	TableName string
 }
+
+type MyFile struct {
+	FirstFile      string
+	SecondFile     string
+}

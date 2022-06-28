@@ -29,6 +29,16 @@ const routes = [
     path: '/login',
     name: 'login',
     component: () => import('../views/login/Login.vue') // 这样写成函数的好处是懒加载
+  },
+  {
+    path: '/javatosql',
+    name: 'javatosql',
+    component: () => import('../views/JavaToSql.vue') // 这样写成函数的好处是懒加载
+  },
+  {
+    path: '/compareFile',
+    name: 'compareFile',
+    component: () => import('../views/CompareFile.vue') // 这样写成函数的好处是懒加载
   }
 ]
 

@@ -1,17 +1,27 @@
 <template>
   <div class="home">
-    <HelloWorld msg="" />
+    <div class="mydiv" @click="$router.replace({ name: 'javatosql' })">
+      java to sql
+    </div>
+
+    <div class="mydiv" @click="$router.replace({ name: 'compareFile' })">
+      对比文件
+    </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
   }
 }
 </script>
+
+<style>
+.mydiv {
+  cursor: pointer;
+}
+</style>

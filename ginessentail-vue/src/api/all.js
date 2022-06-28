@@ -9,3 +9,11 @@ export function javatosql(data) {
   })
 }
 
+export function compareFile(data) {
+  return request({
+    url: '/api/compareFile',
+    method: 'post',
+    data: data
+  })
+}
+

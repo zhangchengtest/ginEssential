@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bufio"
 	"fmt"
 	"ginEssential/common"
 	"ginEssential/dto"
@@ -10,8 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -154,9 +157,6 @@ func Info(ctx *gin.Context) {
 }
 
 func Javatosql(ctx *gin.Context) {
-	//1. 使用map获取application/json请求的参数
-
-
 	var javabean = model.JavaBean{}
 	ctx.Bind(&javabean)
 	fmt.Printf("javabean：%v", javabean)
@@ -166,10 +166,8 @@ func Javatosql(ctx *gin.Context) {
 	originText = strings.Trim(originText," ")
 	var arr []string
 	if strings.Contains(originText, "\n") {
-		fmt.Printf("change 1")
 		arr = strings.Split(originText, "\n")
 	}else if strings.Contains(originText, "\n\r") {
-		fmt.Printf("change 2")
 		arr = strings.Split(originText, "\n\r")
 	}else {
 		arr = strings.Split(originText, "\n\r")
@@ -181,13 +179,90 @@ func Javatosql(ctx *gin.Context) {
 		ret += split(tableName, s)+"\r\n"
 	}
 
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"code": 200,
-	// 	"data": gin.H{
-	// 		"user": dto.ToUserDto(user.(model.User)), // user转dto
-	// 	},
-	// })
 	response.Success2(ctx, ret, "")
+}
+
+
+func CompareFile(ctx *gin.Context) {
+
+	//firstFile := javabean.FirstFile
+	//secondFile :=javabean.SecondFile
+
+	file1, header, err := ctx.Request.FormFile("file1")
+	if err != nil {
+		log.Printf("get file error: %s", err)
+		response.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
+		return
+	}
+
+	filename := header.Filename
+
+	// 创建一个文件，文件名为filename，这里的返回值out也是一个File指针
+	sourceFile1, err := os.Create(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer sourceFile1.Close()
+
+	// 将file的内容拷贝到out
+	_, err = io.Copy(sourceFile1, file1)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file2, header, err := ctx.Request.FormFile("file2")
+	if err != nil {
+		log.Printf("get file error: %s", err)
+		response.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
+		return
+	}
+
+	filename2 := header.Filename
+
+	// 创建一个文件，文件名为filename，这里的返回值out也是一个File指针
+	sourceFile2, err := os.Create(filename2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer sourceFile2.Close()
+
+	// 将file的内容拷贝到out
+	_, err = io.Copy(sourceFile2, file2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("### 逐行比较 ###")
+	sourceFile1.Seek(0, 0)
+	sourceFile2.Seek(0, 0)
+	list := compareFileByLine(sourceFile1, sourceFile2)
+
+
+
+
+	response.Success2(ctx, list, "")
+}
+
+
+func compareFileByLine(f1, f2 *os.File) string{
+	sc1 := bufio.NewScanner(f1)
+	sc2 := bufio.NewScanner(f2)
+
+	var s1 string;
+	var s2 string;
+	for {
+		sc1Bool := sc1.Scan()
+		sc2Bool := sc2.Scan()
+		if !sc1Bool && !sc2Bool {
+			break
+		}
+		s1 += sc1.Text()+"\n\r"
+		s2 += sc2.Text()+"\n\r"
+	}
+	s := util.Diff(s1, s2)
+	return s;
 }
 
 func split(tableName string, originText string) string {

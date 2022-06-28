@@ -1,5 +1,5 @@
-const webpack = require('webpack');
-const Timestamp = new Date().getTime();
+const webpack = require('webpack')
+const Timestamp = new Date().getTime()
 module.exports = {
   productionSourceMap: false,
   publicPath: './',
@@ -17,7 +17,7 @@ module.exports = {
           filename: `js/[name].${process.env.NODE_ENV}.${Timestamp}.js`,
           chunkFilename: `js/[name].${process.env.NODE_ENV}.${Timestamp}.js`
         }
-      };
+      }
     } else {
       return {
         plugins: [
@@ -27,20 +27,20 @@ module.exports = {
             'windows.jQuery': 'jquery'
           })
         ]
-      };
+      }
     }
   },
   chainWebpack: config => {
-    const svgRule = config.module.rule('svg');
-    svgRule.uses.clear();
+    const svgRule = config.module.rule('svg')
+    svgRule.uses.clear()
     svgRule
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
       .options({
         symbolId: 'icon-[name]'
-      });
+      })
   },
   devServer: {
     https: false
   }
-};
+}
