@@ -182,7 +182,6 @@ func Javatosql(ctx *gin.Context) {
 	response.Success2(ctx, ret, "")
 }
 
-
 func CompareFile(ctx *gin.Context) {
 
 	//firstFile := javabean.FirstFile
@@ -234,15 +233,23 @@ func CompareFile(ctx *gin.Context) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("### 逐行比较 ###")
 	sourceFile1.Seek(0, 0)
 	sourceFile2.Seek(0, 0)
 	list := compareFileByLine(sourceFile1, sourceFile2)
 
-
-
-
 	response.Success2(ctx, list, "")
+}
+
+
+
+func TestThread(ctx *gin.Context) {
+
+	//firstFile := javabean.FirstFile
+	//secondFile :=javabean.SecondFile
+	sws := util.GetInstance()
+	//change := util.Change{Add: "ssss"}
+	sws.AddChange( "ssss")
+	response.Success2(ctx, "ok", "")
 }
 
 
