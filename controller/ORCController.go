@@ -44,6 +44,7 @@ func Readorc(ctx *gin.Context) {
 	text, _ := client.Text()
 	arr := strings.Split(text, "\n")
 	fmt.Println(text)
+	var ret string;
 	for _, s := range arr {
 
 		if strings.TrimSpace(s) == ""{
@@ -55,14 +56,12 @@ func Readorc(ctx *gin.Context) {
 			chapter, err := strconv.ParseInt(arr1[len(arr1)-2], 10, 32)
 			if err == nil {
 				fmt.Println(chapter)
+				ret += arr1[len(arr1)-2] +"\r\n"
 			}
-
 		}
 	}
 
-
-
-	response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+	response.Success2(ctx, ret, "新增成功")
 }
 
 

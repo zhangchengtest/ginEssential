@@ -16,6 +16,14 @@ export function daode() {
   })
 }
 
+export function readorc(data) {
+  return request({
+    url: '/api/readorc',
+    method: 'post',
+    data: data
+  })
+}
+
 export function compareFile(data) {
   return request({
     url: '/api/compareFile',

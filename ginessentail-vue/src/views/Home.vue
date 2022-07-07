@@ -11,6 +11,9 @@
     <div class="mydiv" @click="$router.replace({ name: 'daode' })">
       dao de jing
     </div>
+    <div class="mydiv" @click="$router.replace({ name: 'cal' })">
+      calculate
+    </div>
 
   </div>
 </template>

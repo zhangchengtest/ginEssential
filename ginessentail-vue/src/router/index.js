@@ -41,6 +41,11 @@ const routes = [
     component: () => import('../views/Daode.vue') // 这样写成函数的好处是懒加载
   },
   {
+    path: '/cal',
+    name: 'cal',
+    component: () => import('../views/Cal.vue') // 这样写成函数的好处是懒加载
+  },
+  {
     path: '/compareFile',
     name: 'compareFile',
     component: () => import('../views/CompareFile.vue') // 这样写成函数的好处是懒加载
