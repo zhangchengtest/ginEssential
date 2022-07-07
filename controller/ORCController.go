@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func Readorc(ctx *gin.Context) {
@@ -40,7 +41,19 @@ func Readorc(ctx *gin.Context) {
 	defer client.Close()
 	client.SetImage(filename)
 	text, _ := client.Text()
+	arr := strings.Split(text, "\n\r")
 	fmt.Println(text)
+	for _, s := range arr {
+
+		if strings.TrimSpace(s) == ""{
+			continue
+		}
+		arr1 := strings.Split(s, " ")
+		if(len(arr1) == 7){
+			fmt.Println(arr1[6])
+		}
+	}
+
 
 
 	response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
