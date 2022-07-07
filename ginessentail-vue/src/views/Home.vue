@@ -7,6 +7,11 @@
     <div class="mydiv" @click="$router.replace({ name: 'compareFile' })">
       对比文件
     </div>
+
+    <div class="mydiv" @click="$router.replace({ name: 'daode' })">
+      dao de jing
+    </div>
+
   </div>
 </template>
 
@@ -23,5 +28,6 @@ export default {
 <style>
 .mydiv {
   cursor: pointer;
+  margin-top: 10px;
 }
 </style>

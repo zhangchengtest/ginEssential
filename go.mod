@@ -8,7 +8,7 @@ require (
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
-	github.com/go-sql-driver/mysql v1.5.0
+	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20190430165422-3e4dfb77656c // indirect
@@ -17,7 +17,7 @@ require (
 	github.com/ipfs/go-ipfs-files v0.1.1 // indirect
 	github.com/ipfs/go-log v1.0.5
 	github.com/ipfs/go-log/v2 v2.5.1 // indirect
-	github.com/jinzhu/gorm v1.9.12
+	github.com/jinzhu/gorm v1.9.16
 	github.com/klauspost/cpuid/v2 v2.0.12 // indirect
 	github.com/libp2p/go-libp2p-core v0.16.1 // indirect
 	github.com/libp2p/go-libp2p-loggables v0.1.0
@@ -41,5 +41,7 @@ require (
 	golang.org/x/sys v0.0.0-20220622161953-175b2fd9d664 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
+	gorm.io/driver/mysql v1.3.4
+	gorm.io/gorm v1.23.7
 	lukechampine.com/blake3 v1.1.7 // indirect
 )

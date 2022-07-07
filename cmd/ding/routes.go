@@ -14,5 +14,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/javatosql", controller.Javatosql)
 	r.POST("/api/compareFile", controller.CompareFile)
 	r.POST("/api/testThread", controller.TestThread)
+	r.POST("/api/addArticle", controller.AddArticle)
+	r.POST("/api/addArticleFromFile", controller.AddArticleFromFile)
+	r.GET("/api/randomArticle", controller.RandomArticle)
 	return r
 }

@@ -3,21 +3,22 @@ package common
 import (
 	"fmt"
 	"ginEssential/model"
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
 
 func InitDB() *gorm.DB {
-	driverName := viper.GetString("datasource.driverName")
 	host := viper.GetString("datasource.host")
 	port := viper.GetString("datasource.port")
 	database := viper.GetString("datasource.database")
 	username := viper.GetString("datasource.username")
 	password := viper.GetString("datasource.password")
 	charset := viper.GetString("datasource.charset")
-	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=true",
 		username,
 		password,
 		host,
@@ -25,12 +26,15 @@ func InitDB() *gorm.DB {
 		database,
 		charset)
 
-	db, err := gorm.Open(driverName, args)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger:logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		panic("failed to connect database, err: " + err.Error())
 	}
 
-	db.AutoMigrate(&model.User{}) // 自动创建数据库表
+	db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4").AutoMigrate(&model.User{}) // 自动创建数据库表
+	db.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4").AutoMigrate(&model.Article{}) // 自动创建数据库表
 
 	DB = db
 	return db

@@ -2,10 +2,9 @@ server:
   port: 8080
 
 datasource:
-  driverName: mysql
   host: 172.31.21.3
   port: 3306
-  database: ginessential
+  database: hazetip
   username: root
   password: abcd@1234
-  charset: utf8
+  charset: utf8mb4

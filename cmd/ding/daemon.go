@@ -93,8 +93,7 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 	fmt.Printf("Initializing daemon...\n")
 
 	InitConfig()
-	db := common.InitDB()
-	defer db.Close()
+	common.InitDB()
 
 	r := gin.Default()
 	r = CollectRoute(r)

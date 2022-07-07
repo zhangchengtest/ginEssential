@@ -9,6 +9,13 @@ export function javatosql(data) {
   })
 }
 
+export function daode() {
+  return request({
+    url: '/api/randomArticle',
+    method: 'get'
+  })
+}
+
 export function compareFile(data) {
   return request({
     url: '/api/compareFile',
