@@ -49,6 +49,7 @@ func Readorc(ctx *gin.Context) {
 			continue
 		}
 		arr1 := strings.Split(s, " ")
+		fmt.Println(len(arr1))
 		if(len(arr1) == 7){
 			fmt.Println(arr1[6])
 		}
