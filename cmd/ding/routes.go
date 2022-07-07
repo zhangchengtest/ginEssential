@@ -17,5 +17,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/addArticle", controller.AddArticle)
 	r.POST("/api/addArticleFromFile", controller.AddArticleFromFile)
 	r.GET("/api/randomArticle", controller.RandomArticle)
+	r.POST("/api/readorc", controller.Readorc)
+
 	return r
 }
