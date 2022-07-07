@@ -4,12 +4,22 @@
 
     <div class="warp">
       <div class="myinput">
-        <input ref="file1" type="file" accept=".jpg" @change="uploadFile">
+        <el-upload
+            class="pop-upload"
+            ref="upload"
+            action=""
+            :file-list="fileList"
+            :auto-upload="false"
+            :multiple="true"
+            :on-change="handleChange"
+            :on-remove="handleRemove"
+    >
+     <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+    </el-upload>
+
       </div>
       <div />
-      <div class="mybutton" @click="submitAddFile()">
-        <button> 提交</button>
-      </div>
     </div>
 
     <div class="warp">
@@ -45,29 +55,44 @@ export default {
         tableName: '',
         originText: ''
       },
-      myfile1: null
+      responseText: '',
+      fileList: []
     }
   },
   methods: {
-    uploadFile() {
-      this.myfile1 = this.$refs.file1.files[0]
+    handleChange(file, fileList) {
+        this.fileList = fileList
     },
-    uploadFile2() {
-      this.myfile2 = this.$refs.file2.files[0]
+    handleRemove(file, fileList) {
+        this.fileList = fileList
     },
-    submitAddFile() {
-      var formData = new FormData()
-      formData.append('file', this.myfile1)
-         readorc(formData).then((res) => {
-        const { data } = res.data
-        console.log(data)
-        document.getElementById('mycontent').innerHTML = data
-        // 保存token
+    // 上传服务器
+    submitUpload() {
+        if (this.fileList.length === 0) {
+            return this.$message.warning('请选取文件后再上传')
+        }
+        const formData = new FormData()
+        this.fileList.forEach((file) => {
+            formData.append('file', file.raw)
+        })
+        readorc(formData).then((res) => {
+          const { data } = res.data
 
-        // 跳转主页
-      }).catch((err) => {
-        console.log('err:', err)
-      })
+          this.mymodel.originText = data
+          const myArray = data.split('\r\n')
+          var sum = 0
+          for (var i = 0; i < myArray.length; i++) {
+              if (myArray[i]) {
+                sum += parseInt(myArray[i])
+                console.log(myArray[i])
+              }
+          }
+          this.responseText = sum
+          // 保存token
+          // 跳转主页
+        }).catch((err) => {
+          console.log('err:', err)
+        })
     }
   }
 }
