@@ -52,6 +52,7 @@ func Readorc(ctx *gin.Context) {
 					}
 				}
 			}
+			ret += "\r\n"
 		}
 	}
 
