@@ -50,7 +50,7 @@ func Readorc(ctx *gin.Context) {
 		}
 		arr1 := strings.Split(s, " ")
 		//fmt.Println(len(arr1))
-		fmt.Println(arr1[len(arr1)-1])
+		fmt.Println(arr1[len(arr1)-2])
 	}
 
 
