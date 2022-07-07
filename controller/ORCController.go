@@ -41,7 +41,7 @@ func Readorc(ctx *gin.Context) {
 	defer client.Close()
 	client.SetImage(filename)
 	text, _ := client.Text()
-	arr := strings.Split(text, "\n\r")
+	arr := strings.Split(text, "\n")
 	fmt.Println(text)
 	for _, s := range arr {
 
