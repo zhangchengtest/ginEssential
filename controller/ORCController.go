@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -50,7 +51,14 @@ func Readorc(ctx *gin.Context) {
 		}
 		arr1 := strings.Split(s, " ")
 		//fmt.Println(len(arr1))
-		fmt.Println(arr1[len(arr1)-2])
+		if(len(arr1) > 3){
+			fmt.Println(arr1[len(arr1)-2])
+			chapter, err := strconv.ParseInt(arr1[len(arr1)-2], 10, 32)
+			if err == nil {
+				fmt.Println(chapter)
+			}
+
+		}
 	}
 
 
