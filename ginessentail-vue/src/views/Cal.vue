@@ -15,7 +15,9 @@
             :on-remove="handleRemove"
     >
      <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-        <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+     <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+
+     <el-button style="margin-left: 10px;" size="small" type="primary" @click="recal"> 重新计算</el-button>
     </el-upload>
 
       </div>
@@ -37,6 +39,7 @@
 </template>
 
 <script>
+
 import {
   readorc
 } from '@/api/all'
@@ -66,8 +69,21 @@ export default {
     handleRemove(file, fileList) {
         this.fileList = fileList
     },
+    recal() {
+        const myArray = this.mymodel.originText.split('\n')
+        console.log(myArray)
+        var sum = 0
+        for (var i = 0; i < myArray.length; i++) {
+            var ret = myArray[i].trim()
+            if (myArray[i] && ret !== '') {
+              sum += parseInt(myArray[i])
+            }
+        }
+        this.responseText = sum
+    },
     // 上传服务器
     submitUpload() {
+        console.log('Hello world')
         if (this.fileList.length === 0) {
             return this.$message.warning('请选取文件后再上传')
         }
@@ -114,7 +130,7 @@ a {
   color: #42b983;
 }
 .mytextarea{
-  width: 500px;
+  width: 100%;
   height: 600px;
 }
 
@@ -131,14 +147,7 @@ a {
 
 .warp {
     width: 100%;
-    display: flex;
-    flex-direction: row
-}
-
-.warp>div {
-  // border: solid red 1px;
-    flex: 1;
-    text-align: center;
     margin-top: 10px;
 }
+
 </style>

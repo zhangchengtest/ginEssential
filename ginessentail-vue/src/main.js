@@ -15,6 +15,7 @@ import store from './store'
 import './assets/scss/index.scss'
 
 Vue.config.productionTip = false
+Vue.config.devtools = true
 
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
