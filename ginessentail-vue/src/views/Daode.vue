@@ -6,7 +6,6 @@
       <div class="myinput">
         {{mymodel.chapter}} - {{mymodel.readCount}}
       </div>
-      <div />
       <div class="mybutton" @click="gochange()">
         <button> 提交</button>
       </div>
@@ -90,7 +89,7 @@ a {
   color: #42b983;
 }
 .mytextarea{
-  width: 500px;
+  width: 100%;
   height: 600px;
 }
 
@@ -101,20 +100,11 @@ a {
 
 .mybutton{
   text-align: right;
-  display: flex;
- justify-content: flex-end;
 }
 
 .warp {
     width: 100%;
-    display: flex;
-    flex-direction: row
-}
-
-.warp>div {
-  // border: solid red 1px;
-    flex: 1;
-    text-align: center;
     margin-top: 10px;
 }
+
 </style>
