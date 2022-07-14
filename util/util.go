@@ -1,7 +1,9 @@
 package util
 
 import (
+	"github.com/google/uuid"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -14,4 +16,10 @@ func RandomString(n int) string {
 		result[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(result)
+}
+
+func Myuuid() string {
+	uuid := uuid.New().String()
+	uuidWithoutHyphens := strings.Replace(uuid, "-", "", -1)
+	return uuidWithoutHyphens
 }

@@ -1,4 +1,4 @@
-package common
+package util
 
 import (
 	"ginEssential/model"
@@ -9,14 +9,14 @@ import (
 var jwtKey = []byte("a_secret_crect")
 
 type Claims struct {
-	UserId uint
+	UserId string
 	jwt.StandardClaims
 }
 
 func ReleaseToken(user model.User) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour) // 有效期7天
 	claims := &Claims{
-		UserId: user.ID,
+		UserId: user.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(), // 过期时间
 			IssuedAt:  time.Now().Unix(),     // 发放时间

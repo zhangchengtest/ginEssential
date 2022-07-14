@@ -3,7 +3,7 @@ package main
 import (
 	_ "expvar"
 	"fmt"
-	"ginEssential/common"
+	"ginEssential/dao"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
 	cmds "github.com/ipfs/go-ipfs-cmds"
@@ -86,14 +86,13 @@ documented in (and can be modified through) 'ipfs config Addresses'.
 	Run:         daemonFunc,
 }
 
-
 func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment) (_err error) {
 
 	// let the user know we're going.
 	fmt.Printf("Initializing daemon...\n")
 
 	InitConfig()
-	common.InitDB()
+	dao.InitDB()
 
 	r := gin.Default()
 	r = CollectRoute(r)
@@ -102,8 +101,6 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 		panic(r.Run(":" + port))
 	}
 	panic(r.Run())
-
-
 
 	// collect long-running errors and block for shutdown
 	// TODO(cryptix): our fuse currently doesn't follow this pattern for graceful shutdown

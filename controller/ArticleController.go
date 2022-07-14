@@ -3,7 +3,7 @@ package controller
 import (
 	"bufio"
 	"fmt"
-	"ginEssential/common"
+	"ginEssential/dao"
 	"ginEssential/model"
 	"ginEssential/response"
 	"ginEssential/util"
@@ -17,10 +17,11 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func AddArticle(ctx *gin.Context) {
-	DB := common.GetDB()
+	DB := dao.GetDB()
 	// 1. 使用map获取application/json请求的参数
 	// var requestMap = make(map[string]string)
 	// json.NewDecoder(ctx.Request.Body).Decode(&requestMap)
@@ -44,32 +45,30 @@ func AddArticle(ctx *gin.Context) {
 	// telephone := ctx.PostForm("telephone")
 	// password := ctx.PostForm("password")
 
-
 	var s = util.Worker1{}
 	// 创建用户
 	newUser := model.Article{
-		Id: s.GetId(),
-		Chapter:      chapter,
-		Title: title,
-		Content:  content,
+		Id:      s.GetId(),
+		Chapter: chapter,
+		Title:   title,
+		Content: content,
 	}
 
 	DB.Create(&newUser)
 
-
 	response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
 
-
 func RandomArticle(ctx *gin.Context) {
-	DB := common.GetDB()
+	DB := dao.GetDB()
 
 	// 创建用户
 	newUser := model.Article{}
 
 	articleVO := vo.ArticleVO{}
 
-	chapter := rand.Intn(80)+1
+	rand.Seed(time.Now().UnixNano())
+	chapter := rand.Intn(80) + 1
 	DB.Where("chapter = ?", chapter).First(&newUser)
 
 	// User 的 ID 是 `111`
@@ -78,7 +77,7 @@ func RandomArticle(ctx *gin.Context) {
 	content := newUser.Content
 	arr := strings.Split(content, "，")
 	random := rand.Intn(len(arr))
-	ret :=   strings.Replace(content, arr[random], "_______", -1 )
+	ret := strings.Replace(content, arr[random], "_______", -1)
 	newUser.Content = ret
 
 	util.SimpleCopyProperties(&articleVO, &newUser)
@@ -86,8 +85,6 @@ func RandomArticle(ctx *gin.Context) {
 
 	response.Success(ctx, gin.H{"article": articleVO}, "查询成功")
 }
-
-
 
 func AddArticleFromFile(ctx *gin.Context) {
 
@@ -125,13 +122,13 @@ func AddArticleFromFile(ctx *gin.Context) {
 
 func readFile(f1 *os.File) {
 	sc1 := bufio.NewScanner(f1)
-	DB := common.GetDB()
+	DB := dao.GetDB()
 	for {
 		sc1Bool := sc1.Scan()
 		if !sc1Bool {
 			break
 		}
-		if strings.TrimSpace(sc1.Text()) == ""{
+		if strings.TrimSpace(sc1.Text()) == "" {
 			continue
 		}
 
@@ -143,13 +140,12 @@ func readFile(f1 *os.File) {
 		var s = util.Worker1{}
 		// 创建用户
 		newUser := model.Article{
-			Id: s.GetId(),
-			Chapter:      int32(chapter),
-			Title: "道德经",
-			Content:  arr[1],
+			Id:      s.GetId(),
+			Chapter: int32(chapter),
+			Title:   "道德经",
+			Content: arr[1],
 		}
 
 		DB.Create(&newUser)
 	}
 }
-

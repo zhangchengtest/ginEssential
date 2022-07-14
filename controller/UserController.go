@@ -3,8 +3,7 @@ package controller
 import (
 	"bufio"
 	"fmt"
-	"ginEssential/common"
-	"ginEssential/dto"
+	"ginEssential/dao"
 	"ginEssential/model"
 	"ginEssential/response"
 	"ginEssential/util"
@@ -19,7 +18,7 @@ import (
 )
 
 func Register(ctx *gin.Context) {
-	DB := common.GetDB()
+	DB := dao.GetDB()
 	// 1. 使用map获取application/json请求的参数
 	// var requestMap = make(map[string]string)
 	// json.NewDecoder(ctx.Request.Body).Decode(&requestMap)
@@ -35,10 +34,9 @@ func Register(ctx *gin.Context) {
 	ctx.Bind(&ginBindUser)
 	fmt.Printf("ginBindUser：%v", ginBindUser)
 
-	// 获取参数
-	name := ginBindUser.Name
-	telephone := ginBindUser.Telephone
-	password := ginBindUser.Password
+	telephone := ginBindUser.Mobile
+	password := ginBindUser.Pwd
+	userName := ginBindUser.UserName
 	// name := ctx.PostForm("name")
 	// telephone := ctx.PostForm("telephone")
 	// password := ctx.PostForm("password")
@@ -59,12 +57,7 @@ func Register(ctx *gin.Context) {
 		return
 	}
 
-	// 如果name为空，就随机一个10位的字符串
-	if len(name) == 0 {
-		name = util.RandomString(10)
-	}
-
-	log.Println(name, telephone, password)
+	log.Println(telephone, password)
 	// 判断手机号是否存在
 	if isTelephoneExist(DB, telephone) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
@@ -79,15 +72,15 @@ func Register(ctx *gin.Context) {
 	}
 	// 创建用户
 	newUser := model.User{
-		Name:      name,
-		Telephone: telephone,
-		Password:  string(hasedPassword),
+		UserName: userName,
+		Mobile:   telephone,
+		Pwd:      string(hasedPassword),
 	}
 
 	DB.Create(&newUser)
 
 	// 发放token
-	token, err := common.ReleaseToken(newUser)
+	token, err := util.ReleaseToken(newUser)
 	if err != nil {
 		response.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
 		log.Printf("token generate error : %v", err)
@@ -99,9 +92,19 @@ func Register(ctx *gin.Context) {
 
 func Login(ctx *gin.Context) {
 	// 获取参数
-	telephone := ctx.PostForm("telephone")
-	password := ctx.PostForm("password")
+	var ginBindUser = model.User{}
+	ctx.Bind(&ginBindUser)
+	fmt.Printf("ginBindUser：%+v", ginBindUser)
+	// 输出换行符
+	fmt.Printf("\n")
 
+	var bb = model.User{UserId: "11111"}
+	fmt.Printf("bb：%+v", bb)
+	// 输出换行符
+	fmt.Printf("\n")
+
+	telephone := ginBindUser.Mobile
+	password := ginBindUser.Pwd
 	// 数据验证
 	if len(telephone) != 11 {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
@@ -114,27 +117,32 @@ func Login(ctx *gin.Context) {
 	}
 
 	// 判断手机号是否存在
-	DB := common.GetDB()
+	DB := dao.GetDB()
 	var user model.User
 	DB.Where("telephone = ?", telephone).First(&user)
-	if user.ID == 0 {
+	if user.UserId == "" {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
 		return
 	}
 
 	// 判断密码是否正确
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Pwd), []byte(password)); err != nil {
 		response.Response(ctx, http.StatusBadRequest, 400, nil, "密码错误")
 		return
 	}
 
 	// 发放token
-	token, err := common.ReleaseToken(user)
+	token, err := util.ReleaseToken(user)
 	if err != nil {
 		response.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
 		log.Printf("token generate error : %v", err)
 		return
 	}
+
+	uservo := model.UserDto{}
+
+	util.SimpleCopyProperties(&uservo, &user)
+	uservo.AccessToken = token
 
 	// 返回结果
 	// ctx.JSON(200, gin.H{
@@ -142,18 +150,15 @@ func Login(ctx *gin.Context) {
 	// 	"data":    gin.H{"token": token},
 	// 	"message": "注册成功",
 	// })
-	response.Success(ctx, gin.H{"token": token}, "登录成功")
+	response.Success(ctx, uservo, "登录成功")
 }
 
 func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"code": 200,
-	// 	"data": gin.H{
-	// 		"user": dto.ToUserDto(user.(model.User)), // user转dto
-	// 	},
-	// })
-	response.Success(ctx, gin.H{"user": dto.ToUserDto(user.(model.User))}, "")
+
+	uservo := model.UserDto{}
+	util.SimpleCopyProperties(&uservo, &user)
+	response.Success(ctx, uservo, "")
 }
 
 func Javatosql(ctx *gin.Context) {
@@ -161,22 +166,21 @@ func Javatosql(ctx *gin.Context) {
 	ctx.Bind(&javabean)
 	fmt.Printf("javabean：%v", javabean)
 	originText := javabean.OriginText
-	tableName :=javabean.TableName
+	tableName := javabean.TableName
 
-	originText = strings.Trim(originText," ")
+	originText = strings.Trim(originText, " ")
 	var arr []string
 	if strings.Contains(originText, "\n") {
 		arr = strings.Split(originText, "\n")
-	}else if strings.Contains(originText, "\n\r") {
+	} else if strings.Contains(originText, "\n\r") {
 		arr = strings.Split(originText, "\n\r")
-	}else {
+	} else {
 		arr = strings.Split(originText, "\n\r")
 	}
 
-
 	var ret string
 	for _, s := range arr {
-		ret += split(tableName, s)+"\r\n"
+		ret += split(tableName, s) + "\r\n"
 	}
 
 	response.Success2(ctx, ret, "")
@@ -240,42 +244,38 @@ func CompareFile(ctx *gin.Context) {
 	response.Success2(ctx, list, "")
 }
 
-
-
 func TestThread(ctx *gin.Context) {
 
 	//firstFile := javabean.FirstFile
 	//secondFile :=javabean.SecondFile
 	sws := util.GetInstance()
 	//change := util.Change{Add: "ssss"}
-	sws.AddChange( "ssss")
+	sws.AddChange("ssss")
 	response.Success2(ctx, "ok", "")
 }
 
-
-func compareFileByLine(f1, f2 *os.File) string{
+func compareFileByLine(f1, f2 *os.File) string {
 	sc1 := bufio.NewScanner(f1)
 	sc2 := bufio.NewScanner(f2)
 
-	var s1 string;
-	var s2 string;
+	var s1 string
+	var s2 string
 	for {
 		sc1Bool := sc1.Scan()
 		sc2Bool := sc2.Scan()
 		if !sc1Bool && !sc2Bool {
 			break
 		}
-		s1 += sc1.Text()+"\n\r"
-		s2 += sc2.Text()+"\n\r"
+		s1 += sc1.Text() + "\n\r"
+		s2 += sc2.Text() + "\n\r"
 	}
 	s := util.Diff(s1, s2)
-	return s;
+	return s
 }
 
 func split(tableName string, originText string) string {
-	originText = strings.Trim(originText," ")
+	originText = strings.Trim(originText, " ")
 	arr := strings.Split(originText, "//")
-
 
 	var ret string
 	if len(arr) == 2 {
@@ -289,14 +289,14 @@ func split(tableName string, originText string) string {
 
 func change(tableName string, originText string, comment string) string {
 	fmt.Printf("originText：%v", originText)
-	originText = strings.Trim(originText," ")
+	originText = strings.Trim(originText, " ")
 	arr := strings.Split(originText, " ")
 	fmt.Printf("%q\n", arr)
 	var ret string
 	if arr[1] == "String" {
 		/* 如果条件为 true 则执行以下语句 */
-		ret =   strings.Replace(arr[2], ";", "", -1 )
-		ret = fmt.Sprintf("ALTER TABLE `%s` ADD COLUMN `%s` varchar(10) DEFAULT NULL COMMENT '%s';", tableName, ret, comment);
+		ret = strings.Replace(arr[2], ";", "", -1)
+		ret = fmt.Sprintf("ALTER TABLE `%s` ADD COLUMN `%s` varchar(10) DEFAULT NULL COMMENT '%s';", tableName, ret, comment)
 	}
 	return ret
 }
@@ -304,5 +304,5 @@ func change(tableName string, originText string, comment string) string {
 func isTelephoneExist(db *gorm.DB, telephone string) bool {
 	var user model.User
 	db.Where("telephone = ?", telephone).First(&user)
-	return user.ID != 0
+	return user.UserId != ""
 }

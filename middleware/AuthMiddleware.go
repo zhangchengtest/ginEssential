@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"ginEssential/common"
+	"ginEssential/dao"
 	"ginEssential/model"
+	"ginEssential/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
@@ -21,7 +22,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		tokenString = tokenString[7:]
-		token, claims, err := common.ParseToken(tokenString)
+		token, claims, err := util.ParseToken(tokenString)
 		if err != nil || !token.Valid {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足"})
 			ctx.Abort()
@@ -30,12 +31,12 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 验证通过，获取claims中的userId
 		userId := claims.UserId
-		DB := common.GetDB()
+		DB := dao.GetDB()
 		var user model.User
 		DB.First(&user, userId)
 
 		// 用户
-		if user.ID == 0 {
+		if user.UserId == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足"})
 			ctx.Abort()
 			return
