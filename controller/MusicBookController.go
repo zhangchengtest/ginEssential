@@ -30,16 +30,28 @@ func AddMusicBook(ctx *gin.Context) {
 	var book = model.MusicBook{}
 
 	ctx.Bind(&book)
-	book.BookId = util.Myuuid()
-	if book.CreateBy == "" {
-		book.CreateBy = "1"
+	if book.BookId != "" {
+		old := model.MusicBook{}
+		DB.Where("book_id = ?", book.BookId).First(&old)
+		if old.BookId == "" {
+			ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "not found"})
+			return
+		}
+
+		book.UpdateDt = time.Now()
+		DB.Where("book_id = ?", book.BookId).Updates(&book)
+	} else {
+		book.BookId = util.Myuuid()
+		if book.CreateBy == "" {
+			book.CreateBy = "1"
+		}
+		book.CreateDt = time.Now()
+		book.UpdateDt = time.Now()
+
+		fmt.Printf("book：%v", book)
+
+		DB.Create(&book)
 	}
-	book.CreateDt = time.Now()
-	book.UpdateDt = time.Now()
-
-	fmt.Printf("book：%v", book)
-
-	DB.Create(&book)
 
 	response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }

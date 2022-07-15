@@ -32,7 +32,7 @@ service.interceptors.request.use(
     config.headers['Pragma'] = 'no-cache'
     // 设置请求数据格式
     config.headers['Content-Type'] =
-      config.headers['Content-Type'] || 'application/jsoncharset=UTF-8'
+      config.headers['Content-Type'] || 'application/json;charset=UTF-8'
     if (store.getters.token) {
       const Token = getToken()
       config.headers['Authorization'] = `Bearer ${Token}`

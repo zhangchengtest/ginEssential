@@ -34,15 +34,15 @@ func Register(ctx *gin.Context) {
 	ctx.Bind(&ginBindUser)
 	fmt.Printf("ginBindUser：%v", ginBindUser)
 
-	telephone := ginBindUser.Mobile
+	mobile := ginBindUser.Mobile
 	password := ginBindUser.Pwd
 	userName := ginBindUser.UserName
 	// name := ctx.PostForm("name")
-	// telephone := ctx.PostForm("telephone")
+	// mobile := ctx.PostForm("mobile")
 	// password := ctx.PostForm("password")
 
 	// 数据验证
-	if len(telephone) != 11 {
+	if len(mobile) != 11 {
 		// ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "手机号必须为11位"})
 		// 这个gin.H实际是type H map[string]interface{}，所以也可以写成下面这样
 		// ctx.JSON(http.StatusUnprocessableEntity, map[string]interface{}{"code": 422, "msg": "手机号必须为11位"})
@@ -57,9 +57,9 @@ func Register(ctx *gin.Context) {
 		return
 	}
 
-	log.Println(telephone, password)
+	log.Println(mobile, password)
 	// 判断手机号是否存在
-	if isTelephoneExist(DB, telephone) {
+	if isTelephoneExist(DB, mobile) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
 		return
 	}
@@ -73,7 +73,7 @@ func Register(ctx *gin.Context) {
 	// 创建用户
 	newUser := model.User{
 		UserName: userName,
-		Mobile:   telephone,
+		Mobile:   mobile,
 		Pwd:      string(hasedPassword),
 	}
 
@@ -103,10 +103,10 @@ func Login(ctx *gin.Context) {
 	// 输出换行符
 	fmt.Printf("\n")
 
-	telephone := ginBindUser.Mobile
+	mobile := ginBindUser.Mobile
 	password := ginBindUser.Pwd
 	// 数据验证
-	if len(telephone) != 11 {
+	if len(mobile) != 11 {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
 		return
 	}
@@ -119,14 +119,17 @@ func Login(ctx *gin.Context) {
 	// 判断手机号是否存在
 	DB := dao.GetDB()
 	var user model.User
-	DB.Where("telephone = ?", telephone).First(&user)
+	DB.Where("mobile = ?", mobile).First(&user)
 	if user.UserId == "" {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
 		return
 	}
 
+	newSig := util.MD5(password) //转成加密编码
+	// 将编码转换为字符串
+	log.Printf("newSig : %v", newSig)
 	// 判断密码是否正确
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Pwd), []byte(password)); err != nil {
+	if user.Pwd != newSig {
 		response.Response(ctx, http.StatusBadRequest, 400, nil, "密码错误")
 		return
 	}
@@ -143,6 +146,12 @@ func Login(ctx *gin.Context) {
 
 	util.SimpleCopyProperties(&uservo, &user)
 	uservo.AccessToken = token
+
+	var res []model.SysRole
+	DB.Table("sys_role").Select("sys_role.code").
+		Joins("left join sys_user_role on sys_role.id = sys_user_role.role_id").Where("user_id = ?", user.UserId).Scan(&res)
+	fmt.Println(res)
+	uservo.RoleCode = res[0].Code
 
 	// 返回结果
 	// ctx.JSON(200, gin.H{
@@ -301,8 +310,8 @@ func change(tableName string, originText string, comment string) string {
 	return ret
 }
 
-func isTelephoneExist(db *gorm.DB, telephone string) bool {
+func isTelephoneExist(db *gorm.DB, mobile string) bool {
 	var user model.User
-	db.Where("telephone = ?", telephone).First(&user)
+	db.Where("mobile = ?", mobile).First(&user)
 	return user.UserId != ""
 }

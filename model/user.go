@@ -25,17 +25,17 @@ type User struct {
 }
 
 type UserDto struct {
+	UserId       string `json:"userId"`
 	UserName     string `json:"userName"`
 	Mobile       string `json:"mobile"`
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+	RoleCode     string `json:"roleCode"`
 }
 
-func ToUserDto(user User) UserDto {
-	return UserDto{
-		UserName: user.UserName,
-		Mobile:   user.Mobile,
-	}
+// 自定义表名
+func (User) TableName() string {
+	return "sys_user"
 }
 
 type JavaBean struct {

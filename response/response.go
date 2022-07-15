@@ -7,14 +7,20 @@ import (
 
 func Response(ctx *gin.Context, httpStatus int, code int, data interface{}, msg string) {
 	ctx.JSON(httpStatus, gin.H{
-		"code": code,
-		"data": data,
-		"msg":  msg,
+		"code":       code,
+		"data":       data,
+		"msg":        msg,
+		"isSucccess": false,
 	})
 }
 
 func Success(ctx *gin.Context, data interface{}, msg string) {
-	Response(ctx, http.StatusOK, 200, data, msg)
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":       200,
+		"data":       data,
+		"msg":        msg,
+		"isSucccess": true,
+	})
 }
 
 func Success2(ctx *gin.Context, data string, msg string) {
@@ -26,5 +32,10 @@ func Success2(ctx *gin.Context, data string, msg string) {
 }
 
 func Fail(ctx *gin.Context, data gin.H, msg string) {
-	Response(ctx, http.StatusOK, 400, data, msg)
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":       400,
+		"data":       data,
+		"msg":        msg,
+		"isSucccess": false,
+	})
 }
