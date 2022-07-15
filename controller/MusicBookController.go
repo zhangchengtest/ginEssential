@@ -29,6 +29,8 @@ func AddMusicBook(ctx *gin.Context) {
 	// 3. gin自带的bind获取application/json请求的参数
 	var book = model.MusicBook{}
 
+	user := ctx.MustGet("user").(model.User)
+
 	ctx.Bind(&book)
 	if book.BookId != "" {
 		old := model.MusicBook{}
@@ -40,20 +42,19 @@ func AddMusicBook(ctx *gin.Context) {
 
 		book.UpdateDt = time.Now()
 		DB.Where("book_id = ?", book.BookId).Updates(&book)
+		response.Success(ctx, gin.H{"status": "ok"}, "更新成功")
 	} else {
 		book.BookId = util.Myuuid()
-		if book.CreateBy == "" {
-			book.CreateBy = "1"
-		}
 		book.CreateDt = time.Now()
 		book.UpdateDt = time.Now()
+		book.CreateBy = user.UserId
 
 		fmt.Printf("book：%v", book)
 
 		DB.Create(&book)
+		response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 	}
 
-	response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
 
 func SearchMusicBook(ctx *gin.Context) {

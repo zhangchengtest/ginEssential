@@ -33,7 +33,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		userId := claims.UserId
 		DB := dao.GetDB()
 		var user model.User
-		DB.First(&user, userId)
+		DB.Where("user_id = ?", userId).First(&user)
 
 		// 用户
 		if user.UserId == "" {
