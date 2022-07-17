@@ -5,23 +5,23 @@ import (
 )
 
 type User struct {
-	UserId        string    `json:"userId"`
-	UserName      string    `json:"userName"`
-	NickName      string    `json:"nickName"`
-	Mobile        string    `json:"mobile"`
-	Email         string    `json:"email"`
-	Salt          string    `json:"salt"`
-	Pwd           string    `json:"pwd"`
-	Autologin     string    `json:"autologin"`
-	UserStatus    string    `json:"userStatus"`
-	UpdateBy      string    `json:"updateBy"`
-	UpdateDt      time.Time `json:"updateDt"`
-	CreateDt      time.Time `json:"createDt"`
-	CreateBy      string    `json:"createBy"`
-	IsLock        string    `json:"isLock"`
-	Retry         string    `json:"retry"`
-	LastWrongPwDt time.Time `json:"lastWrongPwDt"`
-	LastLoginDt   time.Time `json:"lastLoginDt"`
+	UserId        string     `json:"userId"`
+	UserName      string     `json:"userName"`
+	NickName      string     `json:"nickName"`
+	Mobile        string     `json:"mobile"`
+	Email         string     `json:"email"`
+	Salt          string     `json:"salt"`
+	Pwd           string     `json:"pwd"`
+	Autologin     int        `json:"autologin"`
+	UserStatus    int        `json:"userStatus"`
+	UpdateBy      string     `json:"updateBy"`
+	UpdateDt      *time.Time `json:"updateDt"`
+	CreateDt      time.Time  `json:"createDt"`
+	CreateBy      string     `json:"createBy"`
+	IsLock        int        `json:"isLock"`
+	Retry         int        `json:"retry"`
+	LastWrongPwDt time.Time  `json:"lastWrongPwDt"`
+	LastLoginDt   time.Time  `json:"lastLoginDt"`
 }
 
 type UserDto struct {

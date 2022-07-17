@@ -12,7 +12,7 @@ type Page[T any] struct {
 	Data        []T
 }
 
-func (page *Page[T]) SelectPage(query interface{}, args []interface{}) (e error) {
+func (page *Page[T]) SelectPage(query interface{}, args []interface{}, order string) (e error) {
 	e = nil
 	var model T
 	if len(args) == 0 {
@@ -21,14 +21,14 @@ func (page *Page[T]) SelectPage(query interface{}, args []interface{}) (e error)
 			page.Data = []T{}
 			return
 		}
-		e = DB.Model(&model).Scopes(Paginate(page)).Find(&page.Data).Error
+		e = DB.Model(&model).Scopes(Paginate(page)).Order(order).Find(&page.Data).Error
 	} else {
 		DB.Model(&model).Where(query, args...).Count(&page.Total)
 		if page.Total == 0 {
 			page.Data = []T{}
 			return
 		}
-		e = DB.Model(&model).Where(query, args).Scopes(Paginate(page)).Find(&page.Data).Error
+		e = DB.Model(&model).Where(query, args).Scopes(Paginate(page)).Order(order).Find(&page.Data).Error
 	}
 
 	return

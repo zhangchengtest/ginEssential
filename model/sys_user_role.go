@@ -3,7 +3,7 @@ package model
 type SysUserRole struct {
 	Id     int    `json:"id"`
 	UserId string `json:"userId"`
-	RoleId string `json:"roleId"`
+	RoleId int    `json:"roleId"`
 }
 
 // 自定义表名

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"math/rand"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -31,4 +32,10 @@ func MD5(str string) string {
 	has := md5.Sum(data)
 	md5str := fmt.Sprintf("%x", has) //将[]byte转成16进制
 	return md5str
+}
+
+func VerifyEmailFormat(email string) bool {
+	pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
+	reg := regexp.MustCompile(pattern)
+	return reg.MatchString(email)
 }

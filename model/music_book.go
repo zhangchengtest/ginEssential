@@ -27,6 +27,6 @@ type MusicBook struct {
 	CreateBy    string    `json:"createBy"`
 }
 
-func (c *MusicBook) SelectPageList(p *dao.Page[MusicBook], query interface{}, args []interface{}) error {
-	return p.SelectPage(query, args)
+func (c *MusicBook) SelectPageList(p *dao.Page[MusicBook], query interface{}, args []interface{}, order string) error {
+	return p.SelectPage(query, args, order)
 }

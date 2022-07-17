@@ -3,18 +3,19 @@ package controller
 import (
 	"bufio"
 	"fmt"
+	"ginEssential/common"
 	"ginEssential/dao"
 	"ginEssential/model"
 	"ginEssential/response"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func Register(ctx *gin.Context) {
@@ -34,7 +35,7 @@ func Register(ctx *gin.Context) {
 	ctx.Bind(&ginBindUser)
 	fmt.Printf("ginBindUser：%v", ginBindUser)
 
-	mobile := ginBindUser.Mobile
+	email := ginBindUser.Email
 	password := ginBindUser.Pwd
 	userName := ginBindUser.UserName
 	// name := ctx.PostForm("name")
@@ -42,13 +43,9 @@ func Register(ctx *gin.Context) {
 	// password := ctx.PostForm("password")
 
 	// 数据验证
-	if len(mobile) != 11 {
-		// ctx.JSON(http.StatusUnprocessableEntity, gin.H{"code": 422, "msg": "手机号必须为11位"})
-		// 这个gin.H实际是type H map[string]interface{}，所以也可以写成下面这样
-		// ctx.JSON(http.StatusUnprocessableEntity, map[string]interface{}{"code": 422, "msg": "手机号必须为11位"})
-
+	if !util.VerifyEmailFormat(email) {
 		// 自己封装过后
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式不对")
 		return
 	}
 
@@ -57,37 +54,39 @@ func Register(ctx *gin.Context) {
 		return
 	}
 
-	log.Println(mobile, password)
+	log.Println(email, password)
 	// 判断手机号是否存在
-	if isTelephoneExist(DB, mobile) {
+	if isEmailExist(DB, email) {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
 		return
 	}
 
 	// 加密密码
-	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		response.Response(ctx, http.StatusInternalServerError, 500, nil, "加密错误")
-		return
-	}
+	hasedPassword := util.MD5(password)
 	// 创建用户
 	newUser := model.User{
+		UserId:   util.Myuuid(),
+		CreateDt: time.Now(),
+		UpdateDt: nil,
 		UserName: userName,
-		Mobile:   mobile,
-		Pwd:      string(hasedPassword),
+		NickName: userName,
+		Email:    email,
+		Pwd:      hasedPassword,
 	}
 
+	var s = util.Worker1{}
+
+	var sysUserRole = model.SysUserRole{
+		Id:     int(s.GetId()),
+		UserId: newUser.UserId,
+		RoleId: 2,
+	}
+	DB.Create(&sysUserRole)
 	DB.Create(&newUser)
 
-	// 发放token
-	token, err := util.ReleaseToken(newUser)
-	if err != nil {
-		response.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
-		log.Printf("token generate error : %v", err)
-		return
-	}
+	common.SendRegister(userName, email)
 
-	response.Success(ctx, gin.H{"token": token}, "注册成功")
+	response.Success(ctx, gin.H{"userName": userName}, "注册成功")
 }
 
 func Login(ctx *gin.Context) {
@@ -98,16 +97,11 @@ func Login(ctx *gin.Context) {
 	// 输出换行符
 	fmt.Printf("\n")
 
-	var bb = model.User{UserId: "11111"}
-	fmt.Printf("bb：%+v", bb)
-	// 输出换行符
-	fmt.Printf("\n")
-
-	mobile := ginBindUser.Mobile
+	email := ginBindUser.Email
 	password := ginBindUser.Pwd
 	// 数据验证
-	if len(mobile) != 11 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "手机号必须为11位")
+	if !util.VerifyEmailFormat(email) {
+		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式不对")
 		return
 	}
 
@@ -119,7 +113,7 @@ func Login(ctx *gin.Context) {
 	// 判断手机号是否存在
 	DB := dao.GetDB()
 	var user model.User
-	DB.Where("mobile = ?", mobile).First(&user)
+	DB.Where("email = ?", email).First(&user)
 	if user.UserId == "" {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
 		return
@@ -313,5 +307,11 @@ func change(tableName string, originText string, comment string) string {
 func isTelephoneExist(db *gorm.DB, mobile string) bool {
 	var user model.User
 	db.Where("mobile = ?", mobile).First(&user)
+	return user.UserId != ""
+}
+
+func isEmailExist(db *gorm.DB, email string) bool {
+	var user model.User
+	db.Where("email = ?", email).First(&user)
 	return user.UserId != ""
 }

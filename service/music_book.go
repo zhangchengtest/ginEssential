@@ -10,7 +10,6 @@ type MusicBookService struct{}
 
 var musicBookModel model.MusicBook
 
-// 使用泛型调用分页查询
 func (c *MusicBookService) SelectPageList(queryVo model.MusicBookDTO) (*model.PageResponse[model.MusicBook], error) {
 	p := &dao.Page[model.MusicBook]{
 		CurrentPage: queryVo.PageNum,
@@ -37,7 +36,7 @@ func (c *MusicBookService) SelectPageList(queryVo model.MusicBookDTO) (*model.Pa
 		fmt.Printf("index: %d value: %s\n", index, value)
 	}
 
-	err := musicBookModel.SelectPageList(p, querystr, args)
+	err := musicBookModel.SelectPageList(p, querystr, args, "create_dt desc")
 	if err != nil {
 		return nil, err
 	}
