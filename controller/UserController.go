@@ -91,32 +91,34 @@ func Register(ctx *gin.Context) {
 
 func Login(ctx *gin.Context) {
 	// 获取参数
-	var ginBindUser = model.User{}
-	ctx.Bind(&ginBindUser)
-	fmt.Printf("ginBindUser：%+v", ginBindUser)
+	var userLoginDTO = model.UserLoginDTO{}
+	ctx.Bind(&userLoginDTO)
+	fmt.Printf("userLoginDTO：%+v", userLoginDTO)
 	// 输出换行符
 	fmt.Printf("\n")
 
-	email := ginBindUser.Email
-	password := ginBindUser.Pwd
-	// 数据验证
-	if !util.VerifyEmailFormat(email) {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式不对")
-		return
-	}
+	account := userLoginDTO.Account
+	password := userLoginDTO.Pwd
 
 	if len(password) < 6 {
 		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
 		return
 	}
-
-	// 判断手机号是否存在
 	DB := dao.GetDB()
 	var user model.User
-	DB.Where("email = ?", email).First(&user)
-	if user.UserId == "" {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
-		return
+	// 数据验证
+	if util.VerifyEmailFormat(account) {
+		DB.Where("email = ?", account).First(&user)
+		if user.UserId == "" {
+			response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
+			return
+		}
+	} else {
+		DB.Where("user_name = ?", account).First(&user)
+		if user.UserId == "" {
+			response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
+			return
+		}
 	}
 
 	newSig := util.MD5(password) //转成加密编码
@@ -136,7 +138,7 @@ func Login(ctx *gin.Context) {
 		return
 	}
 
-	uservo := model.UserDto{}
+	uservo := model.UserVO{}
 
 	util.SimpleCopyProperties(&uservo, &user)
 	uservo.AccessToken = token
@@ -159,7 +161,7 @@ func Login(ctx *gin.Context) {
 func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
 
-	uservo := model.UserDto{}
+	uservo := model.UserVO{}
 	util.SimpleCopyProperties(&uservo, &user)
 	response.Success(ctx, uservo, "")
 }

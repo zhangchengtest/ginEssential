@@ -24,13 +24,18 @@ type User struct {
 	LastLoginDt   time.Time  `json:"lastLoginDt"`
 }
 
-type UserDto struct {
+type UserVO struct {
 	UserId       string `json:"userId"`
 	UserName     string `json:"userName"`
 	Mobile       string `json:"mobile"`
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 	RoleCode     string `json:"roleCode"`
+}
+
+type UserLoginDTO struct {
+	Account string `json:"account"`
+	Pwd     string `json:"pwd"`
 }
 
 // 自定义表名
