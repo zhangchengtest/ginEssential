@@ -20,15 +20,11 @@ import (
 	"time"
 )
 
-
-
 const (
 	EnvEnableProfiling = "IPFS_PROF"
 	cpuProfile         = "ipfs.cpuprof"
 	heapProfile        = "ipfs.memprof"
 )
-
-var log = logging.Logger("cmd/ding")
 
 // main roadmap:
 // - parse the commandline to get a cmdInvocation
@@ -45,7 +41,6 @@ func mainRet() int {
 	var err error
 
 	buildEnv := func(ctx context.Context, req *cmds.Request) (cmds.Environment, error) {
-
 
 		// this sets up the function that will initialize the node
 		// this is so that we can construct the node lazily.
@@ -96,7 +91,6 @@ func makeExecutor(req *cmds.Request, env interface{}) (cmds.Executor, error) {
 		return exe, nil
 	}
 
-
 	// Still no api specified? Run it on the client or fail.
 	if apiAddr == nil {
 		if req.Command.NoLocal {
@@ -119,7 +113,6 @@ func makeExecutor(req *cmds.Request, env interface{}) (cmds.Executor, error) {
 	opts := []cmdhttp.ClientOpt{
 		cmdhttp.ClientWithAPIPrefix("/api/v0"),
 	}
-
 
 	switch network {
 	case "tcp", "tcp4", "tcp6":

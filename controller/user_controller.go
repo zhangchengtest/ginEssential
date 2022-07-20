@@ -4,11 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"ginEssential/common"
-	"ginEssential/dao"
 	"ginEssential/model"
-	"ginEssential/response"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	"github.com/zhangchengtest/simple/sqls"
 	"gorm.io/gorm"
 	"io"
 	"log"
@@ -19,7 +18,7 @@ import (
 )
 
 func Register(ctx *gin.Context) {
-	DB := dao.GetDB()
+	DB := sqls.DB()
 	// 1. 使用map获取application/json请求的参数
 	// var requestMap = make(map[string]string)
 	// json.NewDecoder(ctx.Request.Body).Decode(&requestMap)
@@ -45,19 +44,19 @@ func Register(ctx *gin.Context) {
 	// 数据验证
 	if !util.VerifyEmailFormat(email) {
 		// 自己封装过后
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式不对")
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式不对")
 		return
 	}
 
 	if len(password) < 6 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
 		return
 	}
 
 	log.Println(email, password)
 	// 判断手机号是否存在
 	if isEmailExist(DB, email) {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
 		return
 	}
 
@@ -86,7 +85,7 @@ func Register(ctx *gin.Context) {
 
 	common.SendRegister(userName, email)
 
-	response.Success(ctx, gin.H{"userName": userName}, "注册成功")
+	model.Success(ctx, gin.H{"userName": userName}, "注册成功")
 }
 
 func Login(ctx *gin.Context) {
@@ -101,22 +100,22 @@ func Login(ctx *gin.Context) {
 	password := userLoginDTO.Pwd
 
 	if len(password) < 6 {
-		response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
 		return
 	}
-	DB := dao.GetDB()
+	DB := sqls.DB()
 	var user model.User
 	// 数据验证
 	if util.VerifyEmailFormat(account) {
 		DB.Where("email = ?", account).First(&user)
 		if user.UserId == "" {
-			response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
+			model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
 			return
 		}
 	} else {
 		DB.Where("user_name = ?", account).First(&user)
 		if user.UserId == "" {
-			response.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
+			model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
 			return
 		}
 	}
@@ -126,14 +125,14 @@ func Login(ctx *gin.Context) {
 	log.Printf("newSig : %v", newSig)
 	// 判断密码是否正确
 	if user.Pwd != newSig {
-		response.Response(ctx, http.StatusBadRequest, 400, nil, "密码错误")
+		model.Response(ctx, http.StatusBadRequest, 400, nil, "密码错误")
 		return
 	}
 
 	// 发放token
 	token, err := util.ReleaseToken(user)
 	if err != nil {
-		response.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
+		model.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
 		log.Printf("token generate error : %v", err)
 		return
 	}
@@ -155,7 +154,7 @@ func Login(ctx *gin.Context) {
 	// 	"data":    gin.H{"token": token},
 	// 	"message": "注册成功",
 	// })
-	response.Success(ctx, uservo, "登录成功")
+	model.Success(ctx, uservo, "登录成功")
 }
 
 func Info(ctx *gin.Context) {
@@ -163,7 +162,7 @@ func Info(ctx *gin.Context) {
 
 	uservo := model.UserVO{}
 	util.SimpleCopyProperties(&uservo, &user)
-	response.Success(ctx, uservo, "")
+	model.Success(ctx, uservo, "")
 }
 
 func Javatosql(ctx *gin.Context) {
@@ -188,7 +187,7 @@ func Javatosql(ctx *gin.Context) {
 		ret += split(tableName, s) + "\r\n"
 	}
 
-	response.Success2(ctx, ret, "")
+	model.Success2(ctx, ret, "")
 }
 
 func CompareFile(ctx *gin.Context) {
@@ -199,7 +198,7 @@ func CompareFile(ctx *gin.Context) {
 	file1, header, err := ctx.Request.FormFile("file1")
 	if err != nil {
 		log.Printf("get file error: %s", err)
-		response.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
+		model.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
 		return
 	}
 
@@ -222,7 +221,7 @@ func CompareFile(ctx *gin.Context) {
 	file2, header, err := ctx.Request.FormFile("file2")
 	if err != nil {
 		log.Printf("get file error: %s", err)
-		response.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
+		model.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
 		return
 	}
 
@@ -246,7 +245,7 @@ func CompareFile(ctx *gin.Context) {
 	sourceFile2.Seek(0, 0)
 	list := compareFileByLine(sourceFile1, sourceFile2)
 
-	response.Success2(ctx, list, "")
+	model.Success2(ctx, list, "")
 }
 
 func TestThread(ctx *gin.Context) {
@@ -256,7 +255,7 @@ func TestThread(ctx *gin.Context) {
 	sws := util.GetInstance()
 	//change := util.Change{Add: "ssss"}
 	sws.AddChange("ssss")
-	response.Success2(ctx, "ok", "")
+	model.Success2(ctx, "ok", "")
 }
 
 func compareFileByLine(f1, f2 *os.File) string {

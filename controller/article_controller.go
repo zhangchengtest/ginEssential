@@ -3,12 +3,10 @@ package controller
 import (
 	"bufio"
 	"fmt"
-	"ginEssential/dao"
 	"ginEssential/model"
-	"ginEssential/response"
 	"ginEssential/util"
-	"ginEssential/vo"
 	"github.com/gin-gonic/gin"
+	"github.com/zhangchengtest/simple/sqls"
 	"gorm.io/gorm"
 	"io"
 	"log"
@@ -21,7 +19,7 @@ import (
 )
 
 func AddArticle(ctx *gin.Context) {
-	DB := dao.GetDB()
+	DB := sqls.DB()
 	// 1. 使用map获取application/json请求的参数
 	// var requestMap = make(map[string]string)
 	// json.NewDecoder(ctx.Request.Body).Decode(&requestMap)
@@ -56,16 +54,16 @@ func AddArticle(ctx *gin.Context) {
 
 	DB.Create(&newUser)
 
-	response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
 
 func RandomArticle(ctx *gin.Context) {
-	DB := dao.GetDB()
+	DB := sqls.DB()
 
 	// 创建用户
 	newUser := model.Article{}
 
-	articleVO := vo.ArticleVO{}
+	articleVO := model.ArticleVO{}
 
 	rand.Seed(time.Now().UnixNano())
 	chapter := rand.Intn(80) + 1
@@ -83,7 +81,7 @@ func RandomArticle(ctx *gin.Context) {
 	util.SimpleCopyProperties(&articleVO, &newUser)
 	articleVO.Question = arr[random]
 
-	response.Success(ctx, gin.H{"article": articleVO}, "查询成功")
+	model.Success(ctx, gin.H{"article": articleVO}, "查询成功")
 }
 
 func AddArticleFromFile(ctx *gin.Context) {
@@ -94,7 +92,7 @@ func AddArticleFromFile(ctx *gin.Context) {
 	file1, header, err := ctx.Request.FormFile("file")
 	if err != nil {
 		log.Printf("get file error: %s", err)
-		response.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
+		model.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
 		return
 	}
 
@@ -117,12 +115,12 @@ func AddArticleFromFile(ctx *gin.Context) {
 	sourceFile1.Seek(0, 0)
 	readFile(sourceFile1)
 
-	response.Success2(ctx, "ok", "")
+	model.Success2(ctx, "ok", "")
 }
 
 func readFile(f1 *os.File) {
 	sc1 := bufio.NewScanner(f1)
-	DB := dao.GetDB()
+	DB := sqls.DB()
 	for {
 		sc1Bool := sc1.Scan()
 		if !sc1Bool {

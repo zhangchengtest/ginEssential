@@ -2,14 +2,21 @@ package main
 
 import (
 	_ "expvar"
+	"flag"
 	"fmt"
-	"ginEssential/dao"
+	"ginEssential/config"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
 	cmds "github.com/ipfs/go-ipfs-cmds"
-	"github.com/spf13/viper"
+	"github.com/sirupsen/logrus"
+	"github.com/zhangchengtest/simple/sqls"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"io"
+	"log"
 	_ "net/http/pprof"
 	"os"
+	"time"
 )
 
 const (
@@ -86,39 +93,66 @@ documented in (and can be modified through) 'ipfs config Addresses'.
 	Run:         daemonFunc,
 }
 
+var configFile = flag.String("config", "./music.yaml", "配置文件路径")
+
 func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment) (_err error) {
 
 	// let the user know we're going.
 	fmt.Printf("Initializing daemon...\n")
 
-	InitConfig()
-	dao.InitDB()
+	//InitConfig()
+	// 初始化配置
+	conf := config.Init(*configFile)
+
+	// gorm配置
+	gormConf := &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	}
+
+	// 初始化日志
+	if file, err := os.OpenFile(conf.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+		logrus.SetOutput(io.MultiWriter(os.Stdout, file))
+		if conf.ShowSql {
+			gormConf.Logger = logger.New(log.New(file, "\r\n", log.LstdFlags), logger.Config{
+				SlowThreshold: time.Second,
+				Colorful:      true,
+				LogLevel:      logger.Info,
+			})
+		}
+	} else {
+		logrus.SetOutput(os.Stdout)
+		logrus.Error(err)
+	}
+
+	// 连接数据库
+	if err := sqls.Open(conf.DB.Url, gormConf, conf.DB.MaxIdleConns, conf.DB.MaxOpenConns); err != nil {
+		logrus.Error(err)
+	}
 
 	r := gin.Default()
 	r = CollectRoute(r)
-	port := viper.GetString("server.port")
+	port := conf.Port
 	if port != "" {
 		panic(r.Run(":" + port))
 	}
 	panic(r.Run())
 
-	// collect long-running errors and block for shutdown
-	// TODO(cryptix): our fuse currently doesn't follow this pattern for graceful shutdown
+	sws := util.GetInstance()
+	go sws.Run()
+
 	var errs error
 
 	return errs
 }
 
-func InitConfig() {
-	workDir, _ := os.Getwd()
-	viper.SetConfigName("application")
-	viper.SetConfigType("yml")
-	viper.AddConfigPath(workDir + "/config")
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Errorf("read config failed ,err : %v", err)
-		panic("read config failed, err: " + err.Error())
-	}
-	sws := util.GetInstance()
-	go sws.Run()
-}
+//func InitConfig() {
+//	workDir, _ := os.Getwd()
+//	viper.SetConfigName("application")
+//	viper.SetConfigType("yml")
+//	viper.AddConfigPath(workDir + "/config")
+//	err := viper.ReadInConfig()
+//	if err != nil {
+//		log.Errorf("read config failed ,err : %v", err)
+//		panic("read config failed, err: " + err.Error())
+//	}
+//}

@@ -2,31 +2,18 @@ package controller
 
 import (
 	"fmt"
-	"ginEssential/dao"
 	"ginEssential/model"
-	"ginEssential/response"
 	"ginEssential/service"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	"github.com/zhangchengtest/simple/sqls"
+	"github.com/zhangchengtest/simple/web/params"
 	"net/http"
 	"time"
 )
 
-var musicBookService service.MusicBookService
-
 func AddMusicBook(ctx *gin.Context) {
-	DB := dao.GetDB()
-	// 1. 使用map获取application/json请求的参数
-	// var requestMap = make(map[string]string)
-	// json.NewDecoder(ctx.Request.Body).Decode(&requestMap)
-	// fmt.Printf("requestMap：%v", requestMap)
-
-	// 2. 使用结构体获取application/json请求的参数
-	// var requestUser = model.User{}
-	// json.NewDecoder(ctx.Request.Body).Decode(&requestUser)
-	// fmt.Printf("requestUser：%v", requestUser)
-
-	// 3. gin自带的bind获取application/json请求的参数
+	DB := sqls.DB()
 	var book = model.MusicBook{}
 
 	user := ctx.MustGet("user").(model.User)
@@ -42,7 +29,7 @@ func AddMusicBook(ctx *gin.Context) {
 
 		book.UpdateDt = time.Now()
 		DB.Where("book_id = ?", book.BookId).Updates(&book)
-		response.Success(ctx, gin.H{"status": "ok"}, "更新成功")
+		model.Success(ctx, gin.H{"status": "ok"}, "更新成功")
 	} else {
 		book.BookId = util.Myuuid()
 		book.CreateDt = time.Now()
@@ -52,7 +39,7 @@ func AddMusicBook(ctx *gin.Context) {
 		fmt.Printf("book：%v", book)
 
 		DB.Create(&book)
-		response.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+		model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 	}
 
 }
@@ -64,28 +51,25 @@ func SearchMusicBook(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
 		return
 	}
-	pageResponse, e := musicBookService.SelectPageList(queryVo)
+
+	params := params.NewQueryParams(ctx)
+	if queryVo.BookTitle != "" {
+		params.Like("book_title", queryVo.BookTitle)
+	}
+	params.Page(queryVo.PageNum, queryVo.PageSize).Desc("create_dt")
+
+	pageResponse, e := service.MusicBookService.FindPageByParams(params)
+
 	if e != nil {
-		ctx.JSON(http.StatusOK, model.Response{Code: 400, Msg: "操作失败"})
+		ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
 		return
 	}
-	ctx.JSON(
-		http.StatusOK,
-		model.Response{Code: 200, Msg: "操做成功", Data: pageResponse},
-	)
+	model.Success(ctx, pageResponse, "查询成功")
 }
 
 func DetailMusicBook(ctx *gin.Context) {
-	DB := dao.GetDB()
-	var book model.MusicBook
 
-	if err := DB.Where("book_id = ?", ctx.Param("id")).First(&book).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
-		return
-	}
+	book := service.MusicBookService.Get(ctx.Param("id"))
 
-	ctx.JSON(
-		http.StatusOK,
-		model.Response{Code: 200, Msg: "操做成功", Data: book},
-	)
+	model.Success(ctx, book, "查询成功")
 }

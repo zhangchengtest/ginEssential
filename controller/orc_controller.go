@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"ginEssential/response"
+	"ginEssential/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,8 +51,5 @@ func Readorc(ctx *gin.Context) {
 	//	}
 	//}
 
-	response.Success2(ctx, "ret", "新增成功")
+	model.Success2(ctx, "ret", "新增成功")
 }
-
-
-

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/goburrow/cache"
-	"github.com/mlogclub/simple/sqls"
 	"github.com/sirupsen/logrus"
+	"github.com/zhangchengtest/simple/sqls"
 
 	"ginEssential/model"
 )

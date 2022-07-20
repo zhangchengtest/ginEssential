@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"github.com/mlogclub/simple/sqls"
-	"github.com/mlogclub/simple/web/params"
+	"github.com/zhangchengtest/simple/sqls"
+	"github.com/zhangchengtest/simple/web/params"
 	"gorm.io/gorm"
 
 	"ginEssential/model"

@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"ginEssential/dao"
 	"ginEssential/model"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	"github.com/zhangchengtest/simple/sqls"
 	"net/http"
 	"strings"
 )
@@ -31,7 +31,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// 验证通过，获取claims中的userId
 		userId := claims.UserId
-		DB := dao.GetDB()
+		DB := sqls.DB()
 		var user model.User
 		DB.Where("user_id = ?", userId).First(&user)
 
