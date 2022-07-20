@@ -37,11 +37,11 @@ func (s *bookDetailService) FindOne(cnd *sqls.Cnd) *model.BookDetail {
 	return dao.BookDetailDao.FindOne(sqls.DB(), cnd)
 }
 
-func (s *bookDetailService) FindPageByParams(params *params.QueryParams) (list []model.BookDetail, paging *sqls.Paging) {
+func (s *bookDetailService) FindPageByParams(params *params.QueryParams) (*model.PageResponse[model.BookDetail], error) {
 	return dao.BookDetailDao.FindPageByParams(sqls.DB(), params)
 }
 
-func (s *bookDetailService) FindPageByCnd(cnd *sqls.Cnd) (list []model.BookDetail, paging *sqls.Paging) {
+func (s *bookDetailService) FindPageByCnd(cnd *sqls.Cnd) (*model.PageResponse[model.BookDetail], error) {
 	return dao.BookDetailDao.FindPageByCnd(sqls.DB(), cnd)
 }
 

@@ -81,13 +81,18 @@ func (r *musicBookDao) Update(db *gorm.DB, t *model.MusicBook) (err error) {
 	return
 }
 
-func (r *musicBookDao) Updates(db *gorm.DB, id int64, columns map[string]interface{}) (err error) {
-	err = db.Model(&model.MusicBook{}).Where("id = ?", id).Updates(columns).Error
+func (r *musicBookDao) Updates(db *gorm.DB, id string, columns map[string]interface{}) (err error) {
+	err = db.Model(&model.MusicBook{}).Where("book_id = ?", id).Updates(columns).Error
+	return
+}
+
+func (r *musicBookDao) UpdateAll(db *gorm.DB, id string, columns *model.MusicBook) (err error) {
+	err = db.Model(&model.MusicBook{}).Where("book_id = ?", id).Updates(columns).Error
 	return
 }
 
 func (r *musicBookDao) UpdateColumn(db *gorm.DB, id int64, name string, value interface{}) (err error) {
-	err = db.Model(&model.MusicBook{}).Where("id = ?", id).UpdateColumn(name, value).Error
+	err = db.Model(&model.MusicBook{}).Where("book_id = ?", id).UpdateColumn(name, value).Error
 	return
 }
 

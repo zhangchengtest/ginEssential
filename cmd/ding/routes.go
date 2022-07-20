@@ -23,5 +23,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/musicBook/search", controller.SearchMusicBook)
 	r.GET("/api/musicBook/detail/:id", controller.DetailMusicBook)
 
+	r.POST("/api/musicBookDetail/searchByPage", controller.SearchMusicBookDetail)
+
 	return r
 }

@@ -5,3 +5,8 @@ type MusicBookDTO struct {
 	BookTitle string
 	Author    string
 }
+
+type BookDetailDTO struct {
+	PageInfo
+	BookId string
+}

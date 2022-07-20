@@ -90,9 +90,14 @@ func (s *musicBookService) Update(t *model.MusicBook) error {
 	return nil
 }
 
-// func (s *musicBookService) Updates(id int64, columns map[string]interface{}) error {
-// 	return dao.MusicBookDao.Updates(sqls.DB(), id, columns)
-// }
+func (s *musicBookService) Updates(id string, columns map[string]interface{}) error {
+	return dao.MusicBookDao.Updates(sqls.DB(), id, columns)
+}
+
+func (s *musicBookService) UpdateAll(id string, columns *model.MusicBook) error {
+	return dao.MusicBookDao.UpdateAll(sqls.DB(), id, columns)
+}
+
 //
 // func (s *musicBookService) UpdateColumn(id int64, name string, value interface{}) error {
 // 	return dao.MusicBookDao.UpdateColumn(sqls.DB(), id, name, value)

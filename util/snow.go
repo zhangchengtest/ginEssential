@@ -9,27 +9,27 @@ import (
 // 支持 2 ^ 8 - 1 台机器
 //每一个毫秒支持 2 ^ 9 - 1 个不同的id
 const (
-	workerIdBitsMoveLen 	= uint(8)
-	maxWorkerId          	= int64(-1 ^ (-1 << workerIdBitsMoveLen))
-	timerIdBitsMoveLen 		= uint(17)
-	maxNumId 							= int64(-1 ^ (-1 << 9))
+	workerIdBitsMoveLen = uint(8)
+	maxWorkerId         = int64(-1 ^ (-1 << workerIdBitsMoveLen))
+	timerIdBitsMoveLen  = uint(17)
+	maxNumId            = int64(-1 ^ (-1 << 9))
 )
 
 // 定义一个woker工作节点所需要的基本参数
 type Worker1 struct {
 	mu        sync.Mutex // 添加互斥锁 确保并发安全
-	workerId 	int64      // 机器编码
+	workerId  int64      // 机器编码
 	timestamp int64      // 记录时间戳
 	number    int64      // 当前毫秒已经生成的id序列号(从0开始累加) 1毫秒内最多生成4096个ID
 }
 
 // 初始化ID生成结构体
 // workerId 机器的编号
-func NewWorker1(workerId int64) *Worker1 {
+func NewSnow(workerId int64) *Worker1 {
 	if workerId > maxWorkerId {
 		panic("workerId 不能大于最大值")
 	}
-	return &Worker1{workerId: workerId,timestamp: 0, number: 0}
+	return &Worker1{workerId: workerId, timestamp: 0, number: 0}
 }
 
 // 生成id 的方法用于生成唯一id
@@ -53,13 +53,13 @@ func (w *Worker1) GetId() int64 {
 		w.number = 0
 		w.timestamp = now // 将机器上一次生成ID的时间更新为当前时间
 	}
-	ID := int64((now-epoch)<< timerIdBitsMoveLen | (w.workerId << workerIdBitsMoveLen) | (w.number))
+	ID := int64((now-epoch)<<timerIdBitsMoveLen | (w.workerId << workerIdBitsMoveLen) | (w.number))
 	return ID
 }
 
 func testGetId() {
-	worker := NewWorker1(55)
-	arr := make([]int64,0 ,100)
+	worker := NewSnow(55)
+	arr := make([]int64, 0, 100)
 
 	for i := 0; i < 100; i++ {
 		arr = append(arr, worker.GetId())
@@ -70,4 +70,3 @@ func testGetId() {
 func main() {
 	testGetId()
 }
-

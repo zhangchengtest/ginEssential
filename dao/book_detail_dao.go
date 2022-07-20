@@ -46,20 +46,28 @@ func (r *bookDetailDao) FindOne(db *gorm.DB, cnd *sqls.Cnd) *model.BookDetail {
 	return ret
 }
 
-func (r *bookDetailDao) FindPageByParams(db *gorm.DB, params *params.QueryParams) (list []model.BookDetail, paging *sqls.Paging) {
+func (r *bookDetailDao) FindPageByParams(db *gorm.DB, params *params.QueryParams) (*model.PageResponse[model.BookDetail], error) {
 	return r.FindPageByCnd(db, &params.Cnd)
 }
 
-func (r *bookDetailDao) FindPageByCnd(db *gorm.DB, cnd *sqls.Cnd) (list []model.BookDetail, paging *sqls.Paging) {
-	cnd.Find(db, &list)
-	count := cnd.Count(db, &model.BookDetail{})
-
-	paging = &sqls.Paging{
-		Page:  cnd.Paging.Page,
-		Limit: cnd.Paging.Limit,
-		Total: count,
+func (r *bookDetailDao) FindPageByCnd(db *gorm.DB, cnd *sqls.Cnd) (*model.PageResponse[model.BookDetail], error) {
+	page := &model.Page[model.BookDetail]{
+		CurrentPage: cnd.Paging.Page,
+		PageSize:    cnd.Paging.Limit,
 	}
-	return
+	cnd.Paging.Total = cnd.Count(db, &model.MusicBook{})
+	page.Total = cnd.Paging.Total
+	page.Pages = cnd.Paging.TotalPage()
+
+	if page.Total == 0 {
+		page.Data = []model.BookDetail{}
+		pageResponse := model.NewPageResponse(page)
+		return pageResponse, nil
+	}
+	cnd.Find(db, &page.Data)
+
+	pageResponse := model.NewPageResponse(page)
+	return pageResponse, nil
 }
 
 func (r *bookDetailDao) Create(db *gorm.DB, t *model.BookDetail) (err error) {

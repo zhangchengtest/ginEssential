@@ -21,11 +21,12 @@ type MusicBook struct {
 }
 
 type BookDetail struct {
-	Id          int64     `json:"id"`
-	BookId      string    `json:"bookId"`
-	BookContent string    `json:"bookContent"`
-	Lyric       string    `json:"lyric"`
-	order       int64     `json:"order"`
-	UpdateDt    time.Time `json:"updateDt"`
-	CreateDt    time.Time `json:"createDt"`
+	Id          int64      `json:"id"`
+	BookId      string     `json:"bookId"`
+	BookContent string     `json:"bookContent"`
+	Lyric       string     `json:"lyric"`
+	BookOrder   int        `json:"book_order"`
+	Status      int        `json:"status"`
+	UpdateDt    *time.Time `json:"updateDt"`
+	CreateDt    time.Time  `json:"createDt"`
 }
