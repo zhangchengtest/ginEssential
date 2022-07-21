@@ -16,7 +16,7 @@ require (
 	github.com/multiformats/go-multiaddr-dns v0.3.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.6.2
-	github.com/zhangchengtest/simple v1.2.1
+	github.com/zhangchengtest/simple v1.2.2
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/gorm v1.23.7
 )
@@ -100,4 +100,3 @@ require (
 
 replace github.com/ugorji/go v1.1.4 => github.com/ugorji/go/codec v0.0.0-20190204201341-e444a5086c43
 
-replace github.com/zhangchengtest/simple v1.2.1 => ../code/simple
