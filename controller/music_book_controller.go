@@ -7,6 +7,7 @@ import (
 	"ginEssential/service"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	"github.com/sjsdfg/common-lang-in-go/StringUtils"
 	"github.com/zhangchengtest/simple/web/params"
 	"net/http"
 	"strconv"
@@ -20,7 +21,19 @@ func SaveMusicBook(ctx *gin.Context) {
 	user := ctx.MustGet("user").(model.User)
 
 	ctx.Bind(&book)
+	ly := book.Lyric
+	arrly := strings.Split(ly, "\n")
+	var resly string
+	for _, tt := range arrly {
+		if StringUtils.IsEmpty(tt) {
+			continue
+		}
+		resly += strings.TrimSpace(tt) + "\n"
+	}
+	book.Lyric = resly
+
 	if book.BookId != "" {
+
 		old := service.MusicBookService.Get(book.BookId)
 		if old.BookId == "" {
 			ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "not found"})
@@ -30,6 +43,13 @@ func SaveMusicBook(ctx *gin.Context) {
 		params.Eq("book_id", book.BookId)
 		params.Asc("book_order")
 		bookdetails := service.BookDetailService.Find(&params.Cnd)
+		if len(bookdetails) == 0 {
+			create(book.Lyric, book.BookId)
+			service.MusicBookService.UpdateAll(book.BookId, &book)
+			model.Success(ctx, gin.H{"status": "ok"}, "更新成功")
+			return
+		}
+
 		num := 1
 		arr2 := util.DiffToArr(old.Lyric, book.Lyric)
 		var arr3 []string
@@ -79,11 +99,21 @@ func SaveMusicBook(ctx *gin.Context) {
 				}
 			} else {
 				fmt.Printf("hi")
-				fmt.Printf(strings.TrimSpace(strings.Replace(tt, "o", "", -1)))
+				res := strings.TrimSpace(strings.Replace(tt, "o", "", -1))
+				fmt.Printf(res)
+				fmt.Printf("\n")
+				fmt.Printf(strconv.Itoa(num - 1))
 				fmt.Printf("\n")
 				fmt.Printf("hi end")
-				bookdetails[num-1].Lyric = strings.TrimSpace(strings.Replace(tt, "o", "", -1))
-				arrFinal = append(arrFinal, bookdetails[num-1])
+				if len(bookdetails) <= num-1 {
+					arrFinal = append(arrFinal, model.BookDetail{
+						Lyric: res,
+					})
+				} else {
+					bookdetails[num-1].Lyric = res
+					arrFinal = append(arrFinal, bookdetails[num-1])
+				}
+
 			}
 			fmt.Printf("\n")
 			num++
@@ -137,27 +167,30 @@ func SaveMusicBook(ctx *gin.Context) {
 		fmt.Printf("book：%v", book)
 
 		service.MusicBookService.Create(&book)
-
-		arr := strings.Split(book.Lyric, "\n")
-		worker := util.NewSnow(55)
-		num := 1
-		for _, tt := range arr {
-
-			bookdetail := model.BookDetail{
-				Id:        worker.GetId(),
-				BookId:    book.BookId,
-				Lyric:     tt,
-				CreateDt:  time.Now(),
-				UpdateDt:  nil,
-				BookOrder: num,
-			}
-			num++
-			service.BookDetailService.Create(&bookdetail)
-		}
-
+		create(book.Lyric, book.BookId)
 		model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 	}
 
+}
+
+func create(lyric, booId string) {
+
+	arr := strings.Split(lyric, "\n")
+	worker := util.NewSnow(55)
+	num := 1
+	for _, tt := range arr {
+
+		bookdetail := model.BookDetail{
+			Id:        worker.GetId(),
+			BookId:    booId,
+			Lyric:     tt,
+			CreateDt:  time.Now(),
+			UpdateDt:  nil,
+			BookOrder: num,
+		}
+		num++
+		service.BookDetailService.Create(&bookdetail)
+	}
 }
 
 func SearchMusicBook(ctx *gin.Context) {
@@ -226,6 +259,7 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 	list := service.BookDetailService.Find(&params.Cnd)
 	books := render.BuildBookDetails(list)
 	var result model.BookDetailVO
+	var prev model.BookDetailVO
 	var lyrics string
 
 	if queryVo.Id == "" {
@@ -236,7 +270,11 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 				if queryVo.Direction == "next" {
 					if index+1 == len(books) {
 						result = books[index]
+						if index-1 >= 0 {
+							prev = books[index-1]
+						}
 					} else {
+						prev = books[index]
 						result = books[index+1]
 					}
 				}
@@ -245,6 +283,9 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 						result = books[0]
 					} else {
 						result = books[index-1]
+						if index-2 >= 0 {
+							prev = books[index-2]
+						}
 					}
 				}
 			}
@@ -268,10 +309,10 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 
 	}
 	fmt.Printf("v+%", result)
-	book := service.MusicBookService.Get(queryVo.BookId)
+	//book := service.MusicBookService.Get(queryVo.BookId)
 
 	model.Success(ctx, gin.H{
-		"book":       book,
+		"prev":       prev,
 		"bookDetail": result,
 		"lyrics":     lyrics,
 	}, "查询成功")
