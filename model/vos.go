@@ -18,12 +18,12 @@ type MusicBookVO struct {
 	CreateBy    string    `json:"createBy"`
 }
 
-type BookDetailResponse struct {
-	Id          int64     `json:"id"`
+type BookDetailVO struct {
+	Id          string    `json:"id"`
 	BookId      string    `json:"bookId"`
 	BookContent string    `json:"bookContent"`
 	Lyric       string    `json:"lyric"`
-	order       int64     `json:"order"`
+	Order       int       `json:"order"`
 	UpdateDt    time.Time `json:"updateDt"`
 	CreateDt    time.Time `json:"createDt"`
 }

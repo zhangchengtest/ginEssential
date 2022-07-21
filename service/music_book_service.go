@@ -103,9 +103,9 @@ func (s *musicBookService) UpdateAll(id string, columns *model.MusicBook) error 
 // 	return dao.MusicBookDao.UpdateColumn(sqls.DB(), id, name, value)
 // }
 //
-// func (s *musicBookService) Delete(id int64) {
-// 	dao.MusicBookDao.Delete(sqls.DB(), id)
-// }
+func (s *musicBookService) Delete(id int64) {
+	dao.MusicBookDao.Delete(sqls.DB(), id)
+}
 
 // 自动完成
 func (s *musicBookService) Autocomplete(input string) []model.MusicBook {

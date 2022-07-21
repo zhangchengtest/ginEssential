@@ -8,5 +8,8 @@ type MusicBookDTO struct {
 
 type BookDetailDTO struct {
 	PageInfo
-	BookId string
+	Id          string
+	BookId      string
+	BookContent string
+	Direction   string
 }

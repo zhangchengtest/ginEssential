@@ -3,6 +3,7 @@ package service
 import (
 	"ginEssential/dao"
 	"ginEssential/model/constants"
+	"strconv"
 	"strings"
 
 	"github.com/zhangchengtest/simple/sqls"
@@ -57,17 +58,18 @@ func (s *bookDetailService) Update(t *model.BookDetail) error {
 	return nil
 }
 
-// func (s *bookDetailService) Updates(id int64, columns map[string]interface{}) error {
-// 	return dao.BookDetailDao.Updates(sqls.DB(), id, columns)
-// }
+func (s *bookDetailService) Updates(id int64, columns map[string]interface{}) error {
+	return dao.BookDetailDao.Updates(sqls.DB(), id, columns)
+}
+
 //
 // func (s *bookDetailService) UpdateColumn(id int64, name string, value interface{}) error {
 // 	return dao.BookDetailDao.UpdateColumn(sqls.DB(), id, name, value)
 // }
 //
-// func (s *bookDetailService) Delete(id int64) {
-// 	dao.BookDetailDao.Delete(sqls.DB(), id)
-// }
+func (s *bookDetailService) Delete(id int64) {
+	dao.BookDetailDao.Delete(sqls.DB(), id)
+}
 
 // 自动完成
 func (s *bookDetailService) Autocomplete(input string) []model.BookDetail {
@@ -83,15 +85,15 @@ func (s *bookDetailService) GetByName(name string) *model.BookDetail {
 	return dao.BookDetailDao.GetByName(name)
 }
 
-func (s *bookDetailService) GetBookDetails() []model.BookDetailResponse {
+func (s *bookDetailService) GetBookDetails() []model.BookDetailVO {
 	list := dao.BookDetailDao.Find(sqls.DB(), sqls.NewCnd().Where("status = ?", constants.StatusOk))
 
-	var bookDetails []model.BookDetailResponse
+	var bookDetails []model.BookDetailVO
 	for _, bookDetail := range list {
 
 		bookDetails = append(bookDetails,
-			model.BookDetailResponse{
-				Id:    bookDetail.Id,
+			model.BookDetailVO{
+				Id:    strconv.FormatInt(bookDetail.Id, 10),
 				Lyric: bookDetail.Lyric,
 			},
 		)

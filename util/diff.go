@@ -1,9 +1,9 @@
 package util
 
 import (
-"bytes"
-"fmt"
-"strings"
+	"bytes"
+	"fmt"
+	"strings"
 )
 
 func Diff(src, dest string) string {
@@ -25,6 +25,27 @@ func Diff(src, dest string) string {
 		}
 	}
 	return buf.String()
+}
+
+func DiffToArr(src, dest string) (arr []string) {
+	diff := NewLineDiffable(src, dest)
+	es := Myers(diff)
+	x, y := 0, 0
+	for i := range es {
+		switch es[i] {
+		case OpMov:
+			arr = append(arr, "o "+diff.Y(y))
+			x++
+			y++
+		case OpInsert:
+			arr = append(arr, "+ "+diff.Y(y))
+			y++
+		case OpDel:
+			arr = append(arr, "- "+diff.X(x))
+			x++
+		}
+	}
+	return
 }
 
 type EditScript []Op

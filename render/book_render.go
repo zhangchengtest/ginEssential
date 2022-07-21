@@ -5,7 +5,7 @@ import (
 	"ginEssential/util"
 )
 
-func BuildTag(tag *model.MusicBook) *model.MusicBookVO {
+func BuildBook(tag *model.MusicBook) *model.MusicBookVO {
 	if tag == nil {
 		return nil
 	}
@@ -14,13 +14,13 @@ func BuildTag(tag *model.MusicBook) *model.MusicBookVO {
 	return &bookvo
 }
 
-func BuildTags(tags []model.MusicBook) *[]model.MusicBookVO {
+func BuildBooks(tags []model.MusicBook) *[]model.MusicBookVO {
 	if len(tags) == 0 {
 		return nil
 	}
 	var responses []model.MusicBookVO
 	for _, tag := range tags {
-		responses = append(responses, *BuildTag(&tag))
+		responses = append(responses, *BuildBook(&tag))
 	}
 	return &responses
 }
