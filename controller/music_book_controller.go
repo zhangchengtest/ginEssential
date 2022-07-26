@@ -358,7 +358,7 @@ func UpdateMusicBookDetail(ctx *gin.Context) {
 	list := service.BookDetailService.Find(&params.Cnd)
 	var content string
 	for _, book := range list {
-		content += book.BookContent
+		content += book.BookContent + " "
 	}
 
 	service.MusicBookService.Updates(bookDetail.BookId, map[string]interface{}{
