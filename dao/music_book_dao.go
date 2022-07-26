@@ -96,8 +96,8 @@ func (r *musicBookDao) UpdateColumn(db *gorm.DB, id int64, name string, value in
 	return
 }
 
-func (r *musicBookDao) Delete(db *gorm.DB, id int64) {
-	db.Delete(&model.MusicBook{}, "id = ?", id)
+func (r *musicBookDao) Delete(db *gorm.DB, id string) {
+	db.Delete(&model.MusicBook{}, "book_id = ?", id)
 }
 
 func (r *musicBookDao) GetMusicBookInIds(musicBookIds []int64) []model.MusicBook {

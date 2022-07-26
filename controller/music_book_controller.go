@@ -223,6 +223,23 @@ func DetailMusicBook(ctx *gin.Context) {
 	model.Success(ctx, book, "查询成功")
 }
 
+func DeleteMusicBook(ctx *gin.Context) {
+
+	service.MusicBookService.Delete(ctx.Param("id"))
+
+	params := params.NewQueryParams(ctx)
+	params.Eq("book_id", ctx.Param("id"))
+	params.Asc("book_order")
+
+	list := service.BookDetailService.Find(&params.Cnd)
+
+	for _, book := range list {
+		service.BookDetailService.Delete(book.Id)
+	}
+
+	model.Success(ctx, nil, "删除成功")
+}
+
 func SearchMusicBookDetail(ctx *gin.Context) {
 
 	var queryVo model.BookDetailDTO
@@ -261,8 +278,9 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 	var result model.BookDetailVO
 	var prev model.BookDetailVO
 	var lyrics string
+	if len(books) == 0 {
 
-	if queryVo.Id == "" {
+	} else if queryVo.Id == "" {
 		result = books[0]
 	} else {
 		for index, book := range books {

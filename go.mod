@@ -15,6 +15,7 @@ require (
 	github.com/multiformats/go-multiaddr v0.5.0
 	github.com/multiformats/go-multiaddr-dns v0.3.1
 	github.com/sirupsen/logrus v1.8.1
+	github.com/sjsdfg/common-lang-in-go v0.5.4
 	github.com/zhangchengtest/simple v1.2.3
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/gorm v1.23.7
@@ -65,7 +66,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/cors v1.7.0 // indirect
-	github.com/sjsdfg/common-lang-in-go v0.5.4 // indirect
 	github.com/spacemonkeygo/spacelog v0.0.0-20180420211403-2296661a0572 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/texttheater/golang-levenshtein v0.0.0-20180516184445-d188e65d659e // indirect

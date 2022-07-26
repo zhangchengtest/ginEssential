@@ -22,6 +22,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/musicBook/save", middleware.AuthMiddleware(), controller.SaveMusicBook)
 	r.POST("/api/musicBook/search", controller.SearchMusicBook)
 	r.GET("/api/musicBook/detail/:id", controller.DetailMusicBook)
+	r.POST("/api/musicBook/delete/:id", controller.DeleteMusicBook)
 
 	r.POST("/api/musicBookDetail/searchByPage", controller.SearchMusicBookDetail)
 	r.POST("/api/musicBookDetail/searchOne", controller.SearchOneMusicBookDetail)

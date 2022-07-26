@@ -103,7 +103,7 @@ func (s *musicBookService) UpdateAll(id string, columns *model.MusicBook) error 
 // 	return dao.MusicBookDao.UpdateColumn(sqls.DB(), id, name, value)
 // }
 //
-func (s *musicBookService) Delete(id int64) {
+func (s *musicBookService) Delete(id string) {
 	dao.MusicBookDao.Delete(sqls.DB(), id)
 }
 
