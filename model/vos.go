@@ -23,6 +23,7 @@ type BookDetailVO struct {
 	BookId      string    `json:"bookId"`
 	BookContent string    `json:"bookContent"`
 	Lyric       string    `json:"lyric"`
+	ShowClass   string    `json:"showClass"`
 	Order       int       `json:"order"`
 	UpdateDt    time.Time `json:"updateDt"`
 	CreateDt    time.Time `json:"createDt"`

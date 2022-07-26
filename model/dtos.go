@@ -11,5 +11,4 @@ type BookDetailDTO struct {
 	Id          string
 	BookId      string
 	BookContent string
-	Direction   string
 }

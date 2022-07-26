@@ -277,62 +277,48 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 	books := render.BuildBookDetails(list)
 	var result model.BookDetailVO
 	var prev model.BookDetailVO
-	var lyrics string
+	//var lyrics string
 	if len(books) == 0 {
 
 	} else if queryVo.Id == "" {
+		fmt.Printf("hello man")
 		result = books[0]
 	} else {
 		for index, book := range books {
 			if book.Id == queryVo.Id {
-				if queryVo.Direction == "next" {
-					if index+1 == len(books) {
-						result = books[index]
-						if index-1 >= 0 {
-							prev = books[index-1]
-						}
-					} else {
-						prev = books[index]
-						result = books[index+1]
-					}
-				}
-				if queryVo.Direction == "prev" {
-					if index-1 < 0 {
-						result = books[0]
-					} else {
-						result = books[index-1]
-						if index-2 >= 0 {
-							prev = books[index-2]
-						}
-					}
+				result = books[index]
+				if index-1 >= 0 {
+					prev = books[index-1]
 				}
 			}
 		}
 	}
+	var newBooks []model.BookDetailVO
 	for _, book := range books {
 		if book.BookContent != "" {
 			if result.Id == book.Id {
-				lyrics += "&nbsp;<span style=\"color:red\"> " + book.Lyric + "</span>&nbsp;"
+				book.ShowClass = "red_span"
 			} else {
-				lyrics += "&nbsp;<span style=\"color:green\"> " + book.Lyric + "</span>&nbsp;"
+				book.ShowClass = "green_span"
 			}
 
 		} else {
 			if result.Id == book.Id {
-				lyrics += "&nbsp;<span style=\"color:red\"> " + book.Lyric + "</span>&nbsp;"
+				book.ShowClass = "red_span"
 			} else {
-				lyrics += "&nbsp;" + book.Lyric + "&nbsp;"
+				book.ShowClass = "normal_span"
 			}
 		}
-
+		newBooks = append(newBooks, book)
 	}
-	fmt.Printf("v+%", result)
+	//fmt.Printf("v+%", books)
+	//fmt.Printf("v+%", newBooks)
 	//book := service.MusicBookService.Get(queryVo.BookId)
 
 	model.Success(ctx, gin.H{
 		"prev":       prev,
 		"bookDetail": result,
-		"lyrics":     lyrics,
+		"lyrics":     newBooks,
 	}, "查询成功")
 }
 
