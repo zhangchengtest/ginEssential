@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"ginEssential/model"
 	"ginEssential/render"
 	"ginEssential/service"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/sjsdfg/common-lang-in-go/StringUtils"
 	"github.com/zhangchengtest/simple/web/params"
 	"net/http"
@@ -281,8 +283,15 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 	if len(books) == 0 {
 
 	} else if queryVo.Id == "" {
-		fmt.Printf("hello man")
-		result = books[0]
+		for index, book := range books {
+			if len(book.BookContent) <= 0 {
+				result = books[index]
+				if index-1 >= 0 {
+					prev = books[index-1]
+				}
+				break
+			}
+		}
 	} else {
 		for index, book := range books {
 			if book.Id == queryVo.Id {
@@ -322,7 +331,7 @@ func SearchOneMusicBookDetail(ctx *gin.Context) {
 	}, "查询成功")
 }
 
-func UpdateMusicBookDetail(ctx *gin.Context) {
+func UpdateMusicBookConent(ctx *gin.Context) {
 
 	var queryVo model.BookDetailDTO
 	if e := ctx.ShouldBindJSON(&queryVo); e != nil {
@@ -349,6 +358,41 @@ func UpdateMusicBookDetail(ctx *gin.Context) {
 
 	service.MusicBookService.Updates(bookDetail.BookId, map[string]interface{}{
 		"book_content": content,
+	})
+
+	model.Success(ctx, gin.H{"status": "ok"}, "更新成功")
+}
+
+func UpdateMusicBookLyric(ctx *gin.Context) {
+
+	var queryVo model.BookDetailDTO
+	if e := ctx.ShouldBindJSON(&queryVo); e != nil {
+		ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
+		return
+	}
+	b, _ := json.Marshal(queryVo)
+	logrus.Info(string(b))
+	num, _ := strconv.ParseInt(queryVo.Id, 10, 64)
+	bookDetail := service.BookDetailService.Get(num)
+
+	service.BookDetailService.Updates(num, map[string]interface{}{
+		"lyric": queryVo.Lyric,
+	})
+
+	params := params.NewQueryParams(ctx)
+	params.Eq("book_id", bookDetail.BookId)
+	params.Asc("book_order")
+
+	list := service.BookDetailService.Find(&params.Cnd)
+	var lyric string
+	for _, book := range list {
+		if len(book.Lyric) > 0 {
+			lyric += book.Lyric + "\n"
+		}
+	}
+
+	service.MusicBookService.Updates(bookDetail.BookId, map[string]interface{}{
+		"lyric": lyric,
 	})
 
 	model.Success(ctx, gin.H{"status": "ok"}, "更新成功")

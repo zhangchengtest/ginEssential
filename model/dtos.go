@@ -11,4 +11,5 @@ type BookDetailDTO struct {
 	Id          string
 	BookId      string
 	BookContent string
+	Lyric       string
 }
