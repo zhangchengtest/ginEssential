@@ -7,7 +7,7 @@ type PuzzlePiece struct {
 	Content  string    `gorm:"type:text;not null"`
 	Title    string    `gorm:"type:varchar(200);not null"`
 	Url      string    `gorm:"type:varchar(200);not null"`
-	Sort     int32     `gorm:"type:int(11);not null"`
+	Sort     int       `gorm:"type:int(11);not null"`
 	CreateDt time.Time `json:"createDt"`
 	CreateBy string    `json:"createBy"`
 }
