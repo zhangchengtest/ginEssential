@@ -51,6 +51,11 @@ const routes = [
     component: () => import('../views/Split.vue') // 这样写成函数的好处是懒加载
   },
   {
+    path: '/game',
+    name: 'game',
+    component: () => import('../views/Game.vue') // 这样写成函数的好处是懒加载
+  },
+  {
     path: '/compareFile',
     name: 'compareFile',
     component: () => import('../views/CompareFile.vue') // 这样写成函数的好处是懒加载

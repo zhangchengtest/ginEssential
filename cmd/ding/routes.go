@@ -31,6 +31,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	r.POST("/api/game/uploadSplitImages", controller.UploadSplitImages)
 
+	r.GET("/api/game/queryPuzzle", controller.QueryPuzzle)
+
 	r.GET("/api/oss/authTemp", controller.AuthTemp)
 	r.POST("/api/oss/temp2formal", controller.Copy)
 

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"ginEssential/config"
 	"ginEssential/model"
+	"ginEssential/service"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	strftime "github.com/itchyny/timefmt-go"
 	"github.com/zhangchengtest/simple/sqls"
 	"image"
 	"image/png"
@@ -29,11 +31,19 @@ func UploadSplitImages(ctx *gin.Context) {
 		return
 	}
 
+	t := time.Now()
+	dir := strftime.Format(t, "%Y%m%d%H%M%S")
+
+	_, err = os.Stat(config.Instance.Uploader.Local.Path + "/" + dir)
+	if os.IsNotExist(err) {
+		os.Mkdir(config.Instance.Uploader.Local.Path+"/"+dir, os.ModePerm)
+	}
+
 	var ret string
 	for _, files := range form.File {
 		for _, file := range files {
 
-			if err := ctx.SaveUploadedFile(file, config.Instance.Uploader.Local.Path+"/"+file.Filename); err != nil {
+			if err := ctx.SaveUploadedFile(file, config.Instance.Uploader.Local.Path+"/"+dir+"/"+file.Filename); err != nil {
 				ctx.String(http.StatusBadRequest, fmt.Sprintf("upload err %s", err.Error()))
 				return
 			}
@@ -43,24 +53,24 @@ func UploadSplitImages(ctx *gin.Context) {
 	}
 	var i = 0
 	i++
-	savePuzzle(ctx.Request.FormValue("piece1"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece1"), ret, i, dir)
 	i++
 	fmt.Printf("insert piece2 ")
-	savePuzzle(ctx.Request.FormValue("piece2"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece2"), ret, i, dir)
 	i++
-	savePuzzle(ctx.Request.FormValue("piece3"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece3"), ret, i, dir)
 	i++
-	savePuzzle(ctx.Request.FormValue("piece4"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece4"), ret, i, dir)
 	i++
-	savePuzzle(ctx.Request.FormValue("piece5"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece5"), ret, i, dir)
 	i++
-	savePuzzle(ctx.Request.FormValue("piece6"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece6"), ret, i, dir)
 	i++
-	savePuzzle(ctx.Request.FormValue("piece7"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece7"), ret, i, dir)
 	i++
-	savePuzzle(ctx.Request.FormValue("piece8"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece8"), ret, i, dir)
 	i++
-	savePuzzle(ctx.Request.FormValue("piece9"), ret, i)
+	savePuzzle(ctx.Request.FormValue("piece9"), ret, i, dir)
 	i++
 
 	//title := ctx.Request.FormValue("title")
@@ -72,32 +82,7 @@ func UploadSplitImages(ctx *gin.Context) {
 	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
 
-func savePuzzle(piece string, ret string, sort int) {
-
-	//ddd, _ := base64.StdEncoding.DecodeString(piece) //成图片文件并把文件写入到buffer
-	//
-	//err := ioutil.WriteFile(, ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
-	//if err != nil {
-	//	fmt.Println("Error:", err)
-	//}
-
-	//unbased, err := base64.StdEncoding.DecodeString(piece)
-	//if err != nil {
-	//	panic("Cannot decode b64")
-	//}
-	//
-	//r := bytes.NewReader(unbased)
-	//im, err := png.Decode(r)
-	//if err != nil {
-	//	panic("Bad png")
-	//}
-	//
-	//f, err := os.OpenFile(config.Instance.Uploader.Local.Path+"/"+"output"+strconv.Itoa(sort)+".png", os.O_WRONLY|os.O_CREATE, 0777)
-	//if err != nil {
-	//	panic("Cannot open file")
-	//}
-	//
-	//png.Encode(f, im)
+func savePuzzle(piece string, ret string, sort int, dir string) {
 
 	piece = strings.Replace(piece, "data:image/png;base64,", "", 1)
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(piece))
@@ -109,7 +94,7 @@ func savePuzzle(piece string, ret string, sort int) {
 	//fmt.Println(bounds, formatString)
 
 	//Encode from image format to writer
-	pngFilename := config.Instance.Uploader.Local.Path + "/" + "output" + strconv.Itoa(sort) + ".png"
+	pngFilename := config.Instance.Uploader.Local.Path + "/" + dir + "/" + "output" + strconv.Itoa(sort) + ".png"
 	f, err := os.OpenFile(pngFilename, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		log.Fatal(err)
@@ -129,13 +114,20 @@ func savePuzzle(piece string, ret string, sort int) {
 	// 创建用户
 	newUser := model.PuzzlePiece{
 		Id:       s.GetId(),
-		Content:  config.Instance.Uploader.Local.Host + "images/" + "output" + strconv.Itoa(sort) + ".png",
+		Content:  config.Instance.Uploader.Local.Host + "images/" + dir + "/" + "output" + strconv.Itoa(sort) + ".png",
 		Title:    ret,
-		Url:      config.Instance.Uploader.Local.Host + "images/" + ret,
+		Url:      config.Instance.Uploader.Local.Host + "images/" + dir + "/" + ret,
 		Sort:     sort,
 		CreateDt: time.Now(),
 		CreateBy: "",
 	}
 
 	DB.Create(&newUser)
+}
+
+func QueryPuzzle(ctx *gin.Context) {
+
+	pageResponse := service.PuzzlePieceService.GetPuzzlePieces()
+
+	model.Success(ctx, pageResponse, "查询成功")
 }

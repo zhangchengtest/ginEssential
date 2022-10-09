@@ -29,6 +29,16 @@ type BookDetailVO struct {
 	CreateDt    time.Time `json:"createDt"`
 }
 
+type PuzzlePieceVO struct {
+	Id       int64     `json:"id"`
+	Content  string    `json:"content"`
+	Title    string    `json:"title"`
+	Url      string    `json:"url"`
+	Sort     int       `json:"sort"`
+	CreateDt time.Time `json:"createDt"`
+	CreateBy string    `json:"createBy"`
+}
+
 type ArticleVO struct {
 	Id        int64  `json:"id"`
 	Chapter   int32  `json:"chapter"`
