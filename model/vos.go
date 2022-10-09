@@ -37,3 +37,12 @@ type ArticleVO struct {
 	ReadCount int32  `json:"readCount"`
 	Question  string `json:"question"`
 }
+
+type TempOssVO struct {
+	Endpoint        string `json:"endpoint"`
+	AccessKeyId     string `json:"accessKeyId"`
+	AccessKeySecret string `json:"accessKeySecret"`
+	BucketName      string `json:"bucketName"`
+	UploadUrl       string `json:"uploadUrl"`
+	Token           string `json:"token"`
+}

@@ -15,6 +15,9 @@
       calculate
     </div>
 
+    <div class="mydiv" @click="$router.replace({ name: 'split' })">
+      split
+    </div>
   </div>
 </template>
 

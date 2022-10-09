@@ -13,3 +13,8 @@ type BookDetailDTO struct {
 	BookContent string
 	Lyric       string
 }
+
+type FileTemp2FormalDTO struct {
+	ServeCode    string
+	RelativePath string
+}

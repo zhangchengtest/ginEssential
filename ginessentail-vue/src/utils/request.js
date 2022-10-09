@@ -31,19 +31,22 @@ service.interceptors.request.use(
     config.headers['Cache-Control'] = 'no-cache'
     config.headers['Pragma'] = 'no-cache'
     // 设置请求数据格式
-    config.headers['Content-Type'] =
-      config.headers['Content-Type'] || 'application/json;charset=UTF-8'
     if (store.getters.token) {
       const Token = getToken()
       config.headers['Authorization'] = `Bearer ${Token}`
     }
+    console.log('a')
     if (config.method === 'post') {
+      console.log('e')
       // 如果为post请求，要求Content-Type为json时，数据需要转换成JSON字符串
       if (config.headers['Content-Type'] === 'application/json;charset=UTF-8') {
+        console.log('f')
         config.data = JSON.stringify(config.data)
       } else {
+        console.log('b')
         // 如果是FormData参数据不需要qs序列化处理，否则默认Content-Type数据格式都需要qs序列化处理
         if (!(config.data instanceof FormData)) {
+          console.log('c')
           config.data = qs.stringify(config.data)
         }
       }

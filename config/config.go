@@ -46,16 +46,22 @@ type Config struct {
 	Uploader struct {
 		Enable    string `yaml:"Enable"`
 		AliyunOss struct {
-			Host          string `yaml:"Host"`
-			Bucket        string `yaml:"Bucket"`
-			Endpoint      string `yaml:"Endpoint"`
-			AccessId      string `yaml:"AccessId"`
-			AccessSecret  string `yaml:"AccessSecret"`
-			StyleSplitter string `yaml:"StyleSplitter"`
-			StyleAvatar   string `yaml:"StyleAvatar"`
-			StylePreview  string `yaml:"StylePreview"`
-			StyleSmall    string `yaml:"StyleSmall"`
-			StyleDetail   string `yaml:"StyleDetail"`
+			Host            string `yaml:"Host"`
+			Bucket          string `yaml:"Bucket"`
+			RealBucket      string `yaml:"RealBucket"`
+			Endpoint        string `yaml:"Endpoint"`
+			RegionId        string `yaml:"RegionId"`
+			AccessId        string `yaml:"AccessId"`
+			AccessSecret    string `yaml:"AccessSecret"`
+			RoleArn         string `yaml:"RoleArn"`
+			RoleSessionName string `yaml:"RoleSessionName"`
+			RemotePath      string `yaml:"RemotePath"`
+			RealPath        string `yaml:"RealPath"`
+			StyleSplitter   string `yaml:"StyleSplitter"`
+			StyleAvatar     string `yaml:"StyleAvatar"`
+			StylePreview    string `yaml:"StylePreview"`
+			StyleSmall      string `yaml:"StyleSmall"`
+			StyleDetail     string `yaml:"StyleDetail"`
 		} `yaml:"AliyunOss"`
 		Local struct {
 			Host string `yaml:"Host"`

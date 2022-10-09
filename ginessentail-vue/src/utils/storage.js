@@ -1,40 +1,40 @@
-import Cookies from 'js-cookie';
+import Cookies from 'js-cookie'
 
-const TokenKey = 'tokenPorta';
-const RefreshTokenKey = 'refreshTokenPorta';
+const TokenKey = 'tokenPorta'
+const RefreshTokenKey = 'refreshTokenPorta'
 
 export function getToken() {
-  return Cookies.get(TokenKey);
+  return Cookies.get(TokenKey)
 }
 
 export function setToken(token) {
-  return Cookies.set(TokenKey, token, { expires: 5 });
+  return Cookies.set(TokenKey, token, { expires: 5 })
 }
 
 export function removeToken() {
-  return Cookies.remove(TokenKey);
+  return Cookies.remove(TokenKey)
 }
 
 export function getRefreshToken() {
-  return Cookies.get(RefreshTokenKey);
+  return Cookies.get(RefreshTokenKey)
 }
 
 export function setRefreshToken(refreshToken) {
-  return Cookies.set(RefreshTokenKey, refreshToken, { expires: 5 });
+  return Cookies.set(RefreshTokenKey, refreshToken, { expires: 5 })
 }
 
 export function removeRefreshToken() {
-  return Cookies.remove(RefreshTokenKey);
+  return Cookies.remove(RefreshTokenKey)
 }
 
 export function getlocalStorage(key) {
-  return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : {};
+  return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : {}
 }
 
 export function setlocalStorage(key, advList) {
-  return localStorage.setItem(key, JSON.stringify(advList));
+  return localStorage.setItem(key, JSON.stringify(advList))
 }
 
 export function removelocalStorage(key) {
-  return localStorage.removeItem(key);
+  return localStorage.removeItem(key)
 }

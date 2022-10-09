@@ -13,8 +13,7 @@
       </div>
     </div>
 
-    <div class="warp" id="mycontent">
-    </div>
+    <div id="mycontent" class="warp" />
   </div>
 </template>
 

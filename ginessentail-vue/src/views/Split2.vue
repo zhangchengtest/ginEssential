@@ -1,10 +1,15 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
+    <h1>Split Image</h1>
+    <form action="#">
+      <p>
+        <input id="row" type="hidden" name="row" value="3">
 
-    <div class="warp">
-      <div class="myinput">
-        <el-upload
+        <input id="column" type="hidden" name="column" value="3">
+
+        <SingleImageUpload v-model="imageUrl" :cropper="true" />
+
+        <!-- <el-upload
           ref="upload"
           class="pop-upload"
           action=""
@@ -20,37 +25,35 @@
           <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">
             上传到服务器
           </el-button>
+        </el-upload> -->
+      </p>
+    </form>
 
-          <el-button style="margin-left: 10px;" size="small" type="primary" @click="recal">
-            重新计算
-          </el-button>
-        </el-upload>
-      </div>
-      <div />
+    <h2>Image Preview</h2>
+    <div id="preview">
+      try to drag an image here
     </div>
 
-    <div class="warp">
-      <div>
-        <textarea v-model="mymodel.originText" class="mytextarea" />
-      </div>
-      <div>
-        >>
-      </div>
-      <div>
-        <textarea v-model="responseText" class="mytextarea" />
-      </div>
-    </div>
+    <h2 style="margin-top: 60px;">
+      Image Split Piece
+    </h2>
+    <div id="result" />
   </div>
 </template>
 
 <script>
-
+import SingleImageUpload from '@/components/SingleImageUpload'
 import {
-  readorc
+  handleFile
+} from '@/utils/split'
+import {
+  uploadSplitImages
 } from '@/api/all'
-
 export default {
-  name: 'HelloWorld',
+  name: 'Split',
+  components: {
+    SingleImageUpload
+  },
   props: {
     msg: {
       type: String,
@@ -64,39 +67,33 @@ export default {
         originText: ''
       },
       responseText: '',
-      fileList: []
+      imageUrl: '',
+      mypieces: [],
+      myfile: null
     }
   },
+
   methods: {
-    handleChange(file, fileList) {
-        this.fileList = fileList
-    },
-    handleRemove(file, fileList) {
-        this.fileList = fileList
-    },
-    recal() {
-        const myArray = this.mymodel.originText.split('\n')
-        console.log(myArray)
-        var sum = 0
-        for (var i = 0; i < myArray.length; i++) {
-            var ret = myArray[i].trim()
-            if (myArray[i] && ret !== '') {
-              sum += parseInt(myArray[i])
-            }
-        }
-        this.responseText = sum
+    handleChange(file) {
+      console.log(file)
+      this.myfile = file.raw
+      handleFile(file.raw, this.mypieces)
     },
     // 上传服务器
     submitUpload() {
         console.log('Hello world')
-        if (this.fileList.length === 0) {
+        console.log(this.myfile)
+        if (this.mypieces.length === 0) {
             return this.$message.warning('请选取文件后再上传')
         }
         const formData = new FormData()
-        this.fileList.forEach((file) => {
-            formData.append('file', file.raw)
+        var i = 1
+        this.mypieces.forEach((file) => {
+            formData.append('piece' + i, file)
+            i++
         })
-        readorc(formData).then((res) => {
+        formData.append('file', this.myfile)
+        uploadSplitImages(formData).then((res) => {
           const { data } = res.data
 
           this.mymodel.originText = data
@@ -120,39 +117,25 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-.mytextarea{
-  width: 100%;
-  height: 600px;
-}
-
-.myinput{
-   text-align: left;
-   display: flex;
-}
-
-.mybutton{
-  text-align: right;
-  display: flex;
- justify-content: flex-end;
-}
-
-.warp {
-    width: 100%;
-    margin-top: 10px;
-}
+ #preview {
+            width: 400px;
+            height: 200px;
+            border: 2px dashed #00f;
+        }
+        #preview img {
+            width: 100%;
+            height: 100%;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        td, th {
+            padding: 0;
+        }
+        td img {
+            display: block;
+            padding: 2px;
+            background: #fff;
+        }
 
 </style>

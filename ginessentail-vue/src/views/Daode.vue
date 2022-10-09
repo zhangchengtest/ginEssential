@@ -4,7 +4,7 @@
 
     <div class="warp">
       <div class="myinput">
-        {{mymodel.chapter}} - {{mymodel.readCount}}
+        {{ mymodel.chapter }} - {{ mymodel.readCount }}
       </div>
       <div class="mybutton" @click="gochange()">
         <button> 提交</button>

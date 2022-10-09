@@ -3,6 +3,8 @@ module ginEssential
 go 1.18
 
 require (
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1791
+	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-sql-driver/mysql v1.6.0
@@ -43,6 +45,7 @@ require (
 	github.com/iris-contrib/schema v0.0.6 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -80,9 +83,11 @@ require (
 	golang.org/x/sys v0.0.0-20220622161953-175b2fd9d664 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
+	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/driver/mysql v1.3.4 // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect
 )

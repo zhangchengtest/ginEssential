@@ -29,5 +29,10 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/musicBookDetail/updateContent", controller.UpdateMusicBookConent)
 	r.POST("/api/musicBookDetail/updateLyric", controller.UpdateMusicBookLyric)
 
+	r.POST("/api/game/uploadSplitImages", controller.UploadSplitImages)
+
+	r.GET("/api/oss/authTemp", controller.AuthTemp)
+	r.POST("/api/oss/temp2formal", controller.Copy)
+
 	return r
 }

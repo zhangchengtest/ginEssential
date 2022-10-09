@@ -24,6 +24,15 @@ export function readorc(data) {
   })
 }
 
+export function uploadSplitImages(data) {
+  console.log(data)
+  return request({
+    url: '/api/game/uploadSplitImages',
+    method: 'post',
+    data: data
+  })
+}
+
 export function compareFile(data) {
   return request({
     url: '/api/compareFile',
