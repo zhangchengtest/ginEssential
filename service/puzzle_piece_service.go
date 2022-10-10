@@ -121,22 +121,23 @@ func (s *puzzlePieceService) GetByName(name string) *model.PuzzlePiece {
 	return dao.PuzzlePieceDao.GetByName(name)
 }
 
-func (s *puzzlePieceService) GetPuzzlePieces() []model.PuzzlePieceVO {
-	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd())
+func (s *puzzlePieceService) GetPuzzlePieces(url string) []string {
+	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd().Where("url = ?", url))
 
-	var puzzlePieces []model.PuzzlePieceVO
+	var puzzlePieces []string
 	for _, puzzlePiece := range list {
+		if puzzlePiece.Sort != 9 {
+			puzzlePieces = append(puzzlePieces, puzzlePiece.Content)
+		}
 
-		bookvo := model.PuzzlePieceVO{}
-		util.SimpleCopyProperties(&bookvo, &puzzlePiece)
-		puzzlePieces = append(puzzlePieces, bookvo)
 	}
 	return puzzlePieces
 }
 
 func (s *puzzlePieceService) GetPuzzlePiecesGroup() []model.PuzzlePieceVO {
-	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd())
 
+	var list []model.PuzzlePiece
+	sqls.DB().Model(&model.PuzzlePiece{}).Select("url").Group("url").Find(&list)
 	var puzzlePieces []model.PuzzlePieceVO
 	for _, puzzlePiece := range list {
 

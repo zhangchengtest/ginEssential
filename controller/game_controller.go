@@ -13,6 +13,7 @@ import (
 	"image"
 	"image/png"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -127,7 +128,12 @@ func savePuzzle(piece string, ret string, sort int, dir string) {
 
 func QueryPuzzle(ctx *gin.Context) {
 
-	pageResponse := service.PuzzlePieceService.GetPuzzlePieces()
+	list := service.PuzzlePieceService.GetPuzzlePiecesGroup()
+	var size = len(list)
+	rand.Seed(time.Now().UnixNano())
+	var num = rand.Intn(size)
+	puzzlePiece := list[num]
+	list2 := service.PuzzlePieceService.GetPuzzlePieces(puzzlePiece.Url)
 
-	model.Success(ctx, pageResponse, "查询成功")
+	model.Success(ctx, list2, "查询成功")
 }
