@@ -165,6 +165,12 @@ func Info(ctx *gin.Context) {
 	model.Success(ctx, uservo, "")
 }
 
+func MockInfo(ctx *gin.Context) {
+
+	uservo := model.UserVO{}
+	model.Success(ctx, uservo, "")
+}
+
 func Javatosql(ctx *gin.Context) {
 	var javabean = model.JavaBean{}
 	ctx.Bind(&javabean)
