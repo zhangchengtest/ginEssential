@@ -39,6 +39,12 @@ type PuzzlePieceVO struct {
 	CreateBy string    `json:"createBy"`
 }
 
+type PuzzlePieceVO2 struct {
+	Url     string   `json:"url"`
+	Piecces []string `json:"piecces"`
+	Orders  []int    `json:"orders"`
+}
+
 type ArticleVO struct {
 	Id        int64  `json:"id"`
 	Chapter   int32  `json:"chapter"`

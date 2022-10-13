@@ -128,12 +128,57 @@ func savePuzzle(piece string, ret string, sort int, dir string) {
 
 func QueryPuzzle(ctx *gin.Context) {
 
-	list := service.PuzzlePieceService.GetPuzzlePiecesGroup()
-	var size = len(list)
+	arr := service.PuzzlePieceService.GetPuzzlePiecesGroup()
+	var size = len(arr)
 	rand.Seed(time.Now().UnixNano())
 	var num = rand.Intn(size)
-	puzzlePiece := list[num]
-	list2 := service.PuzzlePieceService.GetPuzzlePieces(puzzlePiece.Url)
+	puzzlePiece := arr[num]
+	list := service.PuzzlePieceService.GetPuzzlePieces(puzzlePiece.Url)
 
-	model.Success(ctx, list2, "查询成功")
+	var puzzlePieces []string
+	var orders []int
+	for _, puzzlePiece := range list {
+		//if puzzlePiece.Sort != 9 {
+		puzzlePieces = append(puzzlePieces, puzzlePiece.Content)
+		orders = append(orders, puzzlePiece.Sort)
+		//}
+	}
+
+	vo := model.PuzzlePieceVO2{
+		Url:     puzzlePiece.Url,
+		Piecces: puzzlePieces,
+		Orders:  orders,
+	}
+
+	model.Success(ctx, vo, "查询成功")
+}
+
+func QueryPuzzleByUrl(ctx *gin.Context) {
+
+	val := ctx.Request.FormValue("url")
+	fmt.Printf(val)
+
+	//var queryVo model.PuzzlePieceDTO
+	//if e := ctx.ShouldBindJSON(&queryVo); e != nil {
+	//	ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
+	//	return
+	//}
+	list := service.PuzzlePieceService.GetPuzzlePiecesRandom(val)
+
+	var puzzlePieces []string
+	var orders []int
+	for _, puzzlePiece := range list {
+		//if puzzlePiece.Sort != 9 {
+		puzzlePieces = append(puzzlePieces, puzzlePiece.Content)
+		orders = append(orders, puzzlePiece.Sort)
+		//}
+	}
+
+	vo := model.PuzzlePieceVO2{
+		Url:     val,
+		Piecces: puzzlePieces,
+		Orders:  orders,
+	}
+
+	model.Success(ctx, vo, "查询成功")
 }

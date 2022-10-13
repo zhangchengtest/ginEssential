@@ -4,7 +4,9 @@ import (
 	"ginEssential/dao"
 	"ginEssential/model/constants"
 	"ginEssential/util"
+	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/zhangchengtest/simple/sqls"
 	"github.com/zhangchengtest/simple/web/params"
@@ -121,17 +123,27 @@ func (s *puzzlePieceService) GetByName(name string) *model.PuzzlePiece {
 	return dao.PuzzlePieceDao.GetByName(name)
 }
 
-func (s *puzzlePieceService) GetPuzzlePieces(url string) []string {
+func (s *puzzlePieceService) GetPuzzlePieces(url string) []model.PuzzlePiece {
 	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd().Where("url = ?", url))
 
-	var puzzlePieces []string
-	for _, puzzlePiece := range list {
-		if puzzlePiece.Sort != 9 {
-			puzzlePieces = append(puzzlePieces, puzzlePiece.Content)
-		}
+	return list
+}
 
+func (s *puzzlePieceService) GetPuzzlePiecesRandom(url string) []model.PuzzlePiece {
+	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd().Where("url = ?", url))
+	Shuffle(list)
+
+	return list
+}
+
+func Shuffle(slice []model.PuzzlePiece) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for len(slice) > 0 {
+		n := len(slice)
+		randIndex := r.Intn(n)
+		slice[n-1], slice[randIndex] = slice[randIndex], slice[n-1]
+		slice = slice[:n-1]
 	}
-	return puzzlePieces
 }
 
 func (s *puzzlePieceService) GetPuzzlePiecesGroup() []model.PuzzlePieceVO {

@@ -18,3 +18,7 @@ type FileTemp2FormalDTO struct {
 	ServeCode    string
 	RelativePath string
 }
+
+type PuzzlePieceDTO struct {
+	Url string `json:"url"`
+}
