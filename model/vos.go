@@ -39,6 +39,18 @@ type PuzzlePieceVO struct {
 	CreateBy string    `json:"createBy"`
 }
 
+type PuzzleRankVO struct {
+	Id        int64     `json:"id"`
+	Username  string    `json:"username"`
+	Title     string    `json:"title"`
+	Url       string    `json:"url"`
+	Sort      int       `json:"sort"`
+	SpendTime int       `json:"spendTime"`
+	Step      int       `json:"step"`
+	CreateDt  time.Time `json:"createDt"`
+	CreateBy  string    `json:"createBy"`
+}
+
 type PuzzlePieceVO2 struct {
 	Url     string   `json:"url"`
 	Piecces []string `json:"piecces"`

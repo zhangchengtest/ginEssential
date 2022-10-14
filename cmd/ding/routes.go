@@ -34,6 +34,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	r.GET("/api/game/queryPuzzle", controller.QueryPuzzle)
 	r.GET("/api/game/queryPuzzleByUrl", controller.QueryPuzzleByUrl)
+	r.GET("/api/game/queryPuzzleRank", controller.QueryPuzzleRank)
+	r.POST("/api/game/savePuzzleRank", controller.SavePuzzleRank)
 
 	r.GET("/api/oss/authTemp", controller.AuthTemp)
 	r.POST("/api/oss/temp2formal", controller.Copy)

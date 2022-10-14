@@ -126,6 +126,44 @@ func savePuzzle(piece string, ret string, sort int, dir string) {
 	DB.Create(&newUser)
 }
 
+func SavePuzzleRank(ctx *gin.Context) {
+	DB := sqls.DB()
+	var rank = model.PuzzleRank{}
+	ctx.Bind(&rank)
+	fmt.Printf("rank：%v", rank)
+
+	// name := ctx.PostForm("name")
+	// telephone := ctx.PostForm("telephone")
+	// password := ctx.PostForm("password")
+
+	var s = util.Worker1{}
+	// 创建用户
+	newUser := model.PuzzleRank{
+		Id:        s.GetId(),
+		Username:  rank.Username,
+		Title:     rank.Title,
+		Url:       rank.Url,
+		SpendTime: rank.SpendTime,
+		Step:      rank.Step,
+		CreateBy:  "system",
+		CreateDt:  time.Now(),
+	}
+
+	DB.Create(&newUser)
+
+	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+}
+
+func QueryPuzzleRank(ctx *gin.Context) {
+	val := ctx.Request.FormValue("url")
+	fmt.Println()
+	fmt.Printf(val)
+	fmt.Println()
+	list := service.PuzzleRankService.GetPuzzleRanks(val)
+
+	model.Success(ctx, list, "查询成功")
+}
+
 func QueryPuzzle(ctx *gin.Context) {
 
 	arr := service.PuzzlePieceService.GetPuzzlePiecesGroup()
