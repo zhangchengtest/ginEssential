@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"ginEssential/config"
 	"ginEssential/model"
+	"ginEssential/redis"
 	"ginEssential/service"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
@@ -154,12 +155,57 @@ func SavePuzzleRank(ctx *gin.Context) {
 	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
 
+func SavePlaneRank(ctx *gin.Context) {
+	DB := sqls.DB()
+	var rank = model.PlaneRank{}
+	ctx.Bind(&rank)
+	fmt.Printf("rank：%v", rank)
+
+	// name := ctx.PostForm("name")
+	// telephone := ctx.PostForm("telephone")
+	// password := ctx.PostForm("password")
+
+	var s = util.Worker1{}
+	// 创建用户
+	newUser := model.PlaneRank{
+		Id:       s.GetId(),
+		Username: rank.Username,
+		Coin:     rank.Coin,
+		CreateBy: "system",
+		CreateDt: time.Now(),
+	}
+
+	DB.Create(&newUser)
+
+	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+}
+
 func QueryPuzzleRank(ctx *gin.Context) {
 	val := ctx.Request.FormValue("url")
 	fmt.Println()
 	fmt.Printf(val)
 	fmt.Println()
 	list := service.PuzzleRankService.GetPuzzleRanks(val)
+
+	model.Success(ctx, list, "查询成功")
+}
+
+func Visit(ctx *gin.Context) {
+	val := ctx.Request.FormValue("name")
+	redis.Visit(val)
+	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+}
+
+func ModifyUsername(ctx *gin.Context) {
+	model.Success(ctx, gin.H{"status": "ok"}, "SUCCESS")
+}
+
+func Nickname(ctx *gin.Context) {
+	model.Success(ctx, service.GetFullName(), "新增成功")
+}
+
+func QueryPlaneRank(ctx *gin.Context) {
+	list := service.PlaneRankService.GetRanks()
 
 	model.Success(ctx, list, "查询成功")
 }

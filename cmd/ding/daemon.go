@@ -2,7 +2,6 @@ package main
 
 import (
 	_ "expvar"
-	"flag"
 	"fmt"
 	"ginEssential/config"
 	"ginEssential/util"
@@ -93,16 +92,10 @@ documented in (and can be modified through) 'ipfs config Addresses'.
 	Run:         daemonFunc,
 }
 
-var configFile = flag.String("config", "./music.yaml", "配置文件路径")
-
 func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment) (_err error) {
 
 	// let the user know we're going.
 	fmt.Printf("Initializing daemon...\n")
-
-	//InitConfig()
-	// 初始化配置
-	conf := config.Init(*configFile)
 
 	// gorm配置
 	gormConf := &gorm.Config{
@@ -110,9 +103,9 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 	}
 
 	// 初始化日志
-	if file, err := os.OpenFile(conf.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
+	if file, err := os.OpenFile(config.Instance.LogFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666); err == nil {
 		logrus.SetOutput(io.MultiWriter(os.Stdout, file))
-		if conf.ShowSql {
+		if config.Instance.ShowSql {
 			gormConf.Logger = logger.New(log.New(file, "\r\n", log.LstdFlags), logger.Config{
 				SlowThreshold: time.Second,
 				Colorful:      true,
@@ -125,13 +118,13 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 	}
 
 	// 连接数据库
-	if err := sqls.Open(conf.DB.Url, gormConf, conf.DB.MaxIdleConns, conf.DB.MaxOpenConns); err != nil {
+	if err := sqls.Open(config.Instance.DB.Url, gormConf, config.Instance.DB.MaxIdleConns, config.Instance.DB.MaxOpenConns); err != nil {
 		logrus.Error(err)
 	}
 
 	r := gin.Default()
 	r = CollectRoute(r)
-	port := conf.Port
+	port := config.Instance.Port
 	if port != "" {
 		panic(r.Run(":" + port))
 	}

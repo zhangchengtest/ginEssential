@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"io/ioutil"
 
 	"github.com/sirupsen/logrus"
@@ -23,6 +24,11 @@ type Config struct {
 		MaxIdleConns int    `yaml:"MaxIdleConns"`
 		MaxOpenConns int    `yaml:"MaxOpenConns"`
 	} `yaml:"DB"`
+
+	Redis struct {
+		Addr string `yaml:"Addr"`
+		Pwd  string `yaml:"Pwd"`
+	} `yaml:"Redis"`
 
 	// Github
 	Github struct {
@@ -106,12 +112,12 @@ type Config struct {
 	} `yaml:"Es"`
 }
 
-func Init(filename string) *Config {
+func init() {
+	var filename = flag.String("config", "./music.yaml", "配置文件路径")
 	Instance = &Config{}
-	if yamlFile, err := ioutil.ReadFile(filename); err != nil {
+	if yamlFile, err := ioutil.ReadFile(*filename); err != nil {
 		logrus.Error(err)
 	} else if err = yaml.Unmarshal(yamlFile, Instance); err != nil {
 		logrus.Error(err)
 	}
-	return Instance
 }

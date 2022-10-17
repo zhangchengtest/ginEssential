@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goburrow/cache v0.1.4
+	github.com/gomodule/redigo v1.8.9
 	github.com/google/uuid v1.3.0
 	github.com/ipfs/go-ipfs-cmds v0.8.1
 	github.com/ipfs/go-log v1.0.5

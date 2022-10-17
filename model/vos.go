@@ -50,6 +50,14 @@ type PuzzleRankVO struct {
 	CreateDt  time.Time `json:"createDt"`
 	CreateBy  string    `json:"createBy"`
 }
+type PlaneRankVO struct {
+	Id       int64  `json:"id"`
+	Username string `json:"username"`
+	Sort     int    `json:"sort"`
+	Coin     int    `json:"coin"`
+	CreateDt string `json:"createDt"`
+	CreateBy string `json:"createBy"`
+}
 
 type PuzzlePieceVO2 struct {
 	Url     string   `json:"url"`
