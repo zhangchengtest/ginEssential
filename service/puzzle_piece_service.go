@@ -1,9 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"ginEssential/dao"
 	"ginEssential/model/constants"
 	"ginEssential/util"
+	strftime "github.com/itchyny/timefmt-go"
 	"math/rand"
 	"strings"
 	"time"
@@ -148,8 +150,13 @@ func Shuffle(slice []model.PuzzlePiece) {
 
 func (s *puzzlePieceService) GetPuzzlePiecesGroup() []model.PuzzlePieceVO {
 
+	t := time.Now()
+	date := strftime.Format(t, "%Y-%m-%d")
+	fmt.Println(date)
+	t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+
 	var list []model.PuzzlePiece
-	sqls.DB().Model(&model.PuzzlePiece{}).Select("url").Group("url").Find(&list)
+	sqls.DB().Model(&model.PuzzlePiece{}).Select("url").Where("create_dt > ?", t2).Group("url").Find(&list)
 	var puzzlePieces []model.PuzzlePieceVO
 	for _, puzzlePiece := range list {
 
