@@ -30,3 +30,24 @@ type BookDetail struct {
 	UpdateDt    *time.Time `json:"updateDt"`
 	CreateDt    time.Time  `json:"createDt"`
 }
+
+type BookPiece struct {
+	Id          int64      `json:"id"`
+	BookId      string     `json:"bookId"`
+	PhaseId     string     `json:"phaseId"`
+	BookContent string     `json:"bookContent"`
+	ContentType int        `json:"contentType"`
+	Phase       int        `json:"phase"`
+	UpdateDt    *time.Time `json:"updateDt"`
+	CreateDt    time.Time  `json:"createDt"`
+}
+
+type PieceContent struct {
+	Id        int64      `json:"id"`
+	BookId    string     `json:"bookId"`
+	PhaseId   string     `json:"phaseId"`
+	BreakFlag int        `json:"breakFlag"`
+	BookOrder int        `json:"bookOrder"`
+	UpdateDt  *time.Time `json:"updateDt"`
+	CreateDt  time.Time  `json:"createDt"`
+}

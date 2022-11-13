@@ -30,6 +30,15 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/musicBookDetail/updateContent", controller.UpdateMusicBookConent)
 	r.POST("/api/musicBookDetail/updateLyric", controller.UpdateMusicBookLyric)
 
+	r.POST("/api/musicBookPiece/deletePiece", controller.DeletePiece)
+	r.POST("/api/musicBookPiece/updateContent", controller.UpdateBookPiece)
+	r.POST("/api/musicBookPiece/searchPieces", controller.SearchPieces)
+	r.POST("/api/musicBookPiece/searchPiecesByPhaseId", controller.SearchPiecesByPhaseId)
+	r.POST("/api/musicBookPiece/copy", controller.CopyPiece)
+	r.POST("/api/musicBookPiece/stickUp", controller.StickUp)
+
+	r.POST("/api/musicBookPiece/test", controller.TestBookPiece)
+
 	r.POST("/api/game/uploadSplitImages", controller.UploadSplitImages)
 
 	r.GET("/api/game/queryPuzzle", controller.QueryPuzzle)

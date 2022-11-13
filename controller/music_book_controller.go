@@ -218,13 +218,6 @@ func SearchMusicBook(ctx *gin.Context) {
 	model.Success(ctx, pageResponse, "查询成功")
 }
 
-func DetailMusicBook(ctx *gin.Context) {
-
-	book := service.MusicBookService.Get(ctx.Param("id"))
-
-	model.Success(ctx, book, "查询成功")
-}
-
 func DeleteMusicBook(ctx *gin.Context) {
 
 	service.MusicBookService.Delete(ctx.Param("id"))

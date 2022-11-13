@@ -2,15 +2,19 @@ package render
 
 import (
 	"ginEssential/model"
-	"ginEssential/util"
 )
 
 func BuildBook(tag *model.MusicBook) *model.MusicBookVO {
 	if tag == nil {
 		return nil
 	}
-	bookvo := model.MusicBookVO{}
-	util.SimpleCopyProperties(&bookvo, &tag)
+	bookvo := model.MusicBookVO{
+		BookTitle: tag.BookTitle,
+		Author:    tag.Author,
+		MusicKey:  tag.MusicKey,
+		MusicTime: tag.MusicTime,
+		Singer:    tag.Singer,
+	}
 	return &bookvo
 }
 

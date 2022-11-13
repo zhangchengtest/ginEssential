@@ -3,19 +3,20 @@ package model
 import "time"
 
 type MusicBookVO struct {
-	BookId      string    `json:"bookId"`
-	BookContent string    `json:"bookContent"`
-	Lyric       string    `json:"lyric"`
-	BookType    int       `json:"bookType"`
-	BookTitle   string    `json:"bookTitle"`
-	MusicKey    string    `json:"musicKey"`
-	MusicTime   string    `json:"musicTime"`
-	Author      string    `json:"author"`
-	Composer    string    `json:"composer"`
-	Singer      string    `json:"singer"`
-	UpdateDt    time.Time `json:"updateDt"`
-	CreateDt    time.Time `json:"createDt"`
-	CreateBy    string    `json:"createBy"`
+	BookId      string      `json:"bookId"`
+	BookContent string      `json:"bookContent"`
+	Lyric       string      `json:"lyric"`
+	BookType    int         `json:"bookType"`
+	BookTitle   string      `json:"bookTitle"`
+	MusicKey    string      `json:"musicKey"`
+	MusicTime   string      `json:"musicTime"`
+	Author      string      `json:"author"`
+	Composer    string      `json:"composer"`
+	Singer      string      `json:"singer"`
+	UpdateDt    time.Time   `json:"updateDt"`
+	CreateDt    time.Time   `json:"createDt"`
+	CreateBy    string      `json:"createBy"`
+	PieceAll    BookPieceVO `json:"pieceAll"`
 }
 
 type BookDetailVO struct {
@@ -27,6 +28,66 @@ type BookDetailVO struct {
 	Order       int       `json:"order"`
 	UpdateDt    time.Time `json:"updateDt"`
 	CreateDt    time.Time `json:"createDt"`
+}
+
+type BookPieceVO struct {
+	Id          string          `json:"id"`
+	BookId      string          `json:"bookId"`
+	BookContent string          `json:"bookContent"`
+	Lyric       string          `json:"lyric"`
+	List        []PieceDetailVO `json:"list"`
+	PhaseId     string          `json:"phaseId"`
+	BookOrder   int             `json:"bookOrder"`
+	ShowClass   string          `json:"showClass"`
+}
+
+type PieceDetailVO struct {
+	BookContent      string `json:"bookContent"`
+	Connection       string `json:"connection"`
+	Connectionxstart []int  `json:"connectionxstart"`
+	Connectionxstop  []int  `json:"connectionxstop"`
+	UpPoints         string `json:"upPoints"`
+	Line1            string `json:"line1"`
+	Line2            string `json:"line2"`
+	Line1xstart      []int  `json:"line1xstart"`
+	Line1xstop       []int  `json:"line1xstop"`
+	Line2xstart      []int  `json:"line2xstart"`
+	Line2xstop       []int  `json:"line2xstop"`
+	DownPoints       string `json:"downPoints"`
+	Indent           string `json:"indent"`
+	Lyric            string `json:"lyric"`
+}
+
+type BookPieceVO2 struct {
+	Id1    string `json:"id1"`
+	Id2    string `json:"id2"`
+	Id3    string `json:"id3"`
+	Id4    string `json:"id4"`
+	Val1   string `json:"val1"`
+	Val2   string `json:"val2"`
+	Val3   string `json:"val3"`
+	Val4   string `json:"val4"`
+	Lyric1 string `json:"lyric1"`
+	Lyric2 string `json:"lyric2"`
+	Lyric3 string `json:"lyric3"`
+	Lyric4 string `json:"lyric4"`
+}
+
+type BookPieceVO3 struct {
+	Val0 string `json:"val0"`
+	Val1 string `json:"val1"`
+	Val2 string `json:"val2"`
+	Val3 string `json:"val3"`
+	Val4 string `json:"val4"`
+}
+
+type PieceContentVO struct {
+	Id          int64      `json:"id"`
+	PieceId     string     `json:"pieceId"`
+	Content     string     `json:"content"`
+	ContentType int        `json:"contentType"`
+	UpdateDt    *time.Time `json:"updateDt"`
+	CreateDt    time.Time  `json:"createDt"`
 }
 
 type PuzzlePieceVO struct {
