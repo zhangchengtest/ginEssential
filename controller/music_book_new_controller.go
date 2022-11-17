@@ -2,19 +2,76 @@ package controller
 
 import (
 	"fmt"
+	"ginEssential/config"
 	"ginEssential/model"
 	"ginEssential/render"
 	"ginEssential/service"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	strftime "github.com/itchyny/timefmt-go"
+	"github.com/sjsdfg/common-lang-in-go/Cast"
 	"github.com/sjsdfg/common-lang-in-go/StringUtils"
+	"github.com/zhangchengtest/simple/sqls"
 	"github.com/zhangchengtest/simple/web/params"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 )
+
+func UploadBookImg(ctx *gin.Context) {
+
+	// 获取所有图片
+	form, err := ctx.MultipartForm()
+	if err != nil {
+		return
+	}
+	if len(form.File) <= 0 {
+		return
+	}
+
+	t := time.Now()
+	dir := strftime.Format(t, "%Y%m%d%H%M%S")
+
+	_, err = os.Stat(config.Instance.Uploader.Local.BookPath + "/" + dir)
+	if os.IsNotExist(err) {
+		os.Mkdir(config.Instance.Uploader.Local.BookPath+"/"+dir, os.ModePerm)
+	}
+	var ret string
+	for _, files := range form.File {
+		for _, file := range files {
+
+			if err := ctx.SaveUploadedFile(file, config.Instance.Uploader.Local.BookPath+"/"+dir+"/"+file.Filename); err != nil {
+				ctx.String(http.StatusBadRequest, fmt.Sprintf("upload err %s", err.Error()))
+				return
+			}
+
+			ret = file.Filename
+		}
+	}
+
+	bookId := ctx.PostForm("bookId")
+	authorType := Cast.ToInt(ctx.PostForm("authorType"))
+
+	DB := sqls.DB()
+	var s = util.Worker1{}
+	// 创建图
+	newUser := model.BookImg{
+		Id:         s.GetId(),
+		BookId:     bookId,
+		Title:      ret,
+		Url:        config.Instance.Uploader.Local.Host + "musicBook/" + dir + "/" + ret,
+		AuthorType: authorType,
+		CreateDt:   time.Now(),
+		CreateBy:   "",
+	}
+
+	DB.Create(&newUser)
+
+	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+}
 
 func buildContent(ctx *gin.Context, arr []model.BookPiece) model.PieceDetailVO {
 
@@ -80,12 +137,12 @@ func DetailMusicBook(ctx *gin.Context) {
 
 	bookvo := model.BookPieceVO{}
 
-	params := params.NewQueryParams(ctx)
-	params.Eq("book_id", ctx.Param("id"))
-	params.Eq("break_flag", 1)
-	params.Asc("book_order")
+	params1 := params.NewQueryParams(ctx)
+	params1.Eq("book_id", ctx.Param("id"))
+	params1.Eq("break_flag", 1)
+	params1.Asc("book_order")
 
-	list := service.PieceContentService.Find(&params.Cnd)
+	list := service.PieceContentService.Find(&params1.Cnd)
 
 	start_order := 0
 	end_order := 100000
@@ -113,7 +170,44 @@ func DetailMusicBook(ctx *gin.Context) {
 
 	bookvo.List = details
 	book2.PieceAll = bookvo
+	getMyUrl(ctx, book2)
+	log.Println("aaaa")
+	log.Println(book2.MyUrl)
+	getOtherUrl(ctx, book2)
 	model.Success(ctx, book2, "查询成功")
+}
+
+//func main() {
+//	book := test2()
+//	test1(*book)
+//
+//}
+
+func getMyUrl(ctx *gin.Context, book2 *model.MusicBookVO) {
+	params2 := params.NewQueryParams(ctx)
+	params2.Eq("book_id", ctx.Param("id"))
+	params2.Eq("author_type", 0)
+	params2.Desc("create_dt")
+	imgs := service.BookImgService.Find(&params2.Cnd)
+
+	if imgs != nil && len(imgs) > 0 {
+		book2.MyUrl = imgs[0].Url
+		log.Println("bbbbb")
+		log.Println(book2.MyUrl)
+	}
+}
+
+func getOtherUrl(ctx *gin.Context, book2 *model.MusicBookVO) {
+	params2 := params.NewQueryParams(ctx)
+	params2.Eq("book_id", ctx.Param("id"))
+	params2.Eq("author_type", 1)
+	params2.Desc("create_dt")
+	imgs := service.BookImgService.Find(&params2.Cnd)
+
+	if imgs != nil && len(imgs) > 0 {
+		book2.OtherUrl = imgs[0].Url
+	}
+
 }
 
 func chunk(array []model.BookPiece, size int) [][]model.BookPiece {

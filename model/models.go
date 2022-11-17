@@ -51,3 +51,17 @@ type PieceContent struct {
 	UpdateDt  *time.Time `json:"updateDt"`
 	CreateDt  time.Time  `json:"createDt"`
 }
+
+type BookImg struct {
+	Id         int64     `gorm:"type:bigint(20);not null;unique"`
+	BookId     string    `gorm:"type:varchar(64);not null"`
+	Title      string    `gorm:"type:varchar(200);not null"`
+	Url        string    `gorm:"type:varchar(200);not null"`
+	AuthorType int       `gorm:"type:int(11);not null"`
+	CreateDt   time.Time `json:"createDt"`
+	CreateBy   string    `json:"createBy"`
+}
+
+func (BookImg) TableName() string {
+	return "book_img"
+}

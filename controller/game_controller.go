@@ -113,7 +113,7 @@ func savePuzzle(piece string, ret string, sort int, dir string) {
 
 	DB := sqls.DB()
 	var s = util.Worker1{}
-	// 创建用户
+	// 创建图
 	newUser := model.PuzzlePiece{
 		Id:       s.GetId(),
 		Content:  config.Instance.Uploader.Local.Host + "images/" + dir + "/" + "output" + strconv.Itoa(sort) + ".png",

@@ -70,8 +70,9 @@ type Config struct {
 			StyleDetail     string `yaml:"StyleDetail"`
 		} `yaml:"AliyunOss"`
 		Local struct {
-			Host string `yaml:"Host"`
-			Path string `yaml:"Path"`
+			Host     string `yaml:"Host"`
+			Path     string `yaml:"Path"`
+			BookPath string `yaml:"BookPath"`
 		} `yaml:"Local"`
 	} `yaml:"Uploader"`
 

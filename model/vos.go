@@ -17,6 +17,8 @@ type MusicBookVO struct {
 	CreateDt    time.Time   `json:"createDt"`
 	CreateBy    string      `json:"createBy"`
 	PieceAll    BookPieceVO `json:"pieceAll"`
+	MyUrl       string      `json:"myUrl"`
+	OtherUrl    string      `json:"otherUrl"`
 }
 
 type BookDetailVO struct {
