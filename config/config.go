@@ -25,6 +25,10 @@ type Config struct {
 		MaxOpenConns int    `yaml:"MaxOpenConns"`
 	} `yaml:"DB"`
 
+	Cron struct {
+		Image string `yaml:"Image"`
+	} `yaml:"Cron"`
+
 	Redis struct {
 		Addr string `yaml:"Addr"`
 		Pwd  string `yaml:"Pwd"`

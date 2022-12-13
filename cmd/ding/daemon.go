@@ -125,7 +125,7 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 	}
 
 	c := cron.New()
-	spec := "0 */1 * * * ?"
+	spec := config.Instance.Cron.Image
 	err := c.AddFunc(spec, func() {
 		fmt.Println("cron times : ")
 		job.SplitImageWithIterator()
