@@ -122,7 +122,7 @@ func SplitImageWithIterator() {
 	outs := util.ConsumeIterator(it)
 
 	for i, tt := range outs {
-		savePuzzle(tt, filename, i, path)
+		savePuzzle(tt, filename, i, dir2)
 	}
 
 }
@@ -133,7 +133,7 @@ func savePuzzle(img image.Image, ret string, sort int, dir string) {
 	//fmt.Println(bounds, formatString)
 
 	//Encode from image format to writer
-	pngFilename := dir + "/" + "output" + strconv.Itoa(sort) + ".png"
+	pngFilename := config.Instance.Uploader.Local.Path + "/" + dir + "/" + "output" + strconv.Itoa(sort) + ".png"
 	f, err := os.OpenFile(pngFilename, os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		log.Fatal(err)
