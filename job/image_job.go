@@ -122,7 +122,7 @@ func SplitImageWithIterator() {
 	outs := util.ConsumeIterator(it)
 
 	for i, tt := range outs {
-		savePuzzle(tt, filename, i, dir2)
+		savePuzzle(tt, filename, i+1, dir2)
 	}
 
 }

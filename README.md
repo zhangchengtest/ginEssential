@@ -1,3 +1,4 @@
+cd /ROOT/ginEssential
 git pull
 go build ./cmd/ding
 pkill -9 ding
