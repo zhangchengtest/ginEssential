@@ -2,6 +2,8 @@ package controller
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"ginEssential/common"
 	"ginEssential/model"
@@ -10,10 +12,13 @@ import (
 	"github.com/zhangchengtest/simple/sqls"
 	"gorm.io/gorm"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -171,6 +176,125 @@ func MockInfo(ctx *gin.Context) {
 	model.Success(ctx, uservo, "")
 }
 
+func RedirectTOUnsplash(ctx *gin.Context) {
+
+	domain := "https://unsplash.com/oauth/authorize?"
+	url2 := "client_id=uwKjSmclPhET8snMTq38-TwQqKNHDd8SWACTk-Vr9mg"
+	redirect_uri := "https://pgw.punengshuo.com/api/auth/backFromU"
+	url2 += "&redirect_uri=" + redirect_uri
+	url2 += "&response_type=code"
+	url2 += "&scope=public+read_photos"
+
+	fmt.Printf(domain + url2)
+	fmt.Println()
+	fmt.Println()
+	ss := url.QueryEscape(url2)
+	fmt.Printf("data: s%", domain+ss)
+
+	ctx.Redirect(http.StatusFound, domain+url2)
+}
+
+func BackFromUnsplash(ctx *gin.Context) {
+
+	inputs, err := RequestInputs(ctx)
+	if err != nil {
+		log.Printf("get file error: %s", err)
+		model.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
+		return
+	}
+	code := inputs["code"].(string)
+	fmt.Printf("data: %v", inputs)
+
+	posturl := "https://unsplash.com/oauth/token"
+	redirect_uri := "https://pgw.punengshuo.com/api/auth/backFromU"
+	jsonStr := []byte(`{ "client_id": "uwKjSmclPhET8snMTq38-TwQqKNHDd8SWACTk-Vr9mg", "client_secret": "B4_p5ZZqDLKKFF4V6XyRHsqzzLoCJ7f9tlFfFECJ_H4", 
+		"redirect_uri": "` + redirect_uri + `", "code": "` + code + `", "grant_type": "authorization_code" }`)
+	content := util.Post(posturl, jsonStr, "application/json")
+	fmt.Printf("data: s%", content)
+	uservo := model.UserVO{}
+	model.Success(ctx, uservo, "")
+}
+
+// RequestInputs 获取所有参数
+func RequestInputs(c *gin.Context) (map[string]interface{}, error) {
+
+	const defaultMemory = 32 << 20
+	contentType := c.ContentType()
+
+	var (
+		dataMap  = make(map[string]interface{})
+		queryMap = make(map[string]interface{})
+		postMap  = make(map[string]interface{})
+	)
+
+	// @see gin@v1.7.7/binding/query.go ==> func (queryBinding) Bind(req *http.Request, obj interface{})
+	for k := range c.Request.URL.Query() {
+		queryMap[k] = c.Query(k)
+	}
+
+	if "application/json" == contentType {
+		var bodyBytes []byte
+		if c.Request.Body != nil {
+			bodyBytes, _ = ioutil.ReadAll(c.Request.Body)
+		}
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+		// @see gin@v1.7.7/binding/json.go ==> func (jsonBinding) Bind(req *http.Request, obj interface{})
+		if c.Request != nil && c.Request.Body != nil {
+			if err := json.NewDecoder(c.Request.Body).Decode(&postMap); err != nil {
+				return nil, err
+			}
+		}
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	} else if "multipart/form-data" == contentType {
+		// @see gin@v1.7.7/binding/form.go ==> func (formMultipartBinding) Bind(req *http.Request, obj interface{})
+		if err := c.Request.ParseMultipartForm(defaultMemory); err != nil {
+			return nil, err
+		}
+		for k, v := range c.Request.PostForm {
+			if len(v) > 1 {
+				postMap[k] = v
+			} else if len(v) == 1 {
+				postMap[k] = v[0]
+			}
+		}
+	} else {
+		// ParseForm 解析 URL 中的查询字符串，并将解析结果更新到 r.Form 字段
+		// 对于 POST 或 PUT 请求，ParseForm 还会将 body 当作表单解析，
+		// 并将结果既更新到 r.PostForm 也更新到 r.Form。解析结果中，
+		// POST 或 PUT 请求主体要优先于 URL 查询字符串（同名变量，主体的值在查询字符串的值前面）
+		// @see gin@v1.7.7/binding/form.go ==> func (formBinding) Bind(req *http.Request, obj interface{})
+		if err := c.Request.ParseForm(); err != nil {
+			return nil, err
+		}
+		if err := c.Request.ParseMultipartForm(defaultMemory); err != nil {
+			if err != http.ErrNotMultipart {
+				return nil, err
+			}
+		}
+		for k, v := range c.Request.PostForm {
+			if len(v) > 1 {
+				postMap[k] = v
+			} else if len(v) == 1 {
+				postMap[k] = v[0]
+			}
+		}
+	}
+
+	var mu sync.RWMutex
+	for k, v := range queryMap {
+		mu.Lock()
+		dataMap[k] = v
+		mu.Unlock()
+	}
+	for k, v := range postMap {
+		mu.Lock()
+		dataMap[k] = v
+		mu.Unlock()
+	}
+
+	return dataMap, nil
+}
+
 func Javatosql(ctx *gin.Context) {
 	var javabean = model.JavaBean{}
 	ctx.Bind(&javabean)
@@ -254,15 +378,15 @@ func CompareFile(ctx *gin.Context) {
 	model.Success2(ctx, list, "")
 }
 
-func TestThread(ctx *gin.Context) {
-
-	//firstFile := javabean.FirstFile
-	//secondFile :=javabean.SecondFile
-	sws := util.GetInstance()
-	//change := util.Change{Add: "ssss"}
-	sws.AddChange("ssss")
-	model.Success2(ctx, "ok", "")
-}
+//func TestThread(ctx *gin.Context) {
+//
+//	//firstFile := javabean.FirstFile
+//	//secondFile :=javabean.SecondFile
+//	sws := util.GetInstance()
+//	//change := util.Change{Add: "ssss"}
+//	sws.AddChange("ssss")
+//	model.Success2(ctx, "ok", "")
+//}
 
 func compareFileByLine(f1, f2 *os.File) string {
 	sc1 := bufio.NewScanner(f1)

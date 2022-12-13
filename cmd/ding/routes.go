@@ -12,9 +12,14 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/auth/login", controller.Login)
 	r.GET("/api/auth/info", middleware.AuthMiddleware(), controller.Info)
 	r.GET("/api/auth/mockinfo", controller.MockInfo)
+	//r.GET("/api/auth/randomImage", controller.RandomImage)
+
+	r.GET("/api/auth/redirectU", controller.RedirectTOUnsplash)
+	r.GET("/api/auth/backFromU", controller.BackFromUnsplash)
+
 	r.POST("/api/javatosql", controller.Javatosql)
 	r.POST("/api/compareFile", controller.CompareFile)
-	r.POST("/api/testThread", controller.TestThread)
+	//r.POST("/api/testThread", controller.TestThread)
 	r.POST("/api/addArticle", controller.AddArticle)
 	r.POST("/api/addArticleFromFile", controller.AddArticleFromFile)
 	r.GET("/api/randomArticle", controller.RandomArticle)

@@ -4,11 +4,23 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/google/uuid"
+	"image"
 	"math/rand"
 	"regexp"
 	"strings"
 	"time"
 )
+
+// ConsumeIterator drains the iterator of images and returns them in a slice
+// Note that consuming an entire iterator may cause heavy memory usage
+// and usually is a bad idea
+func ConsumeIterator(it ImageIterator) []image.Image {
+	ms := []image.Image{}
+	for it.Next() {
+		ms = append(ms, it.Get())
+	}
+	return ms
+}
 
 func RandomString(n int) string {
 	var letters = []byte("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM")

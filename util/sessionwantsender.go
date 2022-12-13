@@ -25,7 +25,7 @@ const (
 func GetInstance() *SessionWantSender {
 	once.Do(func() {
 		instance = &SessionWantSender{
-			Changes:                  make(chan string, changesBufferSize),
+			Changes: make(chan string, changesBufferSize),
 		}
 	})
 	return instance
@@ -42,13 +42,13 @@ func (sws *SessionWantSender) AddChange(c string) {
 func (sws *SessionWantSender) Run() {
 	//ch := <-sws.Changes
 	//fmt.Println("hi here %s", ch)
-	for {
-		select {
-		case ch := <-sws.Changes:
-			fmt.Println("hi here %s", ch)
-			//case <-sws.ctx.Done():
-			//	fmt.Println("hi good")
-			//	return
-		}
-	}
+	//for {
+	//	select {
+	//	case ch := <-sws.Changes:
+	//		fmt.Println("hi here %s", ch)
+	//		//case <-sws.ctx.Done():
+	//		//	fmt.Println("hi good")
+	//		//	return
+	//	}
+	//}
 }

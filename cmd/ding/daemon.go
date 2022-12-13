@@ -4,9 +4,11 @@ import (
 	_ "expvar"
 	"fmt"
 	"ginEssential/config"
+	"ginEssential/job"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
 	cmds "github.com/ipfs/go-ipfs-cmds"
+	"github.com/robfig/cron"
 	"github.com/sirupsen/logrus"
 	"github.com/zhangchengtest/simple/sqls"
 	"gorm.io/gorm"
@@ -121,6 +123,18 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 	if err := sqls.Open(config.Instance.DB.Url, gormConf, config.Instance.DB.MaxIdleConns, config.Instance.DB.MaxOpenConns); err != nil {
 		logrus.Error(err)
 	}
+
+	c := cron.New()
+	spec := "0 */1 * * * ?"
+	err := c.AddFunc(spec, func() {
+		fmt.Println("cron times : ")
+		job.SplitImageWithIterator()
+	})
+	if err != nil {
+		fmt.Errorf("AddFunc error : %v", err)
+		return
+	}
+	c.Start()
 
 	r := gin.Default()
 	r = CollectRoute(r)
