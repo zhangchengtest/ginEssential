@@ -194,6 +194,55 @@ func RedirectTOUnsplash(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, domain+url2)
 }
 
+func RedirectTOWechat(ctx *gin.Context) {
+
+	domain := "https://open.weixin.qq.com/connect/oauth2/authorize?"
+	url2 := "appid=wx70711c9b88f9c12f"
+	redirect_uri := "http://cheng.yufu.pub/api/auth/backFromW"
+	url2 += "&redirect_uri=" + redirect_uri
+	url2 += "&response_type=code"
+	url2 += "&scope=snsapi_base#wechat_redirect"
+
+	fmt.Printf(domain + url2)
+	fmt.Println()
+	fmt.Println()
+	ss := url.QueryEscape(url2)
+	fmt.Printf("data: s%", domain+ss)
+
+	ctx.Redirect(http.StatusFound, domain+url2)
+}
+
+func BackFromWechat(ctx *gin.Context) {
+
+	inputs, err := RequestInputs(ctx)
+	if err != nil {
+		log.Printf("get file error: %s", err)
+		model.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
+		return
+	}
+	code := inputs["code"].(string)
+	fmt.Printf("data--------: %v", inputs)
+
+	domain := "https://api.weixin.qq.com/sns/oauth2/access_token?"
+	url2 := "appid=wx70711c9b88f9c12f"
+	url2 += "&secret=20993710aa48342888d3a0b1755af9d6"
+	url2 += "&code=" + code
+	url2 += "&grant_type=authorization_code"
+
+	content := util.Get(domain + url2)
+	fmt.Println()
+	fmt.Printf("token--------: s%", content)
+	var wechatToken model.WechatToken
+
+	err2 := json.Unmarshal([]byte(content), &wechatToken)
+	if err2 != nil {
+		fmt.Println("error:", err2)
+	}
+	fmt.Printf("%+v", wechatToken)
+
+	model.Success(ctx, wechatToken, "")
+}
+
 func BackFromUnsplash(ctx *gin.Context) {
 
 	inputs, err := RequestInputs(ctx)

@@ -137,6 +137,14 @@ type ArticleVO struct {
 	Question  string `json:"question"`
 }
 
+type FoodVO struct {
+	Id       string `json:"id"`
+	FoodName string `json:"foodName"`
+	Category string `json:"category"`
+	Material string `json:"material"`
+	Url      string `json:"url"`
+}
+
 type TempOssVO struct {
 	Endpoint        string `json:"endpoint"`
 	AccessKeyId     string `json:"accessKeyId"`
@@ -144,4 +152,10 @@ type TempOssVO struct {
 	BucketName      string `json:"bucketName"`
 	UploadUrl       string `json:"uploadUrl"`
 	Token           string `json:"token"`
+}
+
+type WechatAuthVO struct {
+	Username  string `json:"username"`
+	NickName  string `json:"nickName"`
+	AvatarUrl string `json:"avatarUrl"`
 }

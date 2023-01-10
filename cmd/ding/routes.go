@@ -17,6 +17,9 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/api/auth/redirectU", controller.RedirectTOUnsplash)
 	r.GET("/api/auth/backFromU", controller.BackFromUnsplash)
 
+	r.GET("/api/auth/redirectW", controller.RedirectTOWechat)
+	r.GET("/api/auth/backFromW", controller.BackFromWechat)
+
 	r.POST("/api/javatosql", controller.Javatosql)
 	r.POST("/api/compareFile", controller.CompareFile)
 	//r.POST("/api/testThread", controller.TestThread)
@@ -24,6 +27,13 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/addArticleFromFile", controller.AddArticleFromFile)
 	r.GET("/api/randomArticle", controller.RandomArticle)
 	r.POST("/api/readorc", controller.Readorc)
+
+	r.POST("/wx/auth/login_by_weixin", controller.LoginByWeixinCode)
+	r.POST("/wx/auth/modify", middleware.AuthMiddleware(), controller.ModifyUser)
+	r.GET("/wx/auth/detail", middleware.AuthMiddleware(), controller.UserDetail)
+	r.POST("/wx/dfs/upload/file", controller.UploadFile)
+
+	r.GET("/api/randomFood", controller.RandomFood)
 
 	r.POST("/api/musicBook/save", middleware.AuthMiddleware(), controller.SaveMusicBook)
 	r.POST("/api/musicBook/search", controller.SearchMusicBook)
@@ -58,6 +68,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/api/game/nickname", controller.Nickname)
 	r.POST("/api/game/savePlaneRank", controller.SavePlaneRank)
 	r.POST("/api/game/modifyUsername", controller.ModifyUsername)
+
+	r.GET("/api/game/push", controller.PushTest)
 
 	r.GET("/api/oss/authTemp", controller.AuthTemp)
 	r.POST("/api/oss/temp2formal", controller.Copy)

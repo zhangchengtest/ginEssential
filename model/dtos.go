@@ -43,3 +43,20 @@ type FileTemp2FormalDTO struct {
 type PuzzlePieceDTO struct {
 	Url string `json:"url"`
 }
+
+type Code2SessionRequest struct {
+
+	// 必填 登录时获取的 code
+	JsCode   string  `json:"code"`
+	UserInfo UserDTO `json:"userInfo"`
+}
+
+type UserDTO struct {
+	Username  string `json:"username"`
+	NickName  string `json:"nickName"`
+	AvatarUrl string `json:"avatarUrl"`
+}
+
+type FileDTO struct {
+	FilePath string `json:"filePath"`
+}

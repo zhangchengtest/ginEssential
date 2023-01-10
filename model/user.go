@@ -14,14 +14,16 @@ type User struct {
 	Pwd           string     `json:"pwd"`
 	Autologin     int        `json:"autologin"`
 	UserStatus    int        `json:"userStatus"`
+	IsLock        int        `json:"isLock"`
+	Retry         int        `json:"retry"`
+	LastWrongPwDt *time.Time `json:"lastWrongPwDt"`
+	LastLoginDt   time.Time  `json:"lastLoginDt"`
+	Openid        string     `json:"openid"`
+	AvatarUrl     string     `json:"avatarUrl"`
 	UpdateBy      string     `json:"updateBy"`
 	UpdateDt      *time.Time `json:"updateDt"`
 	CreateDt      time.Time  `json:"createDt"`
 	CreateBy      string     `json:"createBy"`
-	IsLock        int        `json:"isLock"`
-	Retry         int        `json:"retry"`
-	LastWrongPwDt time.Time  `json:"lastWrongPwDt"`
-	LastLoginDt   time.Time  `json:"lastLoginDt"`
 }
 
 type UserVO struct {
@@ -31,6 +33,13 @@ type UserVO struct {
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
 	RoleCode     string `json:"roleCode"`
+}
+
+type WechatToken struct {
+	Scope        string `json:"scope"`
+	OpenId       string `json:"open_id"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type UserLoginDTO struct {

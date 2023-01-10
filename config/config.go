@@ -34,6 +34,12 @@ type Config struct {
 		Pwd  string `yaml:"Pwd"`
 	} `yaml:"Redis"`
 
+	DAYU struct {
+		APP_KEY           string `yaml:"APP_KEY"`
+		APP_SECRET        string `yaml:"APP_SECRET"`
+		SMS_TEMPLATE_CODE string `yaml:"SMS_127153513"`
+	} `yaml:"DAYU"`
+
 	// Github
 	Github struct {
 		ClientID     string `yaml:"ClientID"`

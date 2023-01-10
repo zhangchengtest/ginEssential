@@ -8,6 +8,7 @@ import (
 	"ginEssential/redis"
 	"ginEssential/service"
 	"ginEssential/util"
+	"github.com/Scorpio69t/jpush-api-golang-client"
 	"github.com/gin-gonic/gin"
 	strftime "github.com/itchyny/timefmt-go"
 	"github.com/zhangchengtest/simple/sqls"
@@ -153,6 +154,49 @@ func SavePuzzleRank(ctx *gin.Context) {
 	DB.Create(&newUser)
 
 	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+}
+
+func PushTest(ctx *gin.Context) {
+	var pf jpush.Platform
+	pf.Add(jpush.ANDROID)
+	// pf.All()
+
+	// Audience: tag
+	var at jpush.Audience
+	id := []string{"1"}
+	at.SetID(id)
+	// at.All()
+
+	// Notification
+	var n jpush.Notification
+	n.SetAlert("alert")
+	n.SetAndroid(&jpush.AndroidNotification{Alert: "alert", Title: "title"})
+
+	// Message
+	var m jpush.Message
+	m.MsgContent = "This is a message"
+	m.Title = "Hello"
+
+	// PayLoad
+	payload := jpush.NewPayLoad()
+	payload.SetPlatform(&pf)
+	payload.SetAudience(&at)
+	payload.SetNotification(&n)
+	payload.SetMessage(&m)
+
+	// Send
+	c := jpush.NewJPushClient("f4d450cd2dec6b2568fa74b9", "48aea09d1a15f68a34f375eb ") // appKey and masterSecret can be gotten from https://www.jiguang.cn/
+	data, err := payload.Bytes()
+	fmt.Printf("%s\n", string(data))
+	if err != nil {
+		panic(err)
+	}
+	res, err := c.Push(data)
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+	} else {
+		fmt.Printf("ok: %v\n", res)
+	}
 }
 
 func SavePlaneRank(ctx *gin.Context) {
