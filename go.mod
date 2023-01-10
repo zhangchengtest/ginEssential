@@ -3,6 +3,7 @@ module ginEssential
 go 1.18
 
 require (
+	github.com/Scorpio69t/jpush-api-golang-client v1.0.0
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.121
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -11,6 +12,7 @@ require (
 	github.com/goburrow/cache v0.1.4
 	github.com/gomodule/redigo v1.8.9
 	github.com/google/uuid v1.3.0
+	github.com/hbagdi/go-unsplash v0.0.0-20220920231246-14121bdf6d94
 	github.com/ipfs/go-ipfs-cmds v0.8.1
 	github.com/ipfs/go-log v1.0.5
 	github.com/itchyny/timefmt-go v0.1.4
@@ -18,22 +20,24 @@ require (
 	github.com/libp2p/go-libp2p-loggables v0.1.0
 	github.com/multiformats/go-multiaddr v0.5.0
 	github.com/multiformats/go-multiaddr-dns v0.3.1
+	github.com/robfig/cron v1.2.0
+	github.com/silenceper/wechat/v2 v2.1.4
 	github.com/sirupsen/logrus v1.9.0
 	github.com/sjsdfg/common-lang-in-go v0.5.4
 	github.com/zhangchengtest/simple v1.2.3
+	golang.org/x/oauth2 v0.3.0
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/gorm v1.23.7
 )
 
 require (
 	github.com/Kubuxu/go-os-helper v0.0.1 // indirect
-	github.com/Scorpio69t/jpush-api-golang-client v1.0.0 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
 	github.com/btcsuite/btcd v0.22.1 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.1.3 // indirect
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/crackcomm/go-gitignore v0.0.0-20170627025303-887ab5e44cc3 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -46,9 +50,8 @@ require (
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/gwpp/alidayu-go v0.0.0-20170914092902-2bab8fdbc3ac // indirect
-	github.com/hbagdi/go-unsplash v0.0.0-20220920231246-14121bdf6d94 // indirect
 	github.com/ipfs/go-cid v0.2.0 // indirect
 	github.com/ipfs/go-ipfs-files v0.1.1 // indirect
 	github.com/ipfs/go-log/v2 v2.5.1 // indirect
@@ -77,15 +80,14 @@ require (
 	github.com/multiformats/go-multicodec v0.4.1 // indirect
 	github.com/multiformats/go-multihash v0.1.0 // indirect
 	github.com/multiformats/go-varint v0.0.6 // indirect
+	github.com/onsi/gomega v1.24.1 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20220228012449-10b1cf09e00b // indirect
 	github.com/pelletier/go-toml/v2 v2.0.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
-	github.com/robfig/cron v1.2.0 // indirect
 	github.com/rs/cors v1.7.0 // indirect
-	github.com/silenceper/wechat/v2 v2.1.4 // indirect
 	github.com/spacemonkeygo/spacelog v0.0.0-20180420211403-2296661a0572 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/texttheater/golang-levenshtein v0.0.0-20180516184445-d188e65d659e // indirect
 	github.com/tidwall/gjson v1.14.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
@@ -98,13 +100,11 @@ require (
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.3.0 // indirect
-	golang.org/x/oauth2 v0.3.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
 	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	golang.org/x/tools v0.1.12 // indirect
-	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
