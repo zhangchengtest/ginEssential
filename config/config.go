@@ -83,6 +83,7 @@ type Config struct {
 			Host     string `yaml:"Host"`
 			Path     string `yaml:"Path"`
 			BookPath string `yaml:"BookPath"`
+			LogoPath string `yaml:"LogoPath"`
 		} `yaml:"Local"`
 	} `yaml:"Uploader"`
 

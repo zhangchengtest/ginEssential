@@ -2,12 +2,14 @@ package controller
 
 import (
 	"fmt"
+	"ginEssential/config"
 	"ginEssential/model"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
 	wechat "github.com/silenceper/wechat/v2"
 	"github.com/silenceper/wechat/v2/cache"
 	miniConfig "github.com/silenceper/wechat/v2/miniprogram/config"
+	"github.com/sjsdfg/common-lang-in-go/StringUtils"
 	"github.com/zhangchengtest/simple/sqls"
 	"io"
 	"log"
@@ -122,8 +124,16 @@ func ModifyUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
 		return
 	}
+	result := map[string]interface{}{}
+	if !StringUtils.IsEmpty(userDTO.NickName) {
+		result["nick_name"] = userDTO.NickName
+	}
+	if !StringUtils.IsEmpty(userDTO.AvatarUrl) {
+		result["avatar_url"] = userDTO.AvatarUrl
+	}
+
 	DB := sqls.DB()
-	DB.Model(&olduser).Where("user_id", olduser.UserId).Updates(map[string]interface{}{"nick_name": userDTO.NickName, "avatar_url": userDTO.AvatarUrl})
+	DB.Model(&olduser).Where("user_id", olduser.UserId).Updates(result)
 	// 创建图
 	autvo := model.WechatAuthVO{
 		Username:  olduser.UserName,
@@ -135,7 +145,7 @@ func ModifyUser(ctx *gin.Context) {
 }
 
 func UploadFile(ctx *gin.Context) {
-	file1, header, err := ctx.Request.FormFile("file")
+	file1, header, err := ctx.Request.FormFile("upfile")
 	if err != nil {
 		log.Printf("get file error: %s", err)
 		model.Response(ctx, http.StatusBadRequest, 422, nil, "文件上传失败")
@@ -145,7 +155,7 @@ func UploadFile(ctx *gin.Context) {
 	filename := header.Filename
 
 	// 创建一个文件，文件名为filename，这里的返回值out也是一个File指针
-	sourceFile1, err := os.Create(filename)
+	sourceFile1, err := os.Create(config.Instance.Uploader.Local.LogoPath + "/" + filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -158,5 +168,5 @@ func UploadFile(ctx *gin.Context) {
 
 	defer sourceFile1.Close()
 
-	model.Success(ctx, gin.H{"userInfo": "autvo"}, "查询成功")
+	model.Success(ctx, gin.H{"url": config.Instance.Uploader.Local.Host + "logoPath" + "/" + filename}, "查询成功")
 }
