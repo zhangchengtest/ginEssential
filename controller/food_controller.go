@@ -46,7 +46,7 @@ func SearchFood(ctx *gin.Context) {
 
 	rand.Seed(time.Now().UnixNano())
 
-	DB.Where("category = ?", "rising").Find(&foods)
+	DB.Where("category = ?", "rising").Order("create_dt desc").Limit(30).Find(&foods)
 
 	vos := render.BuildFoods(foods)
 
