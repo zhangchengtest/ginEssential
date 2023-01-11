@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"ginEssential/config"
 	"ginEssential/model"
+	"ginEssential/render"
 	"ginEssential/util"
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,21 @@ func RandomFood(ctx *gin.Context) {
 	util.SimpleCopyProperties(&articleVO, &foods[chapter])
 
 	model.Success(ctx, gin.H{"food": articleVO}, "查询成功")
+
+}
+
+func SearchFood(ctx *gin.Context) {
+	DB := sqls.DB()
+
+	var foods []model.Food
+
+	rand.Seed(time.Now().UnixNano())
+
+	DB.Where("category = ?", "rising").Find(&foods)
+
+	vos := render.BuildFoods(foods)
+
+	model.Success(ctx, gin.H{"foods": vos}, "查询成功")
 
 }
 

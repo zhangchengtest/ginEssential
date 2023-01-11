@@ -34,6 +34,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/wx/dfs/upload/file", controller.UploadFile)
 
 	r.GET("/api/randomFood", controller.RandomFood)
+	r.GET("/wx/searchFood", controller.SearchFood)
 
 	r.POST("/api/musicBook/save", middleware.AuthMiddleware(), controller.SaveMusicBook)
 	r.POST("/api/musicBook/search", controller.SearchMusicBook)
