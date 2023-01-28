@@ -21,6 +21,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -156,7 +157,7 @@ func SavePuzzleRank(ctx *gin.Context) {
 
 	DB.Create(&newUser)
 
-	sendRank(rank.Username, rank.Username+"在这个图上拼了")
+	sendRank(rank.Username, rank.Username+"在这个图上拼了"+config.Instance.PuzzleUrl+"/#/puzzle/index?randomUrl="+url.QueryEscape(rank.Url)+"&ginToken="+rank.Username)
 
 	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
