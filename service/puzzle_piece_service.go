@@ -102,11 +102,9 @@ func (s *puzzlePieceService) UpdateAll(id string, columns *model.PuzzlePiece) er
 	return dao.PuzzlePieceDao.UpdateAll(sqls.DB(), id, columns)
 }
 
-//
-// func (s *puzzlePieceService) UpdateColumn(id int64, name string, value interface{}) error {
-// 	return dao.PuzzlePieceDao.UpdateColumn(sqls.DB(), id, name, value)
-// }
-//
+//	func (s *puzzlePieceService) UpdateColumn(id int64, name string, value interface{}) error {
+//		return dao.PuzzlePieceDao.UpdateColumn(sqls.DB(), id, name, value)
+//	}
 func (s *puzzlePieceService) Delete(id string) {
 	dao.PuzzlePieceDao.Delete(sqls.DB(), id)
 }
@@ -153,10 +151,10 @@ func (s *puzzlePieceService) GetPuzzlePiecesGroup() []model.PuzzlePieceVO {
 	t := time.Now()
 	date := strftime.Format(t, "%Y-%m-%d")
 	fmt.Println(date)
-	t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+	//t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
 
 	var list []model.PuzzlePiece
-	sqls.DB().Model(&model.PuzzlePiece{}).Select("url").Where("create_dt > ?", t2).Group("url").Find(&list)
+	sqls.DB().Model(&model.PuzzlePiece{}).Select("url, create_dt").Order("create_dt desc").Group("url, create_dt").Limit(30).Find(&list)
 	var puzzlePieces []model.PuzzlePieceVO
 	for _, puzzlePiece := range list {
 

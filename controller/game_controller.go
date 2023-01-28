@@ -318,6 +318,7 @@ func QueryPuzzle(ctx *gin.Context) {
 func QueryPuzzleByUrl(ctx *gin.Context) {
 
 	val := ctx.Request.FormValue("url")
+	order_type := ctx.Request.FormValue("order_type")
 	fmt.Printf(val)
 
 	//var queryVo model.PuzzlePieceDTO
@@ -325,7 +326,12 @@ func QueryPuzzleByUrl(ctx *gin.Context) {
 	//	ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
 	//	return
 	//}
-	list := service.PuzzlePieceService.GetPuzzlePiecesRandom(val)
+	var list []model.PuzzlePiece
+	if order_type == "random" {
+		list = service.PuzzlePieceService.GetPuzzlePiecesRandom(val)
+	} else {
+		list = service.PuzzlePieceService.GetPuzzlePieces(val)
+	}
 
 	var puzzlePieces []string
 	var orders []int
