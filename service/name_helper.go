@@ -3,7 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"ginEssential/util"
 	"math/rand"
 	"time"
 )
@@ -14,23 +14,14 @@ var lastNameLen int
 var firstNameLen int
 
 func init() {
-	jsonConfigList := getName("adjective.json")
+	jsonConfigList := util.ReadJson("adjective.json")
 	firstName = deserializeJson(jsonConfigList)
-	jsonConfigList = getName("noun.json")
+	jsonConfigList = util.ReadJson("noun.json")
 	lastName = deserializeJson(jsonConfigList)
 	lastNameLen = len(lastName)
 	firstNameLen = len(firstName)
 }
 
-func getName(name string) string {
-	b, err := ioutil.ReadFile(name) // just pass the file name
-	if err != nil {
-		fmt.Print(err)
-	}
-	str := string(b) // convert content to a 'string'
-	fmt.Println(str) // print the content as a 'string'
-	return str
-}
 func deserializeJson(configJson string) []string {
 
 	jsonAsBytes := []byte(configJson)

@@ -33,6 +33,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/wx/auth/detail", middleware.AuthMiddleware(), controller.UserDetail)
 	r.POST("/wx/dfs/upload/file", controller.UploadFile)
 
+	r.GET("/wx/testTemplate", middleware.AuthMiddleware(), controller.TestTemplate)
+
 	r.GET("/api/randomFood", controller.RandomFood)
 	r.GET("/wx/searchFood", controller.SearchFood)
 

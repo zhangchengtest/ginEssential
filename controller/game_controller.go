@@ -11,6 +11,10 @@ import (
 	"github.com/Scorpio69t/jpush-api-golang-client"
 	"github.com/gin-gonic/gin"
 	strftime "github.com/itchyny/timefmt-go"
+	"github.com/silenceper/wechat/v2"
+	"github.com/silenceper/wechat/v2/cache"
+	offConfig "github.com/silenceper/wechat/v2/officialaccount/config"
+	"github.com/silenceper/wechat/v2/officialaccount/message"
 	"github.com/zhangchengtest/simple/sqls"
 	"image"
 	"image/png"
@@ -139,7 +143,6 @@ func SavePuzzleRank(ctx *gin.Context) {
 	// password := ctx.PostForm("password")
 
 	var s = util.Worker1{}
-	// 创建用户
 	newUser := model.PuzzleRank{
 		Id:        s.GetId(),
 		Username:  rank.Username,
@@ -152,6 +155,8 @@ func SavePuzzleRank(ctx *gin.Context) {
 	}
 
 	DB.Create(&newUser)
+
+	sendRank(rank.Username, rank.Username+"在这个图上拼了")
 
 	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
@@ -221,7 +226,36 @@ func SavePlaneRank(ctx *gin.Context) {
 
 	DB.Create(&newUser)
 
-	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+	model.Success(ctx, gin.H{"status": "ok"}, "新增排名")
+}
+
+func sendRank(username, msg string) {
+
+	DB := sqls.DB()
+	var user model.User
+	DB.Where("user_name = ?", username).First(&user)
+
+	wc := wechat.NewWechat()
+	//这里本地内存保存access_token，也可选择redis，memcache或者自定cache
+	memory := cache.NewMemory()
+	cfg := &offConfig.Config{
+		AppID:     "wx70711c9b88f9c12f",
+		AppSecret: "20993710aa48342888d3a0b1755af9d6",
+		Token:     wxToken,
+		//EncodingAESKey: "xxxx",
+		Cache: memory,
+	}
+	officialAccount := wc.GetOfficialAccount(cfg)
+
+	data := message.MediaText{
+		Content: msg,
+	}
+	customerMessage := message.CustomerMessage{
+		Msgtype: message.MsgTypeText,
+		Text:    &data,
+		ToUser:  user.Openid,
+	}
+	officialAccount.GetCustomerMessageManager().Send(&customerMessage)
 }
 
 func QueryPuzzleRank(ctx *gin.Context) {

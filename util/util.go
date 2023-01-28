@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"image"
+	"io/ioutil"
 	"math/rand"
 	"regexp"
 	"strings"
@@ -20,6 +21,16 @@ func ConsumeIterator(it ImageIterator) []image.Image {
 		ms = append(ms, it.Get())
 	}
 	return ms
+}
+
+func ReadJson(name string) string {
+	b, err := ioutil.ReadFile(name) // just pass the file name
+	if err != nil {
+		fmt.Print(err)
+	}
+	str := string(b) // convert content to a 'string'
+	fmt.Println(str) // print the content as a 'string'
+	return str
 }
 
 func RandomString(n int) string {

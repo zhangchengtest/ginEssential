@@ -9,6 +9,8 @@ import (
 	wechat "github.com/silenceper/wechat/v2"
 	"github.com/silenceper/wechat/v2/cache"
 	miniConfig "github.com/silenceper/wechat/v2/miniprogram/config"
+	offConfig "github.com/silenceper/wechat/v2/officialaccount/config"
+	"github.com/silenceper/wechat/v2/officialaccount/message"
 	"github.com/sjsdfg/common-lang-in-go/StringUtils"
 	"github.com/zhangchengtest/simple/sqls"
 	"io"
@@ -62,6 +64,7 @@ func LoginByWeixinCode(ctx *gin.Context) {
 			Email:         "test@qq.com",
 			Pwd:           hasedPassword,
 			Openid:        resp.OpenID,
+			Unionid:       resp.UnionID,
 			LastWrongPwDt: nil,
 			LastLoginDt:   time.Now(),
 			AvatarUrl:     "https://thirdwx.qlogo.cn/mmopen/vi_32/POgEwh4mIHO4nibH0KlMECNjjGxQUq24ZEaGT4poC6icRiccVGKSyXwibcPq4BWmiaIGuG1icwxaQX6grC9VemZoJ8rg/132",
@@ -86,7 +89,8 @@ func LoginByWeixinCode(ctx *gin.Context) {
 		}
 
 		token, _ := util.ReleaseToken(newUser)
-
+		fmt.Println("token is here")
+		fmt.Println(token)
 		model.Success(ctx, gin.H{"userInfo": autvo, "token": token}, "查询成功")
 	} else {
 		// 创建图
@@ -96,6 +100,8 @@ func LoginByWeixinCode(ctx *gin.Context) {
 			AvatarUrl: olduser.AvatarUrl,
 		}
 		token, _ := util.ReleaseToken(olduser)
+		fmt.Println("token is here")
+		fmt.Println(token)
 		model.Success(ctx, gin.H{"userInfo": autvo, "token": token}, "查询成功")
 	}
 
@@ -169,4 +175,57 @@ func UploadFile(ctx *gin.Context) {
 	defer sourceFile1.Close()
 
 	model.Success(ctx, gin.H{"url": config.Instance.Uploader.Local.Host + "logoPath" + "/" + filename}, "查询成功")
+}
+
+const wxToken = "cheng12345678" // 这里填微信开发平台里设置的 Token
+func TestTemplate(ctx *gin.Context) {
+
+	olduser, _ := ctx.MustGet("user").(model.User)
+
+	wc := wechat.NewWechat()
+	//这里本地内存保存access_token，也可选择redis，memcache或者自定cache
+	memory := cache.NewMemory()
+	cfg := &offConfig.Config{
+		AppID:     "wx70711c9b88f9c12f",
+		AppSecret: "20993710aa48342888d3a0b1755af9d6",
+		Token:     wxToken,
+		//EncodingAESKey: "xxxx",
+		Cache: memory,
+	}
+	officialAccount := wc.GetOfficialAccount(cfg)
+
+	first := message.TemplateDataItem{
+		Value: "选好吃啥了",
+	}
+	keyword1 := message.TemplateDataItem{
+		Value: "挑食",
+	}
+
+	keyword2 := message.TemplateDataItem{
+		Value: "2022-10-10 01:01",
+	}
+	keyword3 := message.TemplateDataItem{
+		Value: "不错",
+	}
+	remark := message.TemplateDataItem{
+		Value: "你真有眼光",
+	}
+	dd := map[string]*message.TemplateDataItem{}
+	dd["first"] = &first
+	dd["keyword1"] = &keyword1
+	dd["keyword2"] = &keyword2
+	dd["keyword3"] = &keyword3
+	dd["remark"] = &remark
+
+	templateMessage := message.TemplateMessage{
+		TemplateID: "97IdSqc-esk3Vqt-qq95QhBu_qYSbbwdq3lEh1N4EYU",
+		Data:       dd,
+		ToUser:     olduser.Openid,
+	}
+	_, err := officialAccount.GetTemplate().Send(&templateMessage)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	model.Success(ctx, gin.H{"ss": "ss"}, "查询成功")
 }

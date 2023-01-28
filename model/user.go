@@ -19,6 +19,7 @@ type User struct {
 	LastWrongPwDt *time.Time `json:"lastWrongPwDt"`
 	LastLoginDt   time.Time  `json:"lastLoginDt"`
 	Openid        string     `json:"openid"`
+	Unionid       string     `json:"unionid"`
 	AvatarUrl     string     `json:"avatarUrl"`
 	UpdateBy      string     `json:"updateBy"`
 	UpdateDt      *time.Time `json:"updateDt"`
