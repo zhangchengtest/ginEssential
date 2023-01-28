@@ -234,7 +234,7 @@ func sendRank(username, myurl string) {
 
 	DB := sqls.DB()
 	var users []model.User
-	DB.Where("union_id = ?", "123456").Find(&users)
+	DB.Where("unionid = ?", "123456").Find(&users)
 
 	wc := wechat.NewWechat()
 	//这里本地内存保存access_token，也可选择redis，memcache或者自定cache
@@ -250,7 +250,7 @@ func sendRank(username, myurl string) {
 
 	for _, user := range users {
 
-		msg := username + "在这个图上拼了" + config.Instance.PuzzleUrl + "/#/puzzle/index?randomUrl=" + url.QueryEscape(myurl) + "&ginToken=" + user.UserName
+		msg := username + "在这个图上拼的很好\n" + config.Instance.PuzzleUrl + "/#/puzzle/index?randomUrl=" + url.QueryEscape(myurl) + "&ginToken=" + user.UserName
 		data := message.MediaText{
 			Content: msg,
 		}
