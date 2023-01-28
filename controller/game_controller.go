@@ -157,7 +157,7 @@ func SavePuzzleRank(ctx *gin.Context) {
 
 	DB.Create(&newUser)
 
-	sendRank(rank.Username, rank.Username+"在这个图上拼了"+config.Instance.PuzzleUrl+"/#/puzzle/index?randomUrl="+url.QueryEscape(rank.Url)+"&ginToken="+rank.Username)
+	sendRank(rank.Username, rank.Url)
 
 	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
 }
@@ -230,11 +230,11 @@ func SavePlaneRank(ctx *gin.Context) {
 	model.Success(ctx, gin.H{"status": "ok"}, "新增排名")
 }
 
-func sendRank(username, msg string) {
+func sendRank(username, myurl string) {
 
 	DB := sqls.DB()
-	var user model.User
-	DB.Where("user_name = ?", username).First(&user)
+	var users []model.User
+	DB.Where("union_id = ?", "123456").Find(&users)
 
 	wc := wechat.NewWechat()
 	//这里本地内存保存access_token，也可选择redis，memcache或者自定cache
@@ -248,15 +248,22 @@ func sendRank(username, msg string) {
 	}
 	officialAccount := wc.GetOfficialAccount(cfg)
 
-	data := message.MediaText{
-		Content: msg,
+	for _, user := range users {
+
+		msg := username + "在这个图上拼了" + config.Instance.PuzzleUrl + "/#/puzzle/index?randomUrl=" + url.QueryEscape(myurl) + "&ginToken=" + user.UserName
+		data := message.MediaText{
+			Content: msg,
+		}
+		if user.UserName != username {
+			customerMessage := message.CustomerMessage{
+				Msgtype: message.MsgTypeText,
+				Text:    &data,
+				ToUser:  user.Openid,
+			}
+			officialAccount.GetCustomerMessageManager().Send(&customerMessage)
+		}
 	}
-	customerMessage := message.CustomerMessage{
-		Msgtype: message.MsgTypeText,
-		Text:    &data,
-		ToUser:  user.Openid,
-	}
-	officialAccount.GetCustomerMessageManager().Send(&customerMessage)
+
 }
 
 func QueryPuzzleRank(ctx *gin.Context) {
