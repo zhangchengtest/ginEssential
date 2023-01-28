@@ -250,7 +250,7 @@ func sendRank(username, myurl string) {
 
 	for _, user := range users {
 
-		msg := username + "在这个图上拼的很好\n" + config.Instance.PuzzleUrl + "/#/puzzle/index?randomUrl=" + url.QueryEscape(myurl) + "&ginToken=" + user.UserName
+		msg := username + "在这个图上拼的很好\n" + config.Instance.PuzzleUrl + "/#/puzzle/index?randomUrl=" + url.QueryEscape(myurl) + "&ginToken=" + url.QueryEscape(user.UserName)
 		data := message.MediaText{
 			Content: msg,
 		}
