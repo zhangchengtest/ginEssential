@@ -3,6 +3,7 @@ module ginEssential
 go 1.18
 
 require (
+	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/Scorpio69t/jpush-api-golang-client v1.0.0
 	github.com/aliyun/alibaba-cloud-sdk-go v1.62.121
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
@@ -21,6 +22,7 @@ require (
 	github.com/multiformats/go-multiaddr v0.5.0
 	github.com/multiformats/go-multiaddr-dns v0.3.1
 	github.com/robfig/cron v1.2.0
+	github.com/rs/zerolog v1.29.0
 	github.com/silenceper/wechat/v2 v2.1.4
 	github.com/sirupsen/logrus v1.9.0
 	github.com/sjsdfg/common-lang-in-go v0.5.4
@@ -32,6 +34,7 @@ require (
 
 require (
 	github.com/Kubuxu/go-os-helper v0.0.1 // indirect
+	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
 	github.com/btcsuite/btcd v0.22.1 // indirect
@@ -67,6 +70,7 @@ require (
 	github.com/libp2p/go-buffer-pool v0.0.2 // indirect
 	github.com/libp2p/go-libp2p-core v0.16.1 // indirect
 	github.com/libp2p/go-openssl v0.0.7 // indirect
+	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/miekg/dns v1.1.48 // indirect
 	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1 // indirect
@@ -106,7 +110,7 @@ require (
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gorm.io/driver/mysql v1.3.4 // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect

@@ -134,6 +134,37 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 		fmt.Errorf("AddFunc error : %v", err)
 		return
 	}
+
+	spec_gold := config.Instance.Cron.Gold
+	err_gold := c.AddFunc(spec_gold, func() {
+		fmt.Println("cron times : ")
+		job.IcbcGold()
+	})
+	if err_gold != nil {
+		fmt.Errorf("Add gold error : %v", err)
+		return
+	}
+
+	spec_gold2 := config.Instance.Cron.Gold2
+	err_gold2 := c.AddFunc(spec_gold2, func() {
+		fmt.Println("cron times : ")
+		job.IcbcGold()
+	})
+	if err_gold2 != nil {
+		fmt.Errorf("Add gold error : %v", err)
+		return
+	}
+
+	spec_article := config.Instance.Cron.Article
+	err_3 := c.AddFunc(spec_article, func() {
+		fmt.Println("cron times : ")
+		job.RandomArticle()
+	})
+	if err_3 != nil {
+		fmt.Errorf("Add article error : %v", err)
+		return
+	}
+
 	c.Start()
 
 	r := gin.Default()

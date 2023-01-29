@@ -65,3 +65,15 @@ type BookImg struct {
 func (BookImg) TableName() string {
 	return "book_img"
 }
+
+type Words struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+type Theme struct {
+	Id       int64     `gorm:"type:int(11);not null;unique"`
+	Name     string    `gorm:"type:varchar(64);not null"`
+	CreateDt time.Time `json:"createDt"`
+	CreateBy string    `json:"createBy"`
+}

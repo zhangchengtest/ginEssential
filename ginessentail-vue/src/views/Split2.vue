@@ -1,6 +1,7 @@
 <template>
   <div class="hello">
-    <h1>Split Image</h1>
+    <img src="http://127.0.0.1:80/h5/payments/qrcode?paymentId=1234&height=100&width=100">
+    <h1>Split Image1</h1>
     <form action="#">
       <p>
         <input id="row" type="hidden" name="row" value="3">
