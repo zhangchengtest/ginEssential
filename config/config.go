@@ -28,6 +28,8 @@ type Config struct {
 
 	Cron struct {
 		Image string `yaml:"Image"`
+		Gold  string `yaml:"Gold"`
+		Gold2 string `yaml:"Gold2"`
 	} `yaml:"Cron"`
 
 	Redis struct {
