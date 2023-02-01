@@ -1,0 +1,36 @@
+log:
+  path: ./logs
+  fileName: weather.log
+
+push:
+  - label: wechat
+    value: xxx
+  - label: console
+    value:
+  - label: hook
+    value: https://www.topme.pro/hook
+  - label: serverChan
+    value: key
+
+noti:
+  - pro: 10125 #省
+    district: 01 #市
+    city: 01 #区
+    info: 长沙 #展示标识
+    alarm: true #是否预警
+    remind: true #前一天有雨提醒
+    report: true #当天预报
+  - pro: 10102
+    district: 00
+    city: 01
+    info: 上海市
+    alarm: true
+    remind: true
+    report: true
+  - pro: 10125
+    district: 02
+    city: 01
+    info: 湘潭
+    alarm: true
+    remind: true
+    report: true

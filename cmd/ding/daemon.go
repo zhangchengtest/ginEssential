@@ -165,6 +165,16 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 		return
 	}
 
+	spec_Weather := config.Instance.Cron.Weather
+	err_4 := c.AddFunc(spec_Weather, func() {
+		fmt.Println("cron times : ")
+		job.WeatherJob()
+	})
+	if err_4 != nil {
+		fmt.Errorf("Add article error : %v", err)
+		return
+	}
+
 	c.Start()
 
 	r := gin.Default()
