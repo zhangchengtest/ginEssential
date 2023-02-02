@@ -9,37 +9,49 @@ import (
 	"github.com/silenceper/wechat/v2/officialaccount/message"
 	"github.com/zhangchengtest/simple/sqls"
 	"math/rand"
+	"strconv"
+	"strings"
 	"time"
 )
 
-func RandomArticle() {
+func RandomPoetry() {
 	DB := sqls.DB()
 
 	// 创建用户
-	var mywords []model.Words
+	var mywords []model.Tag
 
-	var theme model.Theme
+	var theme model.Poetry
+
+	var article model.Article
 
 	var ss string
 
 	rand.Seed(time.Now().UnixNano())
-	aid := rand.Intn(19) + 1
+	aid := rand.Intn(30000) + 1
 	DB.Where("id = ?", aid).Find(&theme)
-	ss = "主题：" + theme.Name + "\n"
-	ramids := make([]int, 20)
-	for i := 0; i < 20; i++ {
-		ramId := rand.Intn(300000) + 1
-		ramids[i] = ramId
-	}
-	DB.Where("id in ?", ramids).Find(&mywords)
+	ss = theme.Name + "\n"
+	ss = ss + theme.Dynasty + "\n"
+	ss = ss + theme.Poet + "\n"
+
+	DB.Where("poetry_id = ?", aid).Find(&mywords)
 
 	for _, w := range mywords {
-		ss = ss + " " + w.Name
+		ss = ss + " " + w.Tag
 	}
+	dd := strings.Replace(theme.Content, "<br/>", "\n", -1)
+	dd = strings.Replace(dd, "<br>", "\n", -1)
+	ss = ss + "\n" + dd + "\n"
+
+	aid = rand.Intn(80) + 1
+	DB.Where("chapter = ?", aid).Find(&article)
+
+	ss = ss + strconv.Itoa(aid) + "\n"
+	ss = ss + article.Content + "\n"
+
 	sendArticle(ss)
 }
 
-func sendArticle(msg string) {
+func sendPoetry(msg string) {
 	log.Info().Msgf("send to remote")
 	DB := sqls.DB()
 	var users []model.User

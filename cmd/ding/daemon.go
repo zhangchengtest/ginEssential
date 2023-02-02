@@ -175,6 +175,16 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 		return
 	}
 
+	spec_Poetry := config.Instance.Cron.Poetry
+	err_5 := c.AddFunc(spec_Poetry, func() {
+		fmt.Println("cron times : ")
+		job.RandomPoetry()
+	})
+	if err_5 != nil {
+		fmt.Errorf("Add article error : %v", err)
+		return
+	}
+
 	c.Start()
 
 	r := gin.Default()

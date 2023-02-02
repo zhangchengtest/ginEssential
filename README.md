@@ -1,7 +1,7 @@
 cd /ROOT/ginEssential
 git pull
-go build ./cmd/ding
 pkill -9 ding
+go build ./cmd/ding
 nohup ./ding daemon > log.out 2>&1 &
 
 

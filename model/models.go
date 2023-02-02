@@ -77,3 +77,22 @@ type Theme struct {
 	CreateDt time.Time `json:"createDt"`
 	CreateBy string    `json:"createBy"`
 }
+
+type Poetry struct {
+	Id           int64 `gorm:"type:int(11);not null;unique"`
+	Content      string
+	Translate    string
+	Notes        string
+	Appreciation string
+	Pinyin       string
+	Name         string
+	Dynasty      string
+	Poet         string
+	linkId       string
+}
+
+type Tag struct {
+	Id       int64 `gorm:"type:int(11);not null;unique"`
+	PoetryId string
+	Tag      string
+}
