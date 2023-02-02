@@ -4,6 +4,11 @@ pkill -9 ding
 go build ./cmd/ding
 nohup ./ding daemon > log.out 2>&1 &
 
+cd /ROOT/ginEssential
+git pull
+pkill -9 ding
+chmod 777 ding
+nohup ./ding daemon > log.out 2>&1 &
 
 go env -w GOOS=linux
 go env -w GOOS=windows
