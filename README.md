@@ -5,6 +5,9 @@ go build ./cmd/ding
 nohup ./ding daemon > log.out 2>&1 &
 
 
+go env -w GOOS=linux
+go env -w GOOS=windows
+
 安装protoc
 go get -u github.com/golang/protobuf
 
