@@ -4,7 +4,10 @@ pkill -9 ding
 go build ./cmd/ding
 nohup ./ding daemon > log.out 2>&1 &
 
+go build ./cmd/ding
+
 cd /ROOT/ginEssential
+git checkout .
 git pull
 pkill -9 ding
 chmod 777 ding

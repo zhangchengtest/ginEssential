@@ -43,6 +43,8 @@ github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53 h1:sR+/8Yb4s
 github.com/CloudyKit/jet/v6 v6.1.0 h1:hvO96X345XagdH1fAoBjpBYG4a1ghhL/QzalkduPuXk=
 github.com/Kubuxu/go-os-helper v0.0.1 h1:EJiD2VUQyh5A9hWJLmc6iWg6yIcJ7jpBcwC8GMGXfDk=
 github.com/Kubuxu/go-os-helper v0.0.1/go.mod h1:N8B+I7vPCT80IcP58r50u4+gEEcsZETFUpAzWW2ep1Y=
+github.com/Lofanmi/chinese-calendar-golang v0.0.0-20211214151323-ef5cb443e55e h1:hWFKGrEqJI14SqwK7GShkaTV1NtQzMZFLFasITmH/LI=
+github.com/Lofanmi/chinese-calendar-golang v0.0.0-20211214151323-ef5cb443e55e/go.mod h1:nG6VxnU5//MJzjwFAYQzFcrVdm+3RGD8NwO9riziV8E=
 github.com/PuerkitoBio/goquery v1.8.0 h1:PJTF7AmFCFKk1N6V6jmKfrNH9tV5pNE6lZMkG0gta/U=
 github.com/PuerkitoBio/goquery v1.8.0/go.mod h1:ypIiRMtY7COPGk+I/YbZLbxsxn9g5ejnI2HSMtkjZvI=
 github.com/Scorpio69t/jpush-api-golang-client v1.0.0 h1:NH9aj4Msk4wVil1rBHfSOcCcgOSZNFfXGcUVeKJuSPU=

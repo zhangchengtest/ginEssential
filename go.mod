@@ -41,6 +41,7 @@ require (
 
 require (
 	github.com/Kubuxu/go-os-helper v0.0.1 // indirect
+	github.com/Lofanmi/chinese-calendar-golang v0.0.0-20211214151323-ef5cb443e55e // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect

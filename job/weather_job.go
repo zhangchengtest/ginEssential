@@ -5,12 +5,18 @@ import (
 	"flag"
 	"fmt"
 	"ginEssential/config"
+	"ginEssential/model"
 	"ginEssential/push"
 	"ginEssential/spider"
 	"ginEssential/util"
 	"ginEssential/weather"
+	"github.com/Lofanmi/chinese-calendar-golang/calendar"
+	strftime "github.com/itchyny/timefmt-go"
 	"github.com/pmylund/go-bloom"
 	log "github.com/sirupsen/logrus"
+	"github.com/zhangchengtest/simple/sqls"
+	"math"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -36,6 +42,134 @@ func WeatherJob() {
 	task.remind()
 	task.alarm()
 
+	DB := sqls.DB()
+
+	// 创建用户
+	var clocks []model.Clock
+
+	clockvos := make([]model.ClockVO, 0)
+
+	var ss string
+
+	DB.Find(&clocks)
+
+	// 1、年月日
+	year := time.Now().Year()
+	month := time.Now().Month()
+	//或者
+	//month := time.Now().Month().String()
+	day := time.Now().Day()
+
+	for _, w := range clocks {
+
+		if w.EventType == 1 {
+			//按照月
+			dd, _ := strconv.Atoi(w.NotifyDate)
+			if dd >= day {
+				//ss = ss + "还差" + strconv.Itoa(dd-day) + "天就要"
+				//ss = ss + w.EventDescription + "\n"
+
+				c := calendar.BySolar(int64(year), int64(month), int64(day), 0, 0, 0)
+
+				bytes, err := c.ToJSON()
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				fmt.Println(string(bytes))
+				date := strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+
+				vo := model.ClockVO{
+					Days:        dd - day,
+					Description: w.EventDescription,
+					RealDate:    date,
+				}
+				clockvos = append(clockvos, vo)
+
+			}
+		} else if w.EventType == 2 {
+			//按照年
+			// 3. ByLunar
+			// 农历(最后一个参数表示是否闰月)
+			arr := strings.Split(w.NotifyDate, "-")
+			mm, _ := strconv.Atoi(arr[0])
+			dd, _ := strconv.Atoi(arr[1])
+			c := calendar.ByLunar(int64(year), int64(mm), int64(dd), 0, 0, 0, false)
+
+			bytes, err := c.ToJSON()
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			fmt.Println(string(bytes))
+			date := strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+			t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+
+			d := t2.Sub(time.Now())
+
+			//ss = ss + date
+			//ss = ss + "还差" + strconv.FormatFloat(d.Hours()/24+1, 'f', 0, 64) + "天"
+			//ss = ss + w.EventDescription
+
+			vo := model.ClockVO{
+				Days:        int(math.Floor(d.Hours()/24 + 1)),
+				Description: w.EventDescription,
+				RealDate:    date,
+			}
+			clockvos = append(clockvos, vo)
+		} else if w.EventType == 0 {
+			//按照时钟
+			// 3. ByLunar
+			// 农历(最后一个参数表示是否闰月)
+			arr := strings.Split(w.NotifyDate, "-")
+			mm, _ := strconv.Atoi(arr[0])
+			dd, _ := strconv.Atoi(arr[1])
+			c := calendar.BySolar(int64(year), int64(mm), int64(dd), 0, 0, 0)
+
+			bytes, err := c.ToJSON()
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			fmt.Println(string(bytes))
+			date := strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+			t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+
+			d := t2.Sub(time.Now())
+
+			vo := model.ClockVO{
+				Days:        int(math.Floor(d.Hours()/24 + 1)),
+				Description: w.EventDescription,
+				RealDate:    date,
+			}
+			clockvos = append(clockvos, vo)
+		}
+
+	}
+
+	sort.Sort(StudentArray(clockvos))
+
+	for _, w := range clockvos {
+		ss = ss + strconv.Itoa(w.Days) + "天后"
+		ss = ss + w.Description
+		ss = ss + ",就在" + w.RealDate + "\n"
+	}
+
+	sendArticle(ss)
+}
+
+type StudentArray []model.ClockVO
+
+func (array StudentArray) Len() int {
+	return len(array)
+}
+
+func (array StudentArray) Less(i, j int) bool {
+	return array[i].Days < array[j].Days //从小到大， 若为大于号，则从大到小
+}
+
+func (array StudentArray) Swap(i, j int) {
+	array[i], array[j] = array[j], array[i]
 }
 
 var f = bloom.New(10000, 0.001)

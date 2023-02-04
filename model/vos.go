@@ -2,6 +2,12 @@ package model
 
 import "time"
 
+type ClockVO struct {
+	Days        int
+	RealDate    string
+	Description string
+}
+
 type MusicBookVO struct {
 	BookId      string      `json:"bookId"`
 	BookContent string      `json:"bookContent"`
