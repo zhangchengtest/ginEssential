@@ -4,6 +4,8 @@ import "time"
 
 type ClockVO struct {
 	Days        int
+	EventTime   int
+	EventType   int
 	RealDate    string
 	Description string
 }

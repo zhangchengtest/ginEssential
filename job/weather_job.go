@@ -38,9 +38,9 @@ func WeatherJob() {
 	var task Task
 	config := config.NewConfigByName(*configName)
 	readTask(config, &task)
-	task.weatherInfo()
-	task.remind()
-	task.alarm()
+	//task.weatherInfo()
+	//task.remind()
+	//task.alarm()
 
 	DB := sqls.DB()
 
@@ -53,16 +53,40 @@ func WeatherJob() {
 
 	DB.Find(&clocks)
 
+	var cstZone = time.FixedZone("CST", 8*3600) // 东八
 	// 1、年月日
-	year := time.Now().Year()
-	month := time.Now().Month()
+	year := time.Now().In(cstZone).Year()
+	month := time.Now().In(cstZone).Month()
 	//或者
-	//month := time.Now().Month().String()
-	day := time.Now().Day()
+	//month := time.Now().In(cstZone).Month().String()
+	day := time.Now().In(cstZone).Day()
 
 	for _, w := range clocks {
-
 		if w.EventType == 1 {
+			//按当天
+			dd, _ := strconv.Atoi(w.NotifyDate)
+			//ss = ss + "还差" + strconv.Itoa(dd-day) + "天就要"
+			//ss = ss + w.EventDescription + "\n"
+
+			c := calendar.BySolar(int64(year), int64(month), int64(day), 0, 0, 0)
+
+			bytes, err := c.ToJSON()
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			fmt.Println(string(bytes))
+			date := strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+
+			vo := model.ClockVO{
+				Days:        0,
+				EventTime:   dd,
+				EventType:   w.EventType,
+				Description: w.EventDescription,
+				RealDate:    date,
+			}
+			clockvos = append(clockvos, vo)
+		} else if w.EventType == 2 {
 			//按照月
 			dd, _ := strconv.Atoi(w.NotifyDate)
 			if dd >= day {
@@ -81,13 +105,14 @@ func WeatherJob() {
 
 				vo := model.ClockVO{
 					Days:        dd - day,
+					EventType:   w.EventType,
 					Description: w.EventDescription,
 					RealDate:    date,
 				}
 				clockvos = append(clockvos, vo)
 
 			}
-		} else if w.EventType == 2 {
+		} else if w.EventType == 3 {
 			//按照年
 			// 3. ByLunar
 			// 农历(最后一个参数表示是否闰月)
@@ -113,6 +138,7 @@ func WeatherJob() {
 
 			vo := model.ClockVO{
 				Days:        int(math.Floor(d.Hours()/24 + 1)),
+				EventType:   w.EventType,
 				Description: w.EventDescription,
 				RealDate:    date,
 			}
@@ -140,6 +166,7 @@ func WeatherJob() {
 			vo := model.ClockVO{
 				Days:        int(math.Floor(d.Hours()/24 + 1)),
 				Description: w.EventDescription,
+				EventType:   w.EventType,
 				RealDate:    date,
 			}
 			clockvos = append(clockvos, vo)
@@ -150,9 +177,15 @@ func WeatherJob() {
 	sort.Sort(StudentArray(clockvos))
 
 	for _, w := range clockvos {
-		ss = ss + strconv.Itoa(w.Days) + "天后"
-		ss = ss + w.Description
-		ss = ss + ",就在" + w.RealDate + "\n"
+		if w.EventType == 1 {
+			ss = ss + "今天" + strconv.Itoa(w.EventTime) + "点"
+			ss = ss + w.Description + "\n"
+		} else {
+			ss = ss + strconv.Itoa(w.Days) + "天后"
+			ss = ss + w.Description
+			ss = ss + ",就在" + w.RealDate + "\n"
+		}
+
 	}
 
 	sendArticle(ss)
@@ -165,6 +198,9 @@ func (array StudentArray) Len() int {
 }
 
 func (array StudentArray) Less(i, j int) bool {
+	if array[i].Days == array[j].Days {
+		return array[i].EventTime < array[j].EventTime
+	}
 	return array[i].Days < array[j].Days //从小到大， 若为大于号，则从大到小
 }
 

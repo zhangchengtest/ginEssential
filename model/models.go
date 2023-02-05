@@ -64,10 +64,10 @@ type BookImg struct {
 
 type Clock struct {
 	Id               string    `gorm:"type:varchar(36);not null;unique"`
-	EventType        int32     `gorm:"type:varchar(64);not null"`
+	EventType        int       `gorm:"type:int(11);not null"`
 	EventDescription string    `gorm:"type:varchar(200);not null"`
 	NotifyDate       string    `gorm:"type:varchar(200);not null"`
-	Status           int32     `gorm:"type:int(11);not null"`
+	Status           int       `gorm:"type:int(11);not null"`
 	CreateDate       time.Time `json:"createDate"`
 	CreateBy         string    `json:"createBy"`
 	UpdateDate       time.Time `json:"updateDate"`
