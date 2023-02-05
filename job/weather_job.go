@@ -16,6 +16,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zhangchengtest/simple/sqls"
 	"math"
+	"math/rand"
 	"sort"
 	"strconv"
 	"strings"
@@ -188,7 +189,30 @@ func WeatherJob() {
 
 	}
 
+	// 创建用户
+
+	var theme model.Topic
+
+	rand.Seed(time.Now().UnixNano())
+	aid := rand.Intn(70) + 1
+	DB.Where("id = ?", aid).Find(&theme)
+	ss = ss + "\n算法主题：" + theme.Name + "\n"
+
+	ss = sport(ss)
 	sendArticle(ss)
+}
+
+func sport(ss string) string {
+	// 创建用户
+	DB := sqls.DB()
+
+	var theme model.Sport
+
+	rand.Seed(time.Now().UnixNano())
+	aid := rand.Intn(7) + 1
+	DB.Where("id = ?", aid).Find(&theme)
+	res := ss + "\n运动主题：" + theme.Name + "\n"
+	return res
 }
 
 type StudentArray []model.ClockVO

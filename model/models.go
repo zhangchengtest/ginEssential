@@ -74,6 +74,26 @@ type Clock struct {
 	UpdateBy         string    `json:"updateBy"`
 }
 
+type Topic struct {
+	Id         int       `gorm:"type:int(11);not null;unique"`
+	Name       string    `gorm:"type:int(11);not null"`
+	Status     int       `gorm:"type:int(11);not null"`
+	CreateDate time.Time `json:"createDate"`
+	CreateBy   string    `json:"createBy"`
+	UpdateDate time.Time `json:"updateDate"`
+	UpdateBy   string    `json:"updateBy"`
+}
+
+type Sport struct {
+	Id         int       `gorm:"type:int(11);not null;unique"`
+	Name       string    `gorm:"type:int(11);not null"`
+	Status     int       `gorm:"type:int(11);not null"`
+	CreateDate time.Time `json:"createDate"`
+	CreateBy   string    `json:"createBy"`
+	UpdateDate time.Time `json:"updateDate"`
+	UpdateBy   string    `json:"updateBy"`
+}
+
 func (BookImg) TableName() string {
 	return "book_img"
 }

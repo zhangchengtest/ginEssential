@@ -4,7 +4,10 @@ pkill -9 ding
 go build ./cmd/ding
 nohup ./ding daemon > log.out 2>&1 &
 
+go env -w GOOS=linux
 go build ./cmd/ding
+git push origin master
+
 
 cd /ROOT/ginEssential
 git checkout .
