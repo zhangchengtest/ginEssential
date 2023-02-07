@@ -39,9 +39,9 @@ func WeatherJob() {
 	var task Task
 	config := config.NewConfigByName(*configName)
 	readTask(config, &task)
-	//task.weatherInfo()
-	//task.remind()
-	//task.alarm()
+	task.weatherInfo()
+	task.remind()
+	task.alarm()
 
 	DB := sqls.DB()
 
