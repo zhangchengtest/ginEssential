@@ -114,36 +114,70 @@ func WeatherJob() {
 
 			}
 		} else if w.EventType == 3 {
-			//按照年
-			// 3. ByLunar
-			// 农历(最后一个参数表示是否闰月)
-			arr := strings.Split(w.NotifyDate, "-")
-			mm, _ := strconv.Atoi(arr[0])
-			dd, _ := strconv.Atoi(arr[1])
-			c := calendar.ByLunar(int64(year), int64(mm), int64(dd), 0, 0, 0, false)
+			if w.LunarFlag == 1 {
+				//按照年
+				// 3. ByLunar
+				// 农历(最后一个参数表示是否闰月)
+				arr := strings.Split(w.NotifyDate, "-")
+				mm, _ := strconv.Atoi(arr[0])
+				dd, _ := strconv.Atoi(arr[1])
+				c := calendar.ByLunar(int64(year), int64(mm), int64(dd), 0, 0, 0, false)
 
-			bytes, err := c.ToJSON()
-			if err != nil {
-				fmt.Println(err)
+				bytes, err := c.ToJSON()
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				fmt.Println(string(bytes))
+				date := strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+				t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+
+				d := t2.Sub(time.Now())
+
+				//ss = ss + date
+				//ss = ss + "还差" + strconv.FormatFloat(d.Hours()/24+1, 'f', 0, 64) + "天"
+				//ss = ss + w.EventDescription
+
+				vo := model.ClockVO{
+					Days:        int(math.Floor(d.Hours()/24 + 1)),
+					EventType:   w.EventType,
+					Description: w.EventDescription,
+					RealDate:    date,
+				}
+				clockvos = append(clockvos, vo)
+			} else {
+				//按照年
+				// 3. ByLunar
+				// 农历(最后一个参数表示是否闰月)
+				arr := strings.Split(w.NotifyDate, "-")
+				mm, _ := strconv.Atoi(arr[0])
+				dd, _ := strconv.Atoi(arr[1])
+				c := calendar.BySolar(int64(year), int64(mm), int64(dd), 0, 0, 0)
+
+				bytes, err := c.ToJSON()
+				if err != nil {
+					fmt.Println(err)
+				}
+
+				fmt.Println(string(bytes))
+				date := strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+				t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
+
+				d := t2.Sub(time.Now())
+
+				//ss = ss + date
+				//ss = ss + "还差" + strconv.FormatFloat(d.Hours()/24+1, 'f', 0, 64) + "天"
+				//ss = ss + w.EventDescription
+
+				vo := model.ClockVO{
+					Days:        int(math.Floor(d.Hours()/24 + 1)),
+					EventType:   w.EventType,
+					Description: w.EventDescription,
+					RealDate:    date,
+				}
+				clockvos = append(clockvos, vo)
 			}
 
-			fmt.Println(string(bytes))
-			date := strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
-			t2, _ := strftime.Parse(date+" 00:00:00", "%Y-%m-%d %H:%M:%S")
-
-			d := t2.Sub(time.Now())
-
-			//ss = ss + date
-			//ss = ss + "还差" + strconv.FormatFloat(d.Hours()/24+1, 'f', 0, 64) + "天"
-			//ss = ss + w.EventDescription
-
-			vo := model.ClockVO{
-				Days:        int(math.Floor(d.Hours()/24 + 1)),
-				EventType:   w.EventType,
-				Description: w.EventDescription,
-				RealDate:    date,
-			}
-			clockvos = append(clockvos, vo)
 		} else if w.EventType == 0 {
 			//按照时钟
 			// 3. ByLunar
