@@ -15,7 +15,7 @@ var log = logging.Logger("common/email")
 var host = "smtp.163.com"           // smtp服务host
 var port = 465                      // ssl端口
 var user = "zhangchengtest@163.com" // 发送方邮箱
-var pass = "PDBDMQCSCTWZVPRD"       // 授权码
+var pass = "VSHHLYRELHGXAHSN"       // 授权码
 
 func SendRegister(userName string, email string) {
 
@@ -36,7 +36,7 @@ func SendRegister(userName string, email string) {
 
 }
 
-//Request struct
+// Request struct
 type Request struct {
 	from    string
 	to      []string

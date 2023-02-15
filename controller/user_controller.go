@@ -69,13 +69,14 @@ func Register(ctx *gin.Context) {
 	hasedPassword := util.MD5(password)
 	// 创建用户
 	newUser := model.User{
-		UserId:   util.Myuuid(),
-		CreateDt: time.Now(),
-		UpdateDt: nil,
-		UserName: userName,
-		NickName: userName,
-		Email:    email,
-		Pwd:      hasedPassword,
+		UserId:      util.Myuuid(),
+		CreateDt:    time.Now(),
+		UpdateDt:    nil,
+		UserName:    userName,
+		LastLoginDt: time.Now(),
+		NickName:    userName,
+		Email:       email,
+		Pwd:         hasedPassword,
 	}
 
 	var s = util.Worker1{}
@@ -167,6 +168,24 @@ func Info(ctx *gin.Context) {
 
 	uservo := model.UserVO{}
 	util.SimpleCopyProperties(&uservo, &user)
+	model.Success(ctx, uservo, "")
+}
+
+func LoadUserByEmail(ctx *gin.Context) {
+	email := ctx.Query("email")
+	DB := sqls.DB()
+	var user model.User
+	DB.Where("email = ?", email).First(&user)
+
+	uservo := model.UserVO{}
+	util.SimpleCopyProperties(&uservo, &user)
+
+	var res []model.SysRole
+	DB.Table("sys_role").Select("sys_role.code").
+		Joins("left join sys_user_role on sys_role.id = sys_user_role.role_id").Where("user_id = ?", user.UserId).Scan(&res)
+	fmt.Println(res)
+	uservo.RoleCode = res[0].Code
+
 	model.Success(ctx, uservo, "")
 }
 

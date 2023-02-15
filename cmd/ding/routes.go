@@ -12,6 +12,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/auth/login", controller.Login)
 	r.GET("/api/auth/info", middleware.AuthMiddleware(), controller.Info)
 	r.GET("/api/auth/mockinfo", controller.MockInfo)
+	r.GET("/api/auth/loadUserByEmail", controller.LoadUserByEmail)
+
 	//r.GET("/api/auth/randomImage", controller.RandomImage)
 
 	r.GET("/api/auth/redirectU", controller.RedirectTOUnsplash)

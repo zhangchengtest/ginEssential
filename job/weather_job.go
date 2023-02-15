@@ -39,9 +39,9 @@ func WeatherJob() {
 	var task Task
 	config := config.NewConfigByName(*configName)
 	readTask(config, &task)
-	//task.weatherInfo()
-	//task.remind()
-	//task.alarm()
+	task.weatherInfo()
+	task.remind()
+	task.alarm()
 
 	DB := sqls.DB()
 
@@ -149,7 +149,7 @@ func WeatherJob() {
 				//ss = ss + w.EventDescription
 
 				vo := model.ClockVO{
-					Days:        int(math.Floor(d.Hours()/24 + 1)),
+					Days:        int(math.Floor(d.Hours() / 24)),
 					EventType:   w.EventType,
 					Description: w.EventDescription,
 					RealDate:    date,
@@ -180,7 +180,7 @@ func WeatherJob() {
 				//ss = ss + w.EventDescription
 
 				vo := model.ClockVO{
-					Days:        int(math.Floor(d.Hours()/24 + 1)),
+					Days:        int(math.Floor(d.Hours() / 24)),
 					EventType:   w.EventType,
 					Description: w.EventDescription,
 					RealDate:    date,
