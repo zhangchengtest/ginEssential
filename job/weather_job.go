@@ -61,6 +61,7 @@ func WeatherJob() {
 	//month := time.Now().In(cstZone).Month().String()
 	day := time.Now().Day()
 
+	//查询指定年份指定月份有多少天
 	monthDays := util.GetYearMonthToDay(year, int(month))
 
 	for _, w := range clocks {
@@ -88,6 +89,41 @@ func WeatherJob() {
 				RealDate:    date,
 			}
 			clockvos = append(clockvos, vo)
+		} else if w.EventType == 4 {
+
+			//按照周
+			dd, _ := strconv.Atoi(w.NotifyDate)
+			var res int
+			var date string
+
+			weekday := time.Now().Weekday()
+			weekdayInt := int(weekday)
+			if weekday == time.Sunday {
+				weekdayInt = 7
+			}
+
+			if dd >= weekdayInt {
+				//ss = ss + "还差" + strconv.Itoa(dd-day) + "天就要"
+				//ss = ss + w.EventDescription + "\n"
+				res = dd - weekdayInt
+				c := calendar.BySolar(int64(year), int64(month), int64(day+res), 0, 0, 0)
+
+				date = strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+			} else {
+				res = 7 - weekdayInt + dd
+				c := calendar.BySolar(int64(year), int64(month), int64(day+res), 0, 0, 0)
+
+				date = strconv.FormatInt(c.Solar.GetYear(), 10) + "-" + strconv.FormatInt(c.Solar.GetMonth(), 10) + "-" + strconv.FormatInt(c.Solar.GetDay(), 10)
+			}
+
+			vo := model.ClockVO{
+				Days:        res,
+				EventType:   w.EventType,
+				Description: w.EventDescription,
+				RealDate:    date,
+			}
+			clockvos = append(clockvos, vo)
+
 		} else if w.EventType == 2 {
 
 			//按照月

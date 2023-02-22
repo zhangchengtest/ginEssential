@@ -11,9 +11,10 @@ git commit -a -m "sss"
 git push origin master
 
 
-cd /ROOT/ginEssential
 git checkout .
 git pull
+
+cd /ROOT/ginEssential
 pkill -9 ding
 chmod 777 ding
 nohup ./ding daemon > log.out 2>&1 &
