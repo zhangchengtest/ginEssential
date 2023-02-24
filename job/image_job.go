@@ -107,8 +107,10 @@ func SplitImageWithIterator() {
 	in, err := getImage(filename, path)
 	if err != nil {
 		log.Fatal("failed to load test image: %s", err)
+		return
 	}
 
+	log.Print("it still come")
 	// set cfg
 	cfg := util.Config{X: 3, Y: 3}
 
