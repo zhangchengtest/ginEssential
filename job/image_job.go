@@ -106,7 +106,7 @@ func SplitImageWithIterator() {
 	randomImage(filename, path)
 	in, err := getImage(filename, path)
 	if err != nil {
-		log.Fatal("failed to load test image: %s", err)
+		log.Printf("failed to load test image: %s", err)
 		return
 	}
 
@@ -117,7 +117,7 @@ func SplitImageWithIterator() {
 	// split
 	it, err := util.SplitImageWithIterator(in, cfg)
 	if err != nil {
-		log.Fatal("unexpected failure: %s", err)
+		log.Printf("unexpected failure: %s", err)
 	}
 
 	// drain the parts to check expected count
