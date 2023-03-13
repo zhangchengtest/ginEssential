@@ -147,6 +147,7 @@ func Login(ctx *gin.Context) {
 
 	util.SimpleCopyProperties(&uservo, &user)
 	uservo.AccessToken = token
+	uservo.Avatar = user.AvatarUrl
 
 	var res []model.SysRole
 	DB.Table("sys_role").Select("sys_role.code").

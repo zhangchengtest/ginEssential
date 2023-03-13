@@ -36,6 +36,7 @@ type UserVO struct {
 	RoleCode     string `json:"roleCode"`
 	Pwd          string `json:"pwd"`
 	IsLock       int    `json:"isLock"`
+	Avatar       string `json:"avatar"`
 }
 
 type WechatToken struct {
