@@ -14,8 +14,8 @@ git push origin master
 git checkout .
 git pull
 
-cd /ROOT/ginEssential
 pkill -9 ding
+cd /ROOT/ginEssential
 chmod 777 ding
 nohup ./ding daemon > log.out 2>&1 &
 

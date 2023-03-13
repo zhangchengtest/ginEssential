@@ -180,6 +180,7 @@ func LoadUserByEmail(ctx *gin.Context) {
 
 	uservo := model.UserVO{}
 	util.SimpleCopyProperties(&uservo, &user)
+	uservo.Avatar = user.AvatarUrl
 
 	var res []model.SysRole
 	DB.Table("sys_role").Select("sys_role.code").
