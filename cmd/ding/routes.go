@@ -26,6 +26,9 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/compareFile", controller.CompareFile)
 	//r.POST("/api/testThread", controller.TestThread)
 	r.POST("/api/addArticle", controller.AddArticle)
+	r.POST("/api/addDinary", controller.AddDinary)
+	r.GET("/api/seeDinary", controller.SeeDinary)
+
 	r.POST("/api/addArticleFromFile", controller.AddArticleFromFile)
 	r.GET("/api/randomArticle", controller.RandomArticle)
 	r.POST("/api/readorc", controller.Readorc)

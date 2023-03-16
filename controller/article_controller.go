@@ -31,30 +31,86 @@ func AddArticle(ctx *gin.Context) {
 	// fmt.Printf("requestUser：%v", requestUser)
 
 	// 3. gin自带的bind获取application/json请求的参数
-	var ginBindUser = model.Article{}
-	ctx.Bind(&ginBindUser)
-	fmt.Printf("ginBindUser：%v", ginBindUser)
+	var articleDTO = model.Article{}
+	ctx.Bind(&articleDTO)
+	fmt.Printf("articleDTO：%v", articleDTO)
 
 	// 获取参数
-	chapter := ginBindUser.Chapter
-	title := ginBindUser.Title
-	content := ginBindUser.Content
+	chapter := articleDTO.Chapter
+	title := articleDTO.Title
+	content := articleDTO.Content
 	// name := ctx.PostForm("name")
 	// telephone := ctx.PostForm("telephone")
 	// password := ctx.PostForm("password")
 
 	var s = util.Worker1{}
 	// 创建用户
-	newUser := model.Article{
-		Id:      s.GetId(),
-		Chapter: chapter,
-		Title:   title,
-		Content: content,
+	article := model.Article{
+		Id:       s.GetId(),
+		Chapter:  chapter,
+		Category: articleDTO.Category,
+		Title:    title,
+		Content:  content,
+		CreateDt: time.Now(),
 	}
 
-	DB.Create(&newUser)
+	DB.Create(&article)
 
 	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+}
+
+func AddDinary(ctx *gin.Context) {
+	DB := sqls.DB()
+
+	var articleDTO = model.Article{}
+	ctx.Bind(&articleDTO)
+	fmt.Printf("articleDTO：%v", articleDTO)
+
+	// 获取参数
+	chapter := articleDTO.Chapter
+	title := articleDTO.Title
+	content := articleDTO.Content
+	category := articleDTO.Category
+
+	old := model.Article{}
+
+	DB.Where("title = ? and category = ?", title, category).First(&old)
+	if old.Id != 0 {
+
+		content := old.Content + "\n" + articleDTO.Content
+		// User 的 ID 是 `111`
+		DB.Model(&old).Update("content", content)
+
+	} else {
+
+		var s = util.Worker1{}
+		// 创建用户
+		article := model.Article{
+			Id:       s.GetId(),
+			Chapter:  chapter,
+			Category: articleDTO.Category,
+			Title:    title,
+			Content:  content,
+			CreateDt: time.Now(),
+		}
+
+		DB.Create(&article)
+	}
+
+	model.Success(ctx, gin.H{"status": "ok"}, "新增成功")
+}
+
+func SeeDinary(ctx *gin.Context) {
+	DB := sqls.DB()
+
+	title := ctx.Query("title")
+	category := ctx.Query("category")
+
+	old := model.Article{}
+
+	DB.Where("title = ? and category = ?", title, category).First(&old)
+
+	model.Success(ctx, old, "新增成功")
 }
 
 func RandomArticle(ctx *gin.Context) {
