@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"ginEssential/model"
 	"ginEssential/util"
@@ -138,6 +139,66 @@ func RandomArticle(ctx *gin.Context) {
 	articleVO.Question = arr[random]
 
 	model.Success(ctx, gin.H{"article": articleVO}, "查询成功")
+}
+
+type MyArticle struct {
+	Id             interface{} `json:"id"`
+	ArticleTitle   string      `json:"articleTitle"`
+	ArticleContent string      `json:"articleContent"`
+	ArticleCover   string      `json:"articleCover"`
+	CategoryName   string      `json:"categoryName"`
+	TagNames       []string    `json:"tagNames"`
+	IsTop          int         `json:"isTop"`
+	Type           int         `json:"type"`
+	Status         int         `json:"status"`
+	IsFeatured     int         `json:"isFeatured"`
+}
+
+func CopyArticle(ctx *gin.Context) {
+	DB := sqls.DB()
+
+	// 创建用户
+	var articles []model.Article
+
+	DB.Where("title = ?", "道德经").Find(&articles)
+
+	//{
+	//"id": null,
+	//"articleTitle": "2023-03-22",
+	//"articleContent": "ccccccc",
+	//"articleCover": "https://cheng-resource.oss-cn-hangzhou.aliyuncs.com/articles/ec6b56cb53f08d27e487e1442b36f581.png",
+	//"categoryName": "测试",
+	//"tagNames": [
+	//"前端"
+	//],
+	//"isTop": 0,
+	//"type": 1,
+	//"status": 1,
+	//"isFeatured": 0
+	//}
+	go test(articles)
+
+	model.Success2(ctx, "ok", "")
+}
+
+func test(articles []model.Article) {
+	for _, article := range articles {
+
+		my := MyArticle{
+			ArticleTitle:   article.Title + util.Int32ToString(article.Chapter),
+			ArticleContent: article.Content,
+			ArticleCover:   "https://cheng-resource.oss-cn-hangzhou.aliyuncs.com/articles/87a19c5bfbca6d057f244014f85f9881.jpg",
+			CategoryName:   "道德经",
+			TagNames:       []string{"道德经"},
+			IsTop:          0,
+			Type:           1,
+			Status:         1,
+			IsFeatured:     0,
+		}
+		data, _ := json.Marshal(my)
+		result := util.Post("https://apemgr.punengshuo.com/api/admin/articles", data, "application/json")
+		fmt.Printf(result)
+	}
 }
 
 func AddArticleFromFile(ctx *gin.Context) {

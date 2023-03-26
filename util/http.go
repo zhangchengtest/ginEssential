@@ -2,15 +2,16 @@ package util
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
-//发送GET请求
-//url:请求地址
-//response:请求返回的内容
+// 发送GET请求
+// url:请求地址
+// response:请求返回的内容
 func Get(url string) (response string) {
 	client := http.Client{Timeout: 5 * time.Second}
 	resp, error := client.Get(url)
@@ -35,12 +36,17 @@ func Get(url string) (response string) {
 	return
 }
 
-//发送POST请求
-//url:请求地址，data:POST请求提交的数据,contentType:请求体格式，如：application/json
-//content:请求放回的内容
+func Int32ToString(i int32) string {
+	return fmt.Sprint(i)
+}
+
+// 发送POST请求
+// url:请求地址，data:POST请求提交的数据,contentType:请求体格式，如：application/json
+// content:请求放回的内容
 func Post(url string, data []byte, contentType string) (content string) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	req.Header.Add("content-type", contentType)
+	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJjNjY0NjBkNjIyNjc0YzRlODlkNDg1YTliNzBjODQ5YSIsInN1YiI6IjEiLCJpc3MiOiJodWF3ZWltaWFuIn0.JpG5fSNet5jaIHCitzDli7_plbUV2Z-UlVKQVUCsWkY")
 	if err != nil {
 		panic(err)
 	}

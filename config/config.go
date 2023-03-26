@@ -33,6 +33,7 @@ type Config struct {
 		Article string `yaml:"Article"`
 		Weather string `yaml:"Weather"`
 		Poetry  string `yaml:"Poetry"`
+		Clock   string `yaml:"Clock"`
 	} `yaml:"Cron"`
 
 	Redis struct {

@@ -185,6 +185,16 @@ func daemonFunc(req *cmds.Request, re cmds.ResponseEmitter, env cmds.Environment
 		return
 	}
 
+	spec_Clock := config.Instance.Cron.Clock
+	err_6 := c.AddFunc(spec_Clock, func() {
+		fmt.Println("cron times : ")
+		job.DoClock()
+	})
+	if err_6 != nil {
+		fmt.Errorf("Add article error : %v", err)
+		return
+	}
+
 	c.Start()
 
 	r := gin.Default()

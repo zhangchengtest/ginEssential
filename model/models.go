@@ -75,6 +75,19 @@ type Clock struct {
 	UpdateBy         string    `json:"updateBy"`
 }
 
+type Calendar struct {
+	Id               string `gorm:"type:varchar(36);not null;unique"`
+	EventType        int    `gorm:"type:int(11);not null"`
+	EventDescription string `gorm:"type:varchar(200);not null"`
+	NotifyDate       time.Time
+	LunarFlag        int
+	Status           int       `gorm:"type:int(11);not null"`
+	CreateDate       time.Time `json:"createDate"`
+	CreateBy         string    `json:"createBy"`
+	UpdateDate       time.Time `json:"updateDate"`
+	UpdateBy         string    `json:"updateBy"`
+}
+
 type Topic struct {
 	Id         int       `gorm:"type:int(11);not null;unique"`
 	Name       string    `gorm:"type:int(11);not null"`
