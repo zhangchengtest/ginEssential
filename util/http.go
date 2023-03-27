@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -38,6 +39,10 @@ func Get(url string) (response string) {
 
 func Int32ToString(i int32) string {
 	return fmt.Sprint(i)
+}
+
+func IntToString(i int) string {
+	return strconv.Itoa(i)
 }
 
 // 发送POST请求

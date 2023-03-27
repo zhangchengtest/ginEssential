@@ -111,7 +111,20 @@ func SeeDinary(ctx *gin.Context) {
 
 	DB.Where("title = ? and category = ?", title, category).First(&old)
 
-	model.Success(ctx, old, "新增成功")
+	if category == "行程" {
+		arr := strings.Split(old.Content, "\n")
+		content := ""
+		for i, data := range arr {
+			i++
+			content = content + util.IntToString(i) + " " + data + "\n"
+		}
+		old.Content = content
+	} else if category == "日记" {
+		length := len(old.Content)
+		old.Content = old.Content + " " + util.IntToString(length)
+	}
+
+	model.Success(ctx, old, "查询成功")
 }
 
 func RandomArticle(ctx *gin.Context) {
