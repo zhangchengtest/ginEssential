@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 func AddArticle(ctx *gin.Context) {
@@ -136,7 +137,7 @@ func SeeDinary(ctx *gin.Context) {
 	} else if category == "日记" {
 		data := strings.ReplaceAll(old.Content, "\n", "")
 		data = strings.ReplaceAll(data, " ", "")
-		length := len(data)
+		length := utf8.RuneCountInString(data)
 		old.Content = old.Content + " " + util.IntToString(length)
 	}
 
