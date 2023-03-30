@@ -15,6 +15,7 @@ git checkout .
 git pull
 
 pkill -9 ding
+
 cd /ROOT/ginEssential
 chmod 777 ding
 nohup ./ding daemon > log.out 2>&1 &

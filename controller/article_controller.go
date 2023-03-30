@@ -109,6 +109,20 @@ func SeeDinary(ctx *gin.Context) {
 
 	old := model.Article{}
 
+	var arr []model.Article
+
+	if title == "分类" {
+		DB.Select("category").Group("category").Find(&arr)
+		content := ""
+		for i, data := range arr {
+			i++
+			content = content + util.IntToString(i) + " " + data.Category + "\n"
+			old.Content = content
+		}
+		model.Success(ctx, old, "查询成功")
+		return
+
+	}
 	DB.Where("title = ? and category = ?", title, category).First(&old)
 
 	if category == "行程" {
@@ -120,7 +134,9 @@ func SeeDinary(ctx *gin.Context) {
 		}
 		old.Content = content
 	} else if category == "日记" {
-		length := len(old.Content)
+		data := strings.ReplaceAll(old.Content, "\n", "")
+		data = strings.ReplaceAll(data, " ", "")
+		length := len(data)
 		old.Content = old.Content + " " + util.IntToString(length)
 	}
 
