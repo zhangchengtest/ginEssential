@@ -141,7 +141,9 @@ func randStringBytes(n int) string {
 
 func WeixinShare(ctx *gin.Context) {
 	// 获取前端页面传递的URL参数
-	var url = ctx.Param("url")
+	var url = ctx.Query("url")
+	fmt.Println("url ")
+	fmt.Println(url)
 	// 设置appid和appsecret
 	var appId = "wx029106fe29ab6dde"
 	var appSecret = "c54f17c5a7cb10246225a17ce3f43d7d"
