@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"ginEssential/config"
 	"ginEssential/model"
@@ -14,9 +16,12 @@ import (
 	"github.com/sjsdfg/common-lang-in-go/StringUtils"
 	"github.com/zhangchengtest/simple/sqls"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -105,6 +110,65 @@ func LoginByWeixinCode(ctx *gin.Context) {
 		model.Success(ctx, gin.H{"userInfo": autvo, "token": token}, "查询成功")
 	}
 
+}
+
+type AccessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+}
+
+type JsapiTicketResponse struct {
+	Errcode   int    `json:"errcode"`
+	Errmsg    string `json:"errmsg"`
+	Ticket    string `json:"ticket"`
+	ExpiresIn int    `json:"expires_in"`
+}
+
+func WeixinShare(ctx *gin.Context) {
+	// 获取前端页面传递的URL参数
+	var url = ctx.Param("url")
+	// 设置appid和appsecret
+	var appId = "wx029106fe29ab6dde"
+	var appSecret = "c54f17c5a7cb10246225a17ce3f43d7d"
+
+	// 获取access_token
+	var accessTokenUrl = fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", appId, appSecret)
+	accessTokenResp, _ := http.Get(accessTokenUrl)
+	defer accessTokenResp.Body.Close()
+	accessTokenBody, _ := ioutil.ReadAll(accessTokenResp.Body)
+	accessTokenObj := AccessTokenResponse{}
+	json.Unmarshal(accessTokenBody, &accessTokenObj)
+
+	// 获取jsapi_ticket
+	var jsapiTicketUrl = fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi", accessTokenObj.AccessToken)
+	jsapiTicketResp, _ := http.Get(jsapiTicketUrl)
+	defer jsapiTicketResp.Body.Close()
+	jsapiTicketBody, _ := ioutil.ReadAll(jsapiTicketResp.Body)
+	jsapiTicketObj := JsapiTicketResponse{}
+	json.Unmarshal(jsapiTicketBody, &jsapiTicketObj)
+
+	fmt.Printf("jsapiTicket: %s\nexpiresIn: %d\n", jsapiTicketObj.Ticket, jsapiTicketObj.ExpiresIn)
+
+	// 获取微信JS-SDK配置信息（以下数据可通过读取配置文件或从数据库中获取）
+
+	var timestamp = "1234567890"
+	var nonceStr = "Wm3WZYTPz0wzccnW"
+	var signature = ""
+
+	// 对noncestr、ticket和timestamp按字典排序
+	var strs = []string{"noncestr=" + nonceStr, "jsapi_ticket=" + jsapiTicketObj.Ticket, "timestamp=" + timestamp, "url=" + url}
+	sort.Strings(strs)
+
+	// 将排序后的参数拼接成一个字符串
+	var str = strings.Join(strs, "&")
+
+	// 计算字符串的sha1值
+	h := sha1.New()
+	io.WriteString(h, str)
+	signature = fmt.Sprintf("%x", h.Sum(nil))
+
+	// 将微信JS-SDK的配置信息返回至前端
+	model.Success(ctx, gin.H{"appId": appId, "timestamp": timestamp, "nonceStr": nonceStr, "signature": signature}, "查询成功")
 }
 
 func UserDetail(ctx *gin.Context) {

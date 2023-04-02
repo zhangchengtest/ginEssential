@@ -42,6 +42,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	r.GET("/wx/testTemplate", middleware.AuthMiddleware(), controller.TestTemplate)
 
+	r.GET("/api/wx/share", controller.WeixinShare)
+
 	r.GET("/api/randomFood", controller.RandomFood)
 	r.GET("/wx/searchFood", controller.SearchFood)
 
