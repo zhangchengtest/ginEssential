@@ -18,9 +18,11 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -124,6 +126,19 @@ type JsapiTicketResponse struct {
 	ExpiresIn int    `json:"expires_in"`
 }
 
+// 定义一个包含所有可能字符的字符串
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+// 生成随机字符串
+func randStringBytes(n int) string {
+	rand.Seed(time.Now().UnixNano()) // 初始化随机数种子
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))] // 从字符串中随机取出一个字符
+	}
+	return string(b)
+}
+
 func WeixinShare(ctx *gin.Context) {
 	// 获取前端页面传递的URL参数
 	var url = ctx.Param("url")
@@ -151,8 +166,8 @@ func WeixinShare(ctx *gin.Context) {
 
 	// 获取微信JS-SDK配置信息（以下数据可通过读取配置文件或从数据库中获取）
 
-	var timestamp = "1234567890"
-	var nonceStr = "Wm3WZYTPz0wzccnW"
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	nonceStr := randStringBytes(12) // 生成16位随机字符串
 	var signature = ""
 
 	// 对noncestr、ticket和timestamp按字典排序
