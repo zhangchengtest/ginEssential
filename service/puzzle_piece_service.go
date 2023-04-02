@@ -129,8 +129,23 @@ func (s *puzzlePieceService) GetPuzzlePieces(url string) []model.PuzzlePiece {
 	return list
 }
 
+func (s *puzzlePieceService) GetPuzzlePiecesById(id string) []model.PuzzlePiece {
+	piece := dao.PuzzlePieceDao.Get(sqls.DB(), id)
+	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd().Where("url = ?", piece.Url))
+
+	return list
+}
+
 func (s *puzzlePieceService) GetPuzzlePiecesRandom(url string) []model.PuzzlePiece {
 	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd().Where("url = ?", url))
+	Shuffle(list)
+
+	return list
+}
+
+func (s *puzzlePieceService) GetPuzzlePiecesRandomById(id string) []model.PuzzlePiece {
+	piece := dao.PuzzlePieceDao.Get(sqls.DB(), id)
+	list := dao.PuzzlePieceDao.Find(sqls.DB(), sqls.NewCnd().Where("url = ?", piece.Url))
 	Shuffle(list)
 
 	return list
