@@ -131,7 +131,6 @@ type PlaneRankVO struct {
 }
 
 type PuzzlePieceVO2 struct {
-	Id      string   `json:"id"`
 	Url     string   `json:"url"`
 	Piecces []string `json:"piecces"`
 	Orders  []int    `json:"orders"`

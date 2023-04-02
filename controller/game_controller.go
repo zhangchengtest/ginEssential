@@ -313,10 +313,9 @@ func QueryPuzzle(ctx *gin.Context) {
 		orders = append(orders, puzzlePiece.Sort)
 		//}
 	}
-
+	url := strings.ReplaceAll(puzzlePiece.Url, "http://", "")
 	vo := model.PuzzlePieceVO2{
-		Id:      util.Int64ToString(puzzlePiece.Id),
-		Url:     puzzlePiece.Url,
+		Url:     url,
 		Piecces: puzzlePieces,
 		Orders:  orders,
 	}
@@ -330,6 +329,10 @@ func QueryPuzzleByUrl(ctx *gin.Context) {
 	order_type := ctx.Request.FormValue("order_type")
 	fmt.Printf(val)
 
+	if !strings.Contains(val, "http") {
+		val = "http://" + val
+	}
+
 	//var queryVo model.PuzzlePieceDTO
 	//if e := ctx.ShouldBindJSON(&queryVo); e != nil {
 	//	ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
@@ -340,42 +343,6 @@ func QueryPuzzleByUrl(ctx *gin.Context) {
 		list = service.PuzzlePieceService.GetPuzzlePiecesRandom(val)
 	} else {
 		list = service.PuzzlePieceService.GetPuzzlePieces(val)
-	}
-
-	var puzzlePieces []string
-	var orders []int
-	for _, puzzlePiece := range list {
-		//if puzzlePiece.Sort != 9 {
-		puzzlePieces = append(puzzlePieces, puzzlePiece.Content)
-		orders = append(orders, puzzlePiece.Sort)
-		//}
-	}
-
-	vo := model.PuzzlePieceVO2{
-		Url:     val,
-		Piecces: puzzlePieces,
-		Orders:  orders,
-	}
-
-	model.Success(ctx, vo, "查询成功")
-}
-
-func QueryPuzzleById(ctx *gin.Context) {
-
-	val := ctx.Request.FormValue("id")
-	order_type := ctx.Request.FormValue("order_type")
-	fmt.Printf(val)
-
-	//var queryVo model.PuzzlePieceDTO
-	//if e := ctx.ShouldBindJSON(&queryVo); e != nil {
-	//	ctx.JSON(http.StatusOK, gin.H{"code": 300, "msg": "参数错误"})
-	//	return
-	//}
-	var list []model.PuzzlePiece
-	if order_type == "random" {
-		list = service.PuzzlePieceService.GetPuzzlePiecesRandomById(val)
-	} else {
-		list = service.PuzzlePieceService.GetPuzzlePiecesById(val)
 	}
 
 	var puzzlePieces []string

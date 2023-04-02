@@ -72,7 +72,6 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	r.GET("/api/game/queryPuzzle", controller.QueryPuzzle)
 	r.GET("/api/game/queryPuzzleByUrl", controller.QueryPuzzleByUrl)
-	r.GET("/api/game/queryPuzzleById", controller.QueryPuzzleById)
 
 	r.GET("/api/game/queryPuzzleRank", controller.QueryPuzzleRank)
 	r.POST("/api/game/savePuzzleRank", controller.SavePuzzleRank)
