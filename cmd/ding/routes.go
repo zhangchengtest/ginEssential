@@ -33,6 +33,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 
 	r.POST("/api/addArticleFromFile", controller.AddArticleFromFile)
 	r.GET("/api/randomArticle", controller.RandomArticle)
+	r.GET("/api/randomNovel", controller.RandomNovel)
+
 	r.POST("/api/readorc", controller.Readorc)
 
 	r.POST("/wx/auth/login_by_weixin", controller.LoginByWeixinCode)

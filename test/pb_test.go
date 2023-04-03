@@ -62,3 +62,22 @@ func TestData(t *testing.T) {
 	fmt.Println(util.IntToString(utf8.RuneCountInString(str)))
 	fmt.Println("stop")
 }
+
+func TestData2(t *testing.T) {
+	dirPath := "D:\\hanchuancaolu"
+	files, err := util.GetAllFiles2(dirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	// 输出所有文件路径和文件名
+	//for _, file := range files {
+	//	fmt.Println(file)
+	//}
+	fmt.Println(len(files))
+
+	resutl := util.GetRandomString(files)
+	str := strings.ReplaceAll(resutl, dirPath, "http://peer.punengshuo.com")
+	str = strings.ReplaceAll(str, "\\", "/")
+	fmt.Println(str)
+}

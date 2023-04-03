@@ -7,6 +7,8 @@ import (
 	"image"
 	"io/ioutil"
 	"math/rand"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -27,6 +29,44 @@ func Add(l int, msg string) string {
 		msg = "0" + msg
 	}
 	return msg
+}
+
+func GetAllFiles(dirPath string) ([]string, error) {
+	var files []string
+	fileInfo, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, file := range fileInfo {
+		if !file.IsDir() {
+			files = append(files, filepath.Join(dirPath, file.Name()))
+		}
+	}
+
+	return files, nil
+}
+
+func GetAllFiles2(dirPath string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			files = append(files, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
+
+func GetRandomString(strs []string) string {
+	rand.Seed(time.Now().UnixNano())
+	index := rand.Intn(len(strs))
+	return strs[index]
 }
 
 // getYearMonthToDay 查询指定年份指定月份有多少天

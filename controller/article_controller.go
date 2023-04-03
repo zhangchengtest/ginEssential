@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"ginEssential/config"
 	"ginEssential/model"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
@@ -169,6 +170,27 @@ func RandomArticle(ctx *gin.Context) {
 	articleVO.Question = arr[random]
 
 	model.Success(ctx, gin.H{"article": articleVO}, "查询成功")
+}
+
+func RandomNovel(ctx *gin.Context) {
+	dirPath := config.Instance.NovelPath
+	files, err := util.GetAllFiles2(dirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	// 输出所有文件路径和文件名
+	//for _, file := range files {
+	//	fmt.Println(file)
+	//}
+	fmt.Println(len(files))
+
+	resutl := util.GetRandomString(files)
+	str := strings.ReplaceAll(resutl, dirPath, "http://peer.punengshuo.com")
+	str = strings.ReplaceAll(str, "\\", "/")
+	fmt.Println(str)
+
+	model.Success(ctx, gin.H{"url": str}, "查询成功")
 }
 
 type MyArticle struct {

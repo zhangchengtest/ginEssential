@@ -18,6 +18,7 @@ type Config struct {
 	ShowSql    bool   `yaml:"ShowSql"`    // 是否显示日志
 	StaticPath string `yaml:"StaticPath"` // 静态文件目录
 	PuzzleUrl  string `yaml:"PuzzleUrl"`
+	NovelPath  string `yaml:"NovelPath"`
 
 	// 数据库配置
 	DB struct {
