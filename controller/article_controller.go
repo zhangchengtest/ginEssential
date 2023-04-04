@@ -205,7 +205,7 @@ func RandomNovel(ctx *gin.Context) {
 }
 
 func RandomNovelTxt(ctx *gin.Context) {
-	dirPath := config.Instance.NovelPath
+	dirPath := config.Instance.NovelPathTxt
 	files, err := util.GetAllFiles2(dirPath)
 	if err != nil {
 		panic(err)
