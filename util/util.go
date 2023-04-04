@@ -152,8 +152,7 @@ func EncodeURL(urlStr string) (string, error) {
 		return "", err
 	}
 	u.Path = encodePath(u.Path)
-	fmt.Println(u.Scheme + "://" + u.Host + u.Path)
-	return u.String(), nil
+	return u.Scheme + "://" + u.Host + u.Path, nil
 }
 
 func encodePath(path string) string {
