@@ -131,7 +131,8 @@ func TestData4(t *testing.T) {
 
 func TestData5(t *testing.T) {
 
-	path := "https://example.com/我的文件夹/文件.txt?参数1=中文参数&参数2=100"
-	encodedPath, _ := util.EncodePath(path)
+	path := "http://peer.punengshuo.com/易經/50 卦五十.html"
+	encodedPath, _ := util.EncodeURL(path)
 	fmt.Println(encodedPath)
+
 }

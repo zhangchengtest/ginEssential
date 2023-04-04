@@ -196,7 +196,7 @@ func RandomNovel(ctx *gin.Context) {
 	str = strings.ReplaceAll(str, "\\", "/")
 	fmt.Println(str)
 
-	encodedPath, _ := util.EncodePath(str)
+	encodedPath, _ := util.EncodeURL(str)
 
 	novel := Novel{
 		Content: str,
@@ -247,7 +247,7 @@ func RandomNovelTxt(ctx *gin.Context) {
 	if err != nil {
 		log.Println(err)
 	}
-	encodedPath, _ := util.EncodePath(str)
+	encodedPath, _ := util.EncodeURL(str)
 
 	novel := Novel{
 		Content: fileName,

@@ -146,14 +146,28 @@ func TxtToHTML(txtContent string) (string, error) {
 	return html.String(), nil
 }
 
-func EncodePath(path string) (string, error) {
-	u, err := url.Parse(path)
+func EncodeURL(urlStr string) (string, error) {
+	u, err := url.Parse(urlStr)
 	if err != nil {
 		return "", err
 	}
-	u.Path = url.PathEscape(u.Path)
-	u.RawQuery = url.QueryEscape(u.RawQuery)
+	u.Path = encodePath(u.Path)
+	fmt.Println(u.Scheme + "://" + u.Host + u.Path)
 	return u.String(), nil
+}
+
+func encodePath(path string) string {
+	// 将路径按斜杠拆分
+	splits := strings.Split(path, "/")
+	// 对每个部分进行编码
+	for i, s := range splits {
+		if s != "" {
+			splits[i] = url.PathEscape(s)
+		}
+
+	}
+	// 拼接并返回编码后的路径
+	return strings.Join(splits, "/")
 }
 
 func GetFileContent(filepath string) (content string, err error) {
