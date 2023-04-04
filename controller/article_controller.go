@@ -226,9 +226,13 @@ func RandomNovelTxt(ctx *gin.Context) {
 	}
 	//fmt.Println("File content:", content)
 
-	path := config.Instance.NovelPathOutput + "/myfile.html"
+	fileName := util.GetFileName(resutl)
+	fmt.Println(fileName)
+	fileName = util.GetFileNameWithoutExt(fileName)
 
-	str := "http://peer.punengshuo.com" + "/myfile.html"
+	path := config.Instance.NovelPathOutput + "/" + fileName + ".html"
+
+	str := "http://peer.punengshuo.com" + "/out/" + fileName + ".html"
 
 	// 转换为HTML格式
 	htmlContent, err := util.TxtToHTML(content)
@@ -243,7 +247,7 @@ func RandomNovelTxt(ctx *gin.Context) {
 	}
 
 	novel := Novel{
-		Content: resutl,
+		Content: fileName,
 		Url:     str,
 	}
 

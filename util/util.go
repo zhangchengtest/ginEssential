@@ -165,6 +165,15 @@ func GetRandomString(strs []string) string {
 	return strs[index]
 }
 
+func GetFileName(filePath string) string {
+	_, fileName := filepath.Split(filePath)
+	return fileName
+}
+
+func GetFileNameWithoutExt(fileName string) string {
+	return filepath.Base(fileName[:len(fileName)-len(filepath.Ext(fileName))])
+}
+
 // getYearMonthToDay 查询指定年份指定月份有多少天
 // @params year int 指定年份
 // @params month int 指定月份

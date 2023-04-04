@@ -120,3 +120,11 @@ func TestData3(t *testing.T) {
 		log.Println(err)
 	}
 }
+
+func TestData4(t *testing.T) {
+	filePath := "/usr/local/src/go/example/hello.go"
+	fileName := util.GetFileName(filePath)
+	fmt.Println(fileName)
+	fileName = util.GetFileNameWithoutExt(fileName)
+	fmt.Println(fileName)
+}
