@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"ginEssential/pb"
 	"ginEssential/util"
+	"io/ioutil"
+	"log"
 	"strings"
 	"testing"
 	"unicode/utf8"
@@ -80,4 +82,41 @@ func TestData2(t *testing.T) {
 	str := strings.ReplaceAll(resutl, dirPath, "http://peer.punengshuo.com")
 	str = strings.ReplaceAll(str, "\\", "/")
 	fmt.Println(str)
+}
+
+func TestData3(t *testing.T) {
+	dirPath := "D:\\novel\\dongyeguiwu"
+	files, err := util.GetAllFiles2(dirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	// 输出所有文件路径和文件名
+	//for _, file := range files {
+	//	fmt.Println(file)
+	//}
+	fmt.Println(len(files))
+
+	resutl := util.GetRandomString(files)
+	fmt.Println(resutl)
+	content, err := util.GetFileContent(resutl)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("File content:", content)
+
+	path := "D:\\myfile.html"
+
+	// 转换为HTML格式
+	htmlContent, err := util.TxtToHTML(content)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 将HTML格式的内容输出到文件
+	err = ioutil.WriteFile(path, []byte(htmlContent), 0666)
+	if err != nil {
+		log.Println(err)
+	}
 }

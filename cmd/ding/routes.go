@@ -34,6 +34,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.POST("/api/addArticleFromFile", controller.AddArticleFromFile)
 	r.GET("/api/randomArticle", controller.RandomArticle)
 	r.GET("/api/randomNovel", controller.RandomNovel)
+	r.GET("/api/randomNovelTxt", controller.RandomNovelTxt)
 
 	r.POST("/api/readorc", controller.Readorc)
 

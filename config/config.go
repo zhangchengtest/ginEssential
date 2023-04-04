@@ -11,14 +11,16 @@ import (
 var Instance *Config
 
 type Config struct {
-	Env        string `yaml:"Env"`        // 环境：prod、dev
-	BaseUrl    string `yaml:"BaseUrl"`    // base url
-	Port       string `yaml:"Port"`       // 端口
-	LogFile    string `yaml:"LogFile"`    // 日志文件
-	ShowSql    bool   `yaml:"ShowSql"`    // 是否显示日志
-	StaticPath string `yaml:"StaticPath"` // 静态文件目录
-	PuzzleUrl  string `yaml:"PuzzleUrl"`
-	NovelPath  string `yaml:"NovelPath"`
+	Env             string `yaml:"Env"`        // 环境：prod、dev
+	BaseUrl         string `yaml:"BaseUrl"`    // base url
+	Port            string `yaml:"Port"`       // 端口
+	LogFile         string `yaml:"LogFile"`    // 日志文件
+	ShowSql         bool   `yaml:"ShowSql"`    // 是否显示日志
+	StaticPath      string `yaml:"StaticPath"` // 静态文件目录
+	PuzzleUrl       string `yaml:"PuzzleUrl"`
+	NovelPath       string `yaml:"NovelPath"`
+	NovelPathTxt    string `yaml:"NovelPathTxt"`
+	NovelPathOutput string `yaml:"NovelPathOutput"`
 
 	// 数据库配置
 	DB struct {

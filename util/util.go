@@ -1,9 +1,13 @@
 package util
 
 import (
+	"bytes"
 	"crypto/md5"
 	"fmt"
 	"github.com/google/uuid"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
+	"html/template"
 	"image"
 	"io/ioutil"
 	"math/rand"
@@ -61,6 +65,98 @@ func GetAllFiles2(dirPath string) ([]string, error) {
 	}
 
 	return files, nil
+}
+
+func WriteHTMLFile(content string, path string) error {
+	// 定义HTML5模板，使用 %s 占位符存放内容
+	template := `<!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>HTML5模板</title>
+                </head>
+                <body>
+                    %s
+                </body>
+                </html>`
+
+	// 将内容写入模板
+	html := fmt.Sprintf(template, content)
+
+	// 创建文件
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	// 将HTML写入到文件
+	_, err = f.WriteString(html)
+	if err != nil {
+		return err
+	}
+
+	// 关闭文件
+	defer f.Close()
+
+	return nil
+}
+
+func TxtToHTML(txtContent string) (string, error) {
+	// 定义模板
+	tmpl := `<html>
+	           <head>
+	             <meta charset="UTF-8">
+	             <title>{{ .Title }}</title>
+	           </head>
+	           <body>
+	             {{ range .Lines }}<p>{{ . }}</p>{{ end }}
+	           </body>
+	         </html>`
+
+	// 定义结构体
+	type Page struct {
+		Title string
+		Lines []string
+	}
+
+	// 将纯文本分行读入
+	lines := bytes.Split([]byte(txtContent), []byte("\n"))
+	var strLines []string
+	for _, line := range lines {
+		strLines = append(strLines, string(line))
+	}
+
+	// 赋值给结构体
+	pageData := Page{
+		Title: "My Text File",
+		Lines: strLines,
+	}
+
+	t, err := template.New("txtToHTML").Parse(tmpl)
+	if err != nil {
+		return "", err
+	}
+
+	html := new(bytes.Buffer)
+	if err := t.Execute(html, pageData); err != nil {
+		return "", err
+	}
+
+	return html.String(), nil
+}
+
+func GetFileContent(filepath string) (content string, err error) {
+	data, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return "", err
+	}
+	reader := transform.NewReader(bytes.NewReader(data), simplifiedchinese.GBK.NewDecoder())
+	data, err = ioutil.ReadAll(reader)
+	if err != nil {
+		return "", err
+	}
+	content = string(data)
+	return content, nil
 }
 
 func GetRandomString(strs []string) string {

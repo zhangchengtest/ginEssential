@@ -11,6 +11,7 @@ import (
 	"github.com/zhangchengtest/simple/sqls"
 	"gorm.io/gorm"
 	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -172,6 +173,11 @@ func RandomArticle(ctx *gin.Context) {
 	model.Success(ctx, gin.H{"article": articleVO}, "查询成功")
 }
 
+type Novel struct {
+	Content string
+	Url     string `json:"url"`
+}
+
 func RandomNovel(ctx *gin.Context) {
 	dirPath := config.Instance.NovelPath
 	files, err := util.GetAllFiles2(dirPath)
@@ -190,7 +196,58 @@ func RandomNovel(ctx *gin.Context) {
 	str = strings.ReplaceAll(str, "\\", "/")
 	fmt.Println(str)
 
-	model.Success(ctx, gin.H{"url": str}, "查询成功")
+	novel := Novel{
+		Content: str,
+		Url:     str,
+	}
+
+	model.Success(ctx, gin.H{"novel": novel}, "查询成功")
+}
+
+func RandomNovelTxt(ctx *gin.Context) {
+	dirPath := config.Instance.NovelPath
+	files, err := util.GetAllFiles2(dirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	// 输出所有文件路径和文件名
+	//for _, file := range files {
+	//	fmt.Println(file)
+	//}
+	fmt.Println(len(files))
+
+	resutl := util.GetRandomString(files)
+	fmt.Println(resutl)
+	content, err := util.GetFileContent(resutl)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	//fmt.Println("File content:", content)
+
+	path := config.Instance.NovelPathOutput + "/myfile.html"
+
+	str := "http://peer.punengshuo.com" + "/myfile.html"
+
+	// 转换为HTML格式
+	htmlContent, err := util.TxtToHTML(content)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 将HTML格式的内容输出到文件
+	err = ioutil.WriteFile(path, []byte(htmlContent), 0666)
+	if err != nil {
+		log.Println(err)
+	}
+
+	novel := Novel{
+		Content: resutl,
+		Url:     str,
+	}
+
+	model.Success(ctx, gin.H{"novel": novel}, "查询成功")
 }
 
 type MyArticle struct {
