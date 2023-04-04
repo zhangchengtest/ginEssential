@@ -201,7 +201,7 @@ func RandomNovel(ctx *gin.Context) {
 		Url:     str,
 	}
 
-	model.Success(ctx, gin.H{"novel": novel}, "查询成功")
+	model.Success(ctx, novel, "查询成功")
 }
 
 func RandomNovelTxt(ctx *gin.Context) {
@@ -251,7 +251,7 @@ func RandomNovelTxt(ctx *gin.Context) {
 		Url:     str,
 	}
 
-	model.Success(ctx, gin.H{"novel": novel}, "查询成功")
+	model.Success(ctx, novel, "查询成功")
 }
 
 type MyArticle struct {
