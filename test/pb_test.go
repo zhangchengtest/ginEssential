@@ -128,3 +128,10 @@ func TestData4(t *testing.T) {
 	fileName = util.GetFileNameWithoutExt(fileName)
 	fmt.Println(fileName)
 }
+
+func TestData5(t *testing.T) {
+
+	path := "https://example.com/我的文件夹/文件.txt?参数1=中文参数&参数2=100"
+	encodedPath, _ := util.EncodePath(path)
+	fmt.Println(encodedPath)
+}

@@ -11,6 +11,7 @@ import (
 	"image"
 	"io/ioutil"
 	"math/rand"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -143,6 +144,16 @@ func TxtToHTML(txtContent string) (string, error) {
 	}
 
 	return html.String(), nil
+}
+
+func EncodePath(path string) (string, error) {
+	u, err := url.Parse(path)
+	if err != nil {
+		return "", err
+	}
+	u.Path = url.PathEscape(u.Path)
+	u.RawQuery = url.QueryEscape(u.RawQuery)
+	return u.String(), nil
 }
 
 func GetFileContent(filepath string) (content string, err error) {
