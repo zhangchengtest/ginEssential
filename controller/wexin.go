@@ -145,8 +145,8 @@ func WeixinShare(ctx *gin.Context) {
 	fmt.Println("url ")
 	fmt.Println(url)
 	// 设置appid和appsecret
-	var appId = "wx029106fe29ab6dde"
-	var appSecret = "c54f17c5a7cb10246225a17ce3f43d7d"
+	var appId = "wx70711c9b88f9c12f"
+	var appSecret = "20993710aa48342888d3a0b1755af9d6"
 
 	// 获取access_token
 	var accessTokenUrl = fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", appId, appSecret)

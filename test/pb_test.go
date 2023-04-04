@@ -136,3 +136,23 @@ func TestData5(t *testing.T) {
 	fmt.Println(encodedPath)
 
 }
+
+func TestData6(t *testing.T) {
+	dirPath := "D:\\novel\\dongyeguiwu"
+	files, err := util.GetAllFiles2(dirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	// 输出所有文件路径和文件名
+	//for _, file := range files {
+	//	fmt.Println(file)
+	//}
+	fmt.Println(len(files))
+
+	resutl := util.GetRandomString(files)
+
+	str, _ := util.RandomReadFile(resutl, 3000)
+
+	fmt.Println(str)
+}

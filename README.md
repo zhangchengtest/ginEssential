@@ -7,6 +7,7 @@ nohup ./ding daemon > log.out 2>&1 &
 go env -w GOOS=linux
 go build ./cmd/ding
 go env -w GOOS=windows
+
 git commit -a -m "sss"
 git push origin master
 

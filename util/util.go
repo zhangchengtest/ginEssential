@@ -183,6 +183,39 @@ func GetFileContent(filepath string) (content string, err error) {
 	return content, nil
 }
 
+func RandomReadFile(path string, length int64) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	// 获取文件大小
+	stat, err := file.Stat()
+	if err != nil {
+		return "", err
+	}
+	fileSize := stat.Size()
+
+	// 计算随机读取的起始位置
+	rand.Seed(time.Now().Unix())
+	startPos := rand.Int63n(fileSize - length)
+
+	// 设置读取起始位置
+	_, err = file.Seek(startPos, 0)
+	if err != nil {
+		return "", err
+	}
+
+	// 读取固定字数的内容
+	buf := make([]byte, length)
+	_, err = file.Read(buf)
+	if err != nil {
+		return "", err
+	}
+	return string(buf), nil
+}
+
 func GetRandomString(strs []string) string {
 	rand.Seed(time.Now().UnixNano())
 	index := rand.Intn(len(strs))

@@ -221,7 +221,7 @@ func RandomNovelTxt(ctx *gin.Context) {
 
 	resutl := util.GetRandomString(files)
 	fmt.Println(resutl)
-	content, err := util.GetFileContent(resutl)
+	content, err := util.RandomReadFile(resutl, 3000)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
