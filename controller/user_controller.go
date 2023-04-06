@@ -290,7 +290,7 @@ func GetByCodeForPuzzle(ctx *gin.Context) {
 	inputs, err := RequestInputs(ctx)
 	if err != nil {
 		log.Printf(" error: %s", err)
-		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊1")
 		return
 	}
 	code := inputs["code"].(string)
@@ -309,7 +309,7 @@ func GetToken(ctx *gin.Context) {
 	inputs, err := RequestInputs(ctx)
 	if err != nil {
 		log.Printf("get file error: %s", err)
-		model.Response(ctx, http.StatusBadRequest, 422, nil, "东西不对啊")
+		model.Response(ctx, http.StatusBadRequest, 422, nil, "东西不对啊2")
 		return
 	}
 	code := inputs["code"].(string)
@@ -317,16 +317,16 @@ func GetToken(ctx *gin.Context) {
 	client_secret := inputs["client_secret"].(string)
 
 	if !util.IsEmptyString(code) {
-		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊3")
 		return
 	}
 	if !util.CompareStrings(client_id, "puzzle_xxx") {
-		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊4")
 		return
 	}
 
 	if !util.CompareStrings(client_secret, "bbbbb") {
-		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊5")
 		return
 	}
 	user := model.User{
