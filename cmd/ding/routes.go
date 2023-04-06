@@ -22,6 +22,10 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/api/auth/redirectW", controller.RedirectTOWechat)
 	r.GET("/api/auth/backFromW", controller.BackFromWechat)
 
+	r.GET("/api/auth/getByCodeForPuzzle", controller.GetByCodeForPuzzle)
+
+	r.POST("/api/auth/token", controller.GetToken)
+
 	r.POST("/api/javatosql", controller.Javatosql)
 	r.POST("/api/compareFile", controller.CompareFile)
 	//r.POST("/api/testThread", controller.TestThread)

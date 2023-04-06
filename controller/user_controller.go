@@ -285,6 +285,65 @@ func BackFromUnsplash(ctx *gin.Context) {
 	model.Success(ctx, uservo, "")
 }
 
+func GetByCodeForPuzzle(ctx *gin.Context) {
+
+	inputs, err := RequestInputs(ctx)
+	if err != nil {
+		log.Printf(" error: %s", err)
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		return
+	}
+	code := inputs["code"].(string)
+	fmt.Printf("data: %v", inputs)
+
+	posturl := "https://api.punengshuo.com/api/auth/token"
+	jsonStr := []byte(`{ "client_id": "puzzle_xxx", "client_secret": "bbbbb", 
+             "code": "` + code + `", "grant_type": "authorization_code" }`)
+	content := util.Post(posturl, jsonStr, "application/json")
+	fmt.Printf("data: s%", content)
+	model.Success(ctx, content, "")
+}
+
+func GetToken(ctx *gin.Context) {
+
+	inputs, err := RequestInputs(ctx)
+	if err != nil {
+		log.Printf("get file error: %s", err)
+		model.Response(ctx, http.StatusBadRequest, 422, nil, "东西不对啊")
+		return
+	}
+	code := inputs["code"].(string)
+	client_id := inputs["client_id"].(string)
+	client_secret := inputs["client_secret"].(string)
+
+	if !util.IsEmptyString(code) {
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		return
+	}
+	if !util.CompareStrings(client_id, "puzzle_xxx") {
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		return
+	}
+
+	if !util.CompareStrings(client_secret, "bbbbb") {
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊")
+		return
+	}
+	user := model.User{
+		UserId: "123456",
+	}
+
+	// 发放token
+	token, err := util.ReleaseToken(user)
+	if err != nil {
+		model.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
+		log.Printf("token generate error : %v", err)
+		return
+	}
+
+	model.Success(ctx, token, "")
+}
+
 // RequestInputs 获取所有参数
 func RequestInputs(c *gin.Context) (map[string]interface{}, error) {
 

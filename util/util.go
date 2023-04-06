@@ -155,6 +155,21 @@ func EncodeURL(urlStr string) (string, error) {
 	return u.Scheme + "://" + u.Host + u.Path, nil
 }
 
+func CompareStrings(s1, s2 string) bool {
+	if s1 == s2 {
+		return true
+	} else {
+		return false
+	}
+}
+func IsEmptyString(s string) bool {
+	if len(s) == 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
 func encodePath(path string) string {
 	// 将路径按斜杠拆分
 	splits := strings.Split(path, "/")
