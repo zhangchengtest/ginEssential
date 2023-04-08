@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"ginEssential/common"
 	"ginEssential/model"
+	"ginEssential/redis"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
 	"github.com/zhangchengtest/simple/sqls"
@@ -161,14 +162,76 @@ func Login(ctx *gin.Context) {
 	// 	"data":    gin.H{"token": token},
 	// 	"message": "注册成功",
 	// })
+	uservo.Pwd = ""
+	model.Success(ctx, uservo, "登录成功")
+}
+
+func LoginThird(ctx *gin.Context) {
+	// 获取参数
+	var userLoginDTO = model.UserLoginDTO{}
+	ctx.Bind(&userLoginDTO)
+	fmt.Printf("userLoginDTO：%+v", userLoginDTO)
+	// 输出换行符
+	fmt.Printf("\n")
+
+	account := userLoginDTO.Account
+	password := userLoginDTO.Pwd
+
+	if len(password) < 6 {
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
+		return
+	}
+	DB := sqls.DB()
+	var user model.User
+	// 数据验证
+	if util.VerifyEmailFormat(account) {
+		DB.Where("email = ?", account).First(&user)
+		if user.UserId == "" {
+			model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
+			return
+		}
+	} else {
+		DB.Where("user_name = ?", account).First(&user)
+		if user.UserId == "" {
+			model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
+			return
+		}
+	}
+
+	newSig := util.MD5(password) //转成加密编码
+	// 将编码转换为字符串
+	log.Printf("newSig : %v", newSig)
+	// 判断密码是否正确
+	if user.Pwd != newSig {
+		model.Response(ctx, http.StatusBadRequest, 400, nil, "密码错误")
+		return
+	}
+
+	// 发放token
+	token, err := util.ReleaseToken(user)
+	if err != nil {
+		model.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
+		log.Printf("token generate error : %v", err)
+		return
+	}
+
+	uservo := model.UserVO{}
+
+	util.SimpleCopyProperties(&uservo, &user)
+	uservo.AccessToken = token
+	code := util.RandomString(10)
+	redis.Set("code"+code, uservo.UserId, 300)
+	uservo.RedirectUrl = userLoginDTO.RedirectUrl + "?code=" + code
+	uservo.Pwd = ""
 	model.Success(ctx, uservo, "登录成功")
 }
 
 func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
-
-	uservo := model.UserVO{}
-	util.SimpleCopyProperties(&uservo, &user)
+	data := user.(model.User)
+	fmt.Printf("user [%+v]", user)
+	uservo := model.UserVO{UserName: data.UserName}
+	fmt.Printf("uservo [%+v]", uservo)
 	model.Success(ctx, uservo, "")
 }
 
@@ -177,6 +240,25 @@ func LoadUserByEmail(ctx *gin.Context) {
 	DB := sqls.DB()
 	var user model.User
 	DB.Where("email = ?", email).First(&user)
+
+	uservo := model.UserVO{}
+	util.SimpleCopyProperties(&uservo, &user)
+	uservo.Avatar = user.AvatarUrl
+
+	var res []model.SysRole
+	DB.Table("sys_role").Select("sys_role.code").
+		Joins("left join sys_user_role on sys_role.id = sys_user_role.role_id").Where("user_id = ?", user.UserId).Scan(&res)
+	fmt.Println(res)
+	uservo.RoleCode = res[0].Code
+
+	model.Success(ctx, uservo, "")
+}
+
+func LoadUserById(ctx *gin.Context) {
+	userId := ctx.Query("userId")
+	DB := sqls.DB()
+	var user model.User
+	DB.Where("user_id = ?", userId).First(&user)
 
 	uservo := model.UserVO{}
 	util.SimpleCopyProperties(&uservo, &user)
@@ -300,8 +382,16 @@ func GetByCodeForPuzzle(ctx *gin.Context) {
 	jsonStr := []byte(`{ "client_id": "puzzle_xxx", "client_secret": "bbbbb", 
              "code": "` + code + `", "grant_type": "authorization_code" }`)
 	content := util.Post(posturl, jsonStr, "application/json")
+
+	var result model.ResultVO
+
+	err2 := json.Unmarshal([]byte(content), &result)
+	if err2 != nil {
+		fmt.Println("error:", err2)
+	}
+
 	fmt.Printf("data: s%", content)
-	model.Success(ctx, content, "")
+	model.Success(ctx, result.Data, "")
 }
 
 func GetToken(ctx *gin.Context) {
@@ -316,7 +406,7 @@ func GetToken(ctx *gin.Context) {
 	client_id := inputs["client_id"].(string)
 	client_secret := inputs["client_secret"].(string)
 
-	if !util.IsEmptyString(code) {
+	if util.IsEmptyString(code) {
 		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊3")
 		return
 	}
@@ -329,8 +419,13 @@ func GetToken(ctx *gin.Context) {
 		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊5")
 		return
 	}
+	userId := redis.Get("code" + code)
+	if util.IsEmptyString(userId) {
+		model.Response(ctx, http.StatusBadRequest, 500, nil, "东西不对啊6")
+		return
+	}
 	user := model.User{
-		UserId: "123456",
+		UserId: userId,
 	}
 
 	// 发放token

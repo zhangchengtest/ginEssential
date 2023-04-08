@@ -30,7 +30,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		// 验证通过，获取claims中的userId
-		userId := claims.UserId
+		var data model.User
+		util.FromJSONString(claims.Data, &data)
+		userId := data.UserId
 		DB := sqls.DB()
 		var user model.User
 		DB.Where("user_id = ?", userId).First(&user)

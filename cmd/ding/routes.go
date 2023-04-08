@@ -10,9 +10,11 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.Use(middleware.CORSMiddleware())
 	r.POST("/api/auth/register", controller.Register)
 	r.POST("/api/auth/login", controller.Login)
+	r.POST("/api/auth/loginThird", controller.LoginThird)
 	r.GET("/api/auth/info", middleware.AuthMiddleware(), controller.Info)
 	r.GET("/api/auth/mockinfo", controller.MockInfo)
 	r.GET("/api/auth/loadUserByEmail", controller.LoadUserByEmail)
+	r.GET("/api/auth/loadUserById", controller.LoadUserById)
 
 	//r.GET("/api/auth/randomImage", controller.RandomImage)
 
@@ -39,6 +41,7 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/api/randomArticle", controller.RandomArticle)
 	r.GET("/api/randomNovel", controller.RandomNovel)
 	r.GET("/api/randomNovelTxt", controller.RandomNovelTxt)
+	r.GET("/api/game/randomNovel", controller.RandomNovel2)
 
 	r.POST("/api/readorc", controller.Readorc)
 

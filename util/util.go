@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -240,6 +241,23 @@ func GetRandomString(strs []string) string {
 func GetFileName(filePath string) string {
 	_, fileName := filepath.Split(filePath)
 	return fileName
+}
+
+func ToJSONString(obj interface{}) (string, error) {
+	bytes, err := json.Marshal(obj)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
+}
+
+// 从JSON字符串解析出对象
+func FromJSONString(jsonStr string, obj interface{}) error {
+	err := json.Unmarshal([]byte(jsonStr), obj)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetFileNameWithoutExt(fileName string) string {

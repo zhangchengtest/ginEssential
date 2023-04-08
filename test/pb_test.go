@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"ginEssential/model"
 	"ginEssential/pb"
 	"ginEssential/util"
 	"io/ioutil"
@@ -155,4 +156,21 @@ func TestData6(t *testing.T) {
 	str, _ := util.RandomReadFile(resutl, 3000)
 
 	fmt.Println(str)
+}
+
+func TestData7(t *testing.T) {
+	user := model.User{UserId: "1"}
+	data, _ := util.ReleaseToken(user)
+
+	fmt.Println(data)
+	fmt.Println()
+
+	params, _ := util.ToJSONString(map[string]interface{}{
+		"userId": user.UserId,
+	})
+
+	var data2 model.User
+	util.FromJSONString(params, &data2)
+	fmt.Println(data2.UserId)
+	fmt.Println()
 }

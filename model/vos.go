@@ -2,6 +2,13 @@ package model
 
 import "time"
 
+type ResultVO struct {
+	Code      int32
+	Data      string
+	Message   string
+	isSuccess bool
+}
+
 type ClockVO struct {
 	Days        int
 	EventTime   int

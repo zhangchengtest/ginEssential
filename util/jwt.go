@@ -6,17 +6,21 @@ import (
 	"time"
 )
 
-var jwtKey = []byte("a_secret_crect")
+var jwtKey = []byte("dcw#zc#hht#qyj#wh#cb#yl#czz#zzy#dmj#rc#yzh#yc#zyy#nhb#yc#sz#lb@cunw.com.cn&$(YHK!UGHJGS&^%!^&!JBMN!(*^#(*Y!KJ#GH!JGS&^!$%R@TYFVGHVDYTR!&^#RHNVDKAL:!())(123IUH#IU!(*&!&^HK!^*^*()(&*F$$#^^FLKLHFIUEHK)_APQY^#!")
 
 type Claims struct {
-	UserId string
+	Data string
 	jwt.StandardClaims
 }
 
 func ReleaseToken(user model.User) (string, error) {
 	expirationTime := time.Now().Add(7 * 24 * time.Hour) // 有效期7天
+
+	params, _ := ToJSONString(map[string]interface{}{
+		"userId": user.UserId,
+	})
 	claims := &Claims{
-		UserId: user.UserId,
+		Data: params,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(), // 过期时间
 			IssuedAt:  time.Now().Unix(),     // 发放时间

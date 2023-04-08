@@ -174,7 +174,8 @@ func RandomArticle(ctx *gin.Context) {
 }
 
 type Novel struct {
-	Content string
+	Content string `json:"content"`
+	Title   string `json:"title"`
 	Url     string `json:"url"`
 }
 
@@ -252,6 +253,51 @@ func RandomNovelTxt(ctx *gin.Context) {
 	novel := Novel{
 		Content: fileName,
 		Url:     encodedPath,
+	}
+
+	model.Success(ctx, novel, "查询成功")
+}
+
+func RandomNovel2(ctx *gin.Context) {
+	dirPath := config.Instance.NovelPathTxt
+	files, err := util.GetAllFiles2(dirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	// 输出所有文件路径和文件名
+	//for _, file := range files {
+	//	fmt.Println(file)
+	//}
+	fmt.Println(len(files))
+
+	resutl := util.GetRandomString(files)
+	fmt.Println(resutl)
+	content, err := util.RandomReadFile(resutl, 3000)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	//fmt.Println("File content:", content)
+
+	fileName := util.GetFileName(resutl)
+	fmt.Println(fileName)
+	fileName = util.GetFileNameWithoutExt(fileName)
+
+	// 将HTML格式的内容输出到文件
+	if err != nil {
+		log.Println(err)
+	}
+
+	// 转换为HTML格式
+	htmlContent, err := util.TxtToHTML(content)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	novel := Novel{
+		Content: htmlContent,
+		Title:   fileName,
 	}
 
 	model.Success(ctx, novel, "查询成功")

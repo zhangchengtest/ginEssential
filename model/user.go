@@ -37,6 +37,7 @@ type UserVO struct {
 	Pwd          string `json:"pwd"`
 	IsLock       int    `json:"isLock"`
 	Avatar       string `json:"avatar"`
+	RedirectUrl  string `json:"redirectUrl"`
 }
 
 type WechatToken struct {
@@ -47,8 +48,9 @@ type WechatToken struct {
 }
 
 type UserLoginDTO struct {
-	Account string `json:"account"`
-	Pwd     string `json:"pwd"`
+	Account     string `json:"account"`
+	Pwd         string `json:"pwd"`
+	RedirectUrl string `json:"redirectUrl"`
 }
 
 // 自定义表名
