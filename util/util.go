@@ -260,6 +260,24 @@ func FromJSONString(jsonStr string, obj interface{}) error {
 	return nil
 }
 
+func ParseDate(dateStr string) (time.Time, error) {
+	layout := "2006-01-02" // 日期格式
+	t, err := time.Parse(layout, dateStr)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return t, nil
+}
+
+func SubDay(t time.Time, day int) time.Time {
+	return t.AddDate(0, 0, day)
+}
+
+func TimeToString(t time.Time) string {
+	layout := "2006-01-02"
+	return t.Format(layout)
+}
+
 func GetFileNameWithoutExt(fileName string) string {
 	return filepath.Base(fileName[:len(fileName)-len(filepath.Ext(fileName))])
 }

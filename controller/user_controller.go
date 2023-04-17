@@ -18,6 +18,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -271,6 +272,62 @@ func LoadUserById(ctx *gin.Context) {
 	uservo.RoleCode = res[0].Code
 
 	model.Success(ctx, uservo, "")
+}
+
+func LoadUserByOpenId(ctx *gin.Context) {
+	openId := ctx.Query("openId")
+	DB := sqls.DB()
+	var user model.User
+	DB.Where("openid = ?", openId).First(&user)
+
+	uservo := model.UserVO{}
+	util.SimpleCopyProperties(&uservo, &user)
+	uservo.Avatar = user.AvatarUrl
+
+	var res []model.SysRole
+	DB.Table("sys_role").Select("sys_role.code").
+		Joins("left join sys_user_role on sys_role.id = sys_user_role.role_id").Where("user_id = ?", user.UserId).Scan(&res)
+	fmt.Println(res)
+	uservo.RoleCode = res[0].Code
+
+	model.Success(ctx, uservo, "")
+}
+
+func LoadUserByIds(ctx *gin.Context) {
+	result := ctx.Query("userIds")
+	DB := sqls.DB()
+	var users []model.User
+	userIds := userIdsToArray(result)
+	DB.Where("user_id in ?", userIds).Find(&users)
+
+	uservos := copyUserProps(users)
+
+	model.Success(ctx, uservos, "")
+}
+
+func userIdsToArray(userIds string) []int {
+	userIdsArr := strings.Split(userIds, ",")
+	result := make([]int, len(userIdsArr))
+	for i, id := range userIdsArr {
+		idInt, err := strconv.Atoi(id)
+		if err != nil {
+			// 处理转换失败的情况
+			panic(err)
+		}
+		result[i] = idInt
+	}
+	return result
+}
+
+func copyUserProps(users []model.User) []model.UserVO {
+	uservos := make([]model.UserVO, len(users))
+	for i, user := range users {
+		uservo := model.UserVO{}
+		util.SimpleCopyProperties(&uservo, &user)
+		uservo.Avatar = user.AvatarUrl
+		uservos[i] = uservo
+	}
+	return uservos
 }
 
 func MockInfo(ctx *gin.Context) {

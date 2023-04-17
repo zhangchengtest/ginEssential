@@ -15,6 +15,8 @@ func CollectRoute(r *gin.Engine) *gin.Engine {
 	r.GET("/api/auth/mockinfo", controller.MockInfo)
 	r.GET("/api/auth/loadUserByEmail", controller.LoadUserByEmail)
 	r.GET("/api/auth/loadUserById", controller.LoadUserById)
+	r.GET("/api/auth/loadUserByIds", controller.LoadUserByIds)
+	r.GET("/api/auth/loadUserByOpenId", controller.LoadUserByOpenId)
 
 	//r.GET("/api/auth/randomImage", controller.RandomImage)
 

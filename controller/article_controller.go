@@ -128,6 +128,13 @@ func SeeDinary(ctx *gin.Context) {
 	}
 	DB.Where("title = ? and category = ?", title, category).First(&old)
 
+	if old.Content == "" {
+		date, _ := util.ParseDate(title)
+		date = util.SubDay(date, -1)
+		sss := util.TimeToString(date)
+		DB.Where("title = ? and category = ?", sss, category).First(&old)
+	}
+
 	if category == "行程" {
 		arr := strings.Split(old.Content, "\n")
 		content := ""
