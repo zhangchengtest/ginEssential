@@ -45,6 +45,11 @@ func IntToString(i int) string {
 	return strconv.Itoa(i)
 }
 
+func StringToInt(i string) int {
+	data, _ := strconv.Atoi(i)
+	return data
+}
+
 func Int64ToString(i int64) string {
 	return strconv.FormatInt(i, 10)
 }

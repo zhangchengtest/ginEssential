@@ -47,7 +47,7 @@ type Config struct {
 	DAYU struct {
 		APP_KEY           string `yaml:"APP_KEY"`
 		APP_SECRET        string `yaml:"APP_SECRET"`
-		SMS_TEMPLATE_CODE string `yaml:"SMS_127153513"`
+		SMS_TEMPLATE_CODE string `yaml:"SMS_TEMPLATE_CODE"`
 	} `yaml:"DAYU"`
 
 	// Github

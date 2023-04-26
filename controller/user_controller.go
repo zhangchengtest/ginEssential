@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"ginEssential/common"
+	"ginEssential/config"
 	"ginEssential/model"
 	"ginEssential/redis"
 	"ginEssential/util"
@@ -22,6 +23,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
+	dysmsapi20170525 "github.com/alibabacloud-go/dysmsapi-20170525/v3/client"
+	aliutil "github.com/alibabacloud-go/tea-utils/v2/service"
+	"github.com/alibabacloud-go/tea/tea"
 )
 
 func Register(ctx *gin.Context) {
@@ -225,6 +231,172 @@ func LoginThird(ctx *gin.Context) {
 	uservo.RedirectUrl = userLoginDTO.RedirectUrl + "?code=" + code
 	uservo.Pwd = ""
 	model.Success(ctx, uservo, "登录成功")
+}
+
+func LoginPhone(ctx *gin.Context) {
+	// 获取参数
+	var userLoginDTO = model.UserLoginDTO{}
+	ctx.Bind(&userLoginDTO)
+	fmt.Printf("userLoginDTO：%+v", userLoginDTO)
+	// 输出换行符
+	fmt.Printf("\n")
+
+	account := userLoginDTO.Account
+	smsCaptcha := userLoginDTO.SmsCaptcha
+
+	if len(smsCaptcha) != 6 {
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
+		return
+	}
+	DB := sqls.DB()
+	var user model.User
+	// 数据验证
+	DB.Where("mobile = ?", account).First(&user)
+	if user.UserId == "" {
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
+		return
+	}
+
+	smsCaptcha_exist := redis.Get("code" + account)
+
+	// 将编码转换为字符串
+	log.Printf("smsCaptcha_exist : %v", smsCaptcha_exist)
+	// 判断密码是否正确
+	if smsCaptcha != smsCaptcha_exist {
+		model.Response(ctx, http.StatusBadRequest, 400, nil, "验证码错误")
+		return
+	}
+
+	// 发放token
+	token, err := util.ReleaseToken(user)
+	if err != nil {
+		model.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
+		log.Printf("token generate error : %v", err)
+		return
+	}
+
+	uservo := model.UserVO{}
+
+	util.SimpleCopyProperties(&uservo, &user)
+	uservo.AccessToken = token
+	code := util.RandomString(10)
+	redis.Set("code"+code, uservo.UserId, 300)
+	uservo.RedirectUrl = userLoginDTO.RedirectUrl + "?code=" + code
+	uservo.Pwd = ""
+	model.Success(ctx, uservo, "登录成功")
+}
+
+//func SendSms(ctx *gin.Context) {
+//
+//	// 获取参数
+//	var userLoginDTO = model.UserLoginDTO{}
+//	ctx.Bind(&userLoginDTO)
+//	fmt.Printf("userLoginDTO：%+v", userLoginDTO)
+//	// 输出换行符
+//	fmt.Printf("\n")
+//
+//	account := userLoginDTO.Account
+//
+//	code := rand.Intn(900000) + 100000
+//
+//	redis.Set("code"+account, util.IntToString(code), 300)
+//
+//	var regionId = flag.String("regionId", "cn-hangzhou", "区域标识")
+//	var accessKeyId = flag.String("id", config.Instance.DAYU.APP_KEY, "accessKeyId")
+//	var accessKeySecret = flag.String("secret", config.Instance.DAYU.APP_SECRET, "accessKeySecret")
+//	var verifyCode = flag.String("code", util.IntToString(code), "验证码")
+//	var phoneNumbers = flag.Int("phonenumbers", util.StringToInt(account), "手机号")
+//	flag.Parse()
+//
+//	if *phoneNumbers <= 0 {
+//		panic(fmt.Errorf("invalid phonenumbers"))
+//	}
+//
+//	client, err := dysmsapi.NewClientWithAccessKey(*regionId, *accessKeyId, *accessKeySecret)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	params, _ := json.Marshal(map[string]interface{}{
+//		"code": verifyCode,
+//	})
+//
+//	request := dysmsapi.CreateSendSmsRequest()
+//	request.Scheme = "https"
+//	request.TemplateCode = config.Instance.DAYU.SMS_TEMPLATE_CODE
+//	request.SignName = "新云网"
+//	request.TemplateParam = string(params)
+//	request.PhoneNumbers = strconv.Itoa(*phoneNumbers)
+//
+//	resp, err := client.SendSms(request)
+//	if err != nil {
+//		log.Printf("send sms failed resp=%v err=%v", resp, err)
+//		panic(err)
+//	}
+//
+//	if !resp.IsSuccess() {
+//		log.Printf("send sms failed resp=%v err=%v", resp, err)
+//		panic(fmt.Errorf("failed: unknown reason"))
+//	}
+//
+//	model.Success(ctx, gin.H{}, "查询成功")
+//
+//}
+
+/**
+ * 使用AK&SK初始化账号Client
+ * @param accessKeyId
+ * @param accessKeySecret
+ * @return Client
+ * @throws Exception
+ */
+func CreateClient(accessKeyId *string, accessKeySecret *string) (_result *dysmsapi20170525.Client, _err error) {
+	config := &openapi.Config{
+		// 必填，您的 AccessKey ID
+		AccessKeyId: accessKeyId,
+		// 必填，您的 AccessKey Secret
+		AccessKeySecret: accessKeySecret,
+	}
+	// 访问的域名
+	config.Endpoint = tea.String("dysmsapi.aliyuncs.com")
+	_result = &dysmsapi20170525.Client{}
+	_result, _err = dysmsapi20170525.NewClient(config)
+	return _result, _err
+}
+func SendSmsAsync(account string, code string) {
+	client, _err := CreateClient(tea.String(config.Instance.DAYU.APP_KEY), tea.String(config.Instance.DAYU.APP_SECRET))
+	if _err != nil {
+		log.Printf("send sms failed err=%v", _err)
+		return
+	}
+
+	sendSmsRequest := &dysmsapi20170525.SendSmsRequest{
+		PhoneNumbers:  tea.String(account),
+		TemplateCode:  tea.String(config.Instance.DAYU.SMS_TEMPLATE_CODE),
+		TemplateParam: tea.String("{\"code\":\"" + code + "\"}"),
+		SignName:      tea.String("猿盟"),
+	}
+	runtime := &aliutil.RuntimeOptions{}
+	resp, err := client.SendSmsWithOptions(sendSmsRequest, runtime)
+
+	if err != nil {
+		log.Printf("send sms failed err=%v", err)
+		return
+	}
+
+	log.Printf("send sms success resp=%v", resp)
+}
+
+func SendSms(ctx *gin.Context) {
+	var userLoginDTO = model.UserLoginDTO{}
+	ctx.Bind(&userLoginDTO)
+	account := userLoginDTO.Account
+	code := util.GenerateCode()
+	redis.Set("code"+account, code, 300)
+
+	go SendSmsAsync(account, code)
+
+	model.Success(ctx, gin.H{}, "查询成功")
 }
 
 func Info(ctx *gin.Context) {

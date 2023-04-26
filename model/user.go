@@ -28,16 +28,17 @@ type User struct {
 }
 
 type UserVO struct {
-	UserId       string `json:"userId"`
-	UserName     string `json:"userName"`
-	Mobile       string `json:"mobile"`
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-	RoleCode     string `json:"roleCode"`
-	Pwd          string `json:"pwd"`
-	IsLock       int    `json:"isLock"`
-	Avatar       string `json:"avatar"`
-	RedirectUrl  string `json:"redirectUrl"`
+	UserId       string   `json:"userId"`
+	UserName     string   `json:"userName"`
+	Mobile       string   `json:"mobile"`
+	AccessToken  string   `json:"accessToken"`
+	RefreshToken string   `json:"refreshToken"`
+	RoleCode     string   `json:"roleCode"`
+	Pwd          string   `json:"pwd"`
+	IsLock       int      `json:"isLock"`
+	Avatar       string   `json:"avatar"`
+	RedirectUrl  string   `json:"redirectUrl"`
+	Punches      []string `json punches`
 }
 
 type WechatToken struct {
@@ -49,6 +50,7 @@ type WechatToken struct {
 
 type UserLoginDTO struct {
 	Account     string `json:"account"`
+	SmsCaptcha  string `json:"smsCaptcha"`
 	Pwd         string `json:"pwd"`
 	RedirectUrl string `json:"redirectUrl"`
 }

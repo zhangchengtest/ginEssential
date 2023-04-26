@@ -358,6 +358,12 @@ func RandomString(n int) string {
 	return string(result)
 }
 
+// 生成一个六位数的随机验证码
+func GenerateCode() string {
+	rand.Seed(time.Now().UnixNano())
+	return fmt.Sprintf("%06v", rand.Intn(1000000))
+}
+
 func Myuuid() string {
 	uuid := uuid.New().String()
 	uuidWithoutHyphens := strings.Replace(uuid, "-", "", -1)
