@@ -26,10 +26,6 @@ func Set(key string, value string, time int) error {
 	conn := pool.Get()
 	defer conn.Close()
 
-	//str, err := json.Marshal(player)
-	//if err != nil {
-	//	return fmt.Errorf("error marshal player: %v", err)
-	//}
 	_, err := conn.Do("SET", key, value, "EX", time)
 	if err != nil {
 		return fmt.Errorf("error : %v", err)
@@ -42,11 +38,31 @@ func Get(key string) string {
 	conn := pool.Get()
 	defer conn.Close()
 
-	//str, err := json.Marshal(player)
-	//if err != nil {
-	//	return fmt.Errorf("error marshal player: %v", err)
-	//}
 	value, err := redis.String(conn.Do("GET", key))
+	if err != nil {
+		fmt.Println("error : %s", err)
+	}
+
+	return value
+}
+
+func SetBytes(key string, value []byte, time int) error {
+	conn := pool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SET", key, value, "EX", time)
+	if err != nil {
+		return fmt.Errorf("error : %v", err)
+	}
+
+	return nil
+}
+
+func GetBytes(key string) []byte {
+	conn := pool.Get()
+	defer conn.Close()
+
+	value, err := redis.Bytes(conn.Do("GET", key))
 	if err != nil {
 		fmt.Println("error : %s", err)
 	}

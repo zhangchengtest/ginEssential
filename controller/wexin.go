@@ -62,13 +62,14 @@ func LoginByWeixinCode(ctx *gin.Context) {
 		// 加密密码
 		hasedPassword := util.MD5("123456")
 		// 创建用户
+		dd := "test@qq.com"
 		newUser := model.User{
 			UserId:        util.Myuuid(),
 			CreateDt:      time.Now(),
 			UpdateDt:      nil,
 			UserName:      "点击设置用户名",
 			NickName:      "点击设置昵称",
-			Email:         "test@qq.com",
+			Email:         &dd,
 			Pwd:           hasedPassword,
 			Openid:        resp.OpenID,
 			Unionid:       resp.UnionID,
@@ -186,6 +187,54 @@ func WeixinShare(ctx *gin.Context) {
 
 	// 将微信JS-SDK的配置信息返回至前端
 	model.Success(ctx, gin.H{"appId": appId, "timestamp": timestamp, "nonceStr": nonceStr, "signature": signature}, "查询成功")
+}
+
+func WeixinQrcode(ctx *gin.Context) {
+	// 获取前端页面传递的URL参数
+	// 设置appid和appsecret
+	var appId = "wx70711c9b88f9c12f"
+	var appSecret = "20993710aa48342888d3a0b1755af9d6"
+
+	// 获取access_token
+	var accessTokenUrl = fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", appId, appSecret)
+	accessTokenResp, err := http.Get(accessTokenUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer accessTokenResp.Body.Close()
+	accessTokenBody, _ := ioutil.ReadAll(accessTokenResp.Body)
+	accessTokenObj := AccessTokenResponse{}
+	json.Unmarshal(accessTokenBody, &accessTokenObj)
+
+	fmt.Printf("token: %s\n", accessTokenObj.AccessToken)
+
+	width := "400"
+	var jsapiTicketUrl = fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s", accessTokenObj.AccessToken)
+	jsonStr := []byte(`{ "action_name": "QR_STR_SCENE", "scene_str": "abcd", 
+             "expire_seconds": "` + width + `"}`)
+	content := util.Post(jsapiTicketUrl, jsonStr, "application/json")
+
+	jsapiTicketObj := JsapiTicketResponse{}
+
+	err2 := json.Unmarshal([]byte(content), &jsapiTicketObj)
+	if err2 != nil {
+		fmt.Println("error:", err2)
+	}
+
+	fmt.Printf("data: s%", content)
+
+	fmt.Printf("jsapiTicket: %s\nexpiresIn: %d\n", jsapiTicketObj.Ticket, jsapiTicketObj.ExpiresIn)
+
+	// 获取微信JS-SDK配置信息（以下数据可通过读取配置文件或从数据库中获取）
+
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	nonceStr := randStringBytes(12) // 生成16位随机字符串
+	var result = fmt.Sprintf("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", jsapiTicketObj.Ticket)
+
+	log.Println(result)
+
+	// 将微信JS-SDK的配置信息返回至前端
+	model.Success(ctx, gin.H{"appId": appId, "timestamp": timestamp, "nonceStr": nonceStr, "signature": result}, "查询成功")
 }
 
 func UserDetail(ctx *gin.Context) {

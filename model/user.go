@@ -9,7 +9,7 @@ type User struct {
 	UserName      string     `json:"userName"`
 	NickName      string     `json:"nickName"`
 	Mobile        string     `json:"mobile"`
-	Email         string     `json:"email"`
+	Email         *string    `json:"email"`
 	Salt          string     `json:"salt"`
 	Pwd           string     `json:"pwd"`
 	Autologin     int        `json:"autologin"`
@@ -43,7 +43,7 @@ type UserVO struct {
 
 type WechatToken struct {
 	Scope        string `json:"scope"`
-	OpenId       string `json:"open_id"`
+	Openid       string `json:"openid"`
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
@@ -53,6 +53,7 @@ type UserLoginDTO struct {
 	SmsCaptcha  string `json:"smsCaptcha"`
 	Pwd         string `json:"pwd"`
 	RedirectUrl string `json:"redirectUrl"`
+	Uuid        string `json:"uuid"`
 }
 
 // 自定义表名

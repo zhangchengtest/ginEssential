@@ -36,6 +36,7 @@ require (
 	github.com/silenceper/wechat/v2 v2.1.4
 	github.com/sirupsen/logrus v1.9.0
 	github.com/sjsdfg/common-lang-in-go v0.5.4
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/viper v1.15.0
 	github.com/zhangchengtest/simple v1.2.3
 	golang.org/x/oauth2 v0.3.0

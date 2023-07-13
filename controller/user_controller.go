@@ -11,8 +11,10 @@ import (
 	"ginEssential/redis"
 	"ginEssential/util"
 	"github.com/gin-gonic/gin"
+	"github.com/sjsdfg/common-lang-in-go/StringUtils"
 	"github.com/zhangchengtest/simple/sqls"
 	"gorm.io/gorm"
+	"image/png"
 	"io"
 	"io/ioutil"
 	"log"
@@ -28,6 +30,7 @@ import (
 	dysmsapi20170525 "github.com/alibabacloud-go/dysmsapi-20170525/v3/client"
 	aliutil "github.com/alibabacloud-go/tea-utils/v2/service"
 	"github.com/alibabacloud-go/tea/tea"
+	qrcode "github.com/skip2/go-qrcode"
 )
 
 func Register(ctx *gin.Context) {
@@ -55,7 +58,7 @@ func Register(ctx *gin.Context) {
 	// password := ctx.PostForm("password")
 
 	// 数据验证
-	if !util.VerifyEmailFormat(email) {
+	if !util.VerifyEmailFormat(*email) {
 		// 自己封装过后
 		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "邮箱格式不对")
 		return
@@ -68,7 +71,7 @@ func Register(ctx *gin.Context) {
 
 	log.Println(email, password)
 	// 判断手机号是否存在
-	if isEmailExist(DB, email) {
+	if isEmailExist(DB, *email) {
 		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户已经存在")
 		return
 	}
@@ -97,7 +100,7 @@ func Register(ctx *gin.Context) {
 	DB.Create(&sysUserRole)
 	DB.Create(&newUser)
 
-	common.SendRegister(userName, email)
+	common.SendRegister(userName, *email)
 
 	model.Success(ctx, gin.H{"userName": userName}, "注册成功")
 }
@@ -248,14 +251,6 @@ func LoginPhone(ctx *gin.Context) {
 		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
 		return
 	}
-	DB := sqls.DB()
-	var user model.User
-	// 数据验证
-	DB.Where("mobile = ?", account).First(&user)
-	if user.UserId == "" {
-		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "用户不存在")
-		return
-	}
 
 	smsCaptcha_exist := redis.Get("code" + account)
 
@@ -265,6 +260,56 @@ func LoginPhone(ctx *gin.Context) {
 	if smsCaptcha != smsCaptcha_exist {
 		model.Response(ctx, http.StatusBadRequest, 400, nil, "验证码错误")
 		return
+	}
+
+	DB := sqls.DB()
+	var user model.User
+	// 数据验证
+	DB.Where("mobile = ?", account).First(&user)
+	if user.UserId == "" {
+		//create user
+
+		randomStr := util.GenerateCode()
+		password := randomStr
+		userName := "游客" + randomStr
+
+		// 加密密码
+		hasedPassword := util.MD5(password)
+		// 创建用户
+		newUser := model.User{
+			UserId:      util.Myuuid(),
+			CreateDt:    time.Now(),
+			UpdateDt:    nil,
+			UserName:    userName,
+			LastLoginDt: time.Now(),
+			NickName:    userName,
+			Mobile:      account,
+			//Openid:      userLoginDTO.Openid,
+			Email: nil,
+			Pwd:   hasedPassword,
+		}
+
+		var s = util.Worker1{}
+
+		var sysUserRole = model.SysUserRole{
+			Id:     int(s.GetId()),
+			UserId: newUser.UserId,
+			RoleId: 2,
+		}
+		DB.Create(&sysUserRole)
+		DB.Create(&newUser)
+
+		user = newUser
+
+	} else {
+		//update user
+		//result := map[string]interface{}{}
+
+		//if !StringUtils.IsEmpty(userLoginDTO.Openid) {
+		//	result["openid"] = userLoginDTO.Openid
+		//	DB := sqls.DB()
+		//	DB.Model(&user).Where("user_id", user.UserId).Updates(result)
+		//}
 	}
 
 	// 发放token
@@ -281,7 +326,116 @@ func LoginPhone(ctx *gin.Context) {
 	uservo.AccessToken = token
 	code := util.RandomString(10)
 	redis.Set("code"+code, uservo.UserId, 300)
-	uservo.RedirectUrl = userLoginDTO.RedirectUrl + "?code=" + code
+	if strings.Contains(userLoginDTO.RedirectUrl, "?") {
+		uservo.RedirectUrl = userLoginDTO.RedirectUrl + "&code=" + code
+	} else {
+		uservo.RedirectUrl = userLoginDTO.RedirectUrl + "?code=" + code
+	}
+
+	uservo.Pwd = ""
+	model.Success(ctx, uservo, "登录成功")
+}
+
+func LoginPhoneAndWechat(ctx *gin.Context) {
+	// 获取参数
+	var userLoginDTO = model.UserLoginDTO{}
+	ctx.Bind(&userLoginDTO)
+	fmt.Printf("userLoginDTO：%+v", userLoginDTO)
+	// 输出换行符
+	fmt.Printf("\n")
+
+	account := userLoginDTO.Account
+	smsCaptcha := userLoginDTO.SmsCaptcha
+	uuid := userLoginDTO.Uuid
+
+	openid := redis.Get("qrcode" + uuid + "openid")
+
+	if len(smsCaptcha) != 6 {
+		model.Response(ctx, http.StatusUnprocessableEntity, 422, nil, "密码不能少于6位")
+		return
+	}
+
+	smsCaptcha_exist := redis.Get("code" + account)
+
+	// 将编码转换为字符串
+	log.Printf("smsCaptcha_exist : %v", smsCaptcha_exist)
+	// 判断密码是否正确
+	if smsCaptcha != smsCaptcha_exist {
+		model.Response(ctx, http.StatusBadRequest, 400, nil, "验证码错误")
+		return
+	}
+
+	DB := sqls.DB()
+	var user model.User
+	// 数据验证
+	DB.Where("mobile = ?", account).First(&user)
+	if user.UserId == "" {
+		//create user
+
+		randomStr := util.GenerateCode()
+		password := randomStr
+		userName := "游客" + randomStr
+
+		// 加密密码
+		hasedPassword := util.MD5(password)
+		// 创建用户
+		newUser := model.User{
+			UserId:      util.Myuuid(),
+			CreateDt:    time.Now(),
+			UpdateDt:    nil,
+			UserName:    userName,
+			LastLoginDt: time.Now(),
+			NickName:    userName,
+			Mobile:      account,
+			Openid:      openid,
+			Email:       nil,
+			Pwd:         hasedPassword,
+		}
+
+		var s = util.Worker1{}
+
+		var sysUserRole = model.SysUserRole{
+			Id:     int(s.GetId()),
+			UserId: newUser.UserId,
+			RoleId: 2,
+		}
+		DB.Create(&sysUserRole)
+		DB.Create(&newUser)
+
+		user = newUser
+
+	} else {
+		//update user
+		result := map[string]interface{}{}
+
+		if !StringUtils.IsEmpty(openid) {
+			result["openid"] = openid
+			DB := sqls.DB()
+			DB.Model(&user).Where("user_id", user.UserId).Updates(result)
+		}
+	}
+
+	// 发放token
+	token, err := util.ReleaseToken(user)
+	if err != nil {
+		model.Response(ctx, http.StatusInternalServerError, 500, nil, "系统异常")
+		log.Printf("token generate error : %v", err)
+		return
+	}
+
+	uservo := model.UserVO{}
+
+	util.SimpleCopyProperties(&uservo, &user)
+	uservo.AccessToken = token
+
+	userBytes, _ := json.Marshal(uservo)
+	redis.Set("qrcode"+uuid, "done", 5000)
+	redis.SetBytes("qrcode"+uuid+"user", userBytes, 5000)
+
+	code := util.RandomString(10)
+	redis.Set("code"+code, uservo.UserId, 300)
+	redirectUrl := redis.Get("qrcode"+uuid+"redirectUrl") + "?code=" + code
+	uservo.RedirectUrl = redirectUrl
 	uservo.Pwd = ""
 	model.Success(ctx, uservo, "登录成功")
 }
@@ -528,9 +682,11 @@ func RedirectTOUnsplash(ctx *gin.Context) {
 
 func RedirectTOWechat(ctx *gin.Context) {
 
+	uuid := ctx.Query("uuid")
+
 	domain := "https://open.weixin.qq.com/connect/oauth2/authorize?"
 	url2 := "appid=wx70711c9b88f9c12f"
-	redirect_uri := "http://cheng.yufu.pub/api/auth/backFromW"
+	redirect_uri := "https://clock.cuiyi.club/api/auth/backFromW/" + uuid
 	url2 += "&redirect_uri=" + redirect_uri
 	url2 += "&response_type=code"
 	url2 += "&scope=snsapi_base#wechat_redirect"
@@ -545,6 +701,8 @@ func RedirectTOWechat(ctx *gin.Context) {
 }
 
 func BackFromWechat(ctx *gin.Context) {
+
+	uuid := ctx.Param("uuid")
 
 	inputs, err := RequestInputs(ctx)
 	if err != nil {
@@ -563,7 +721,7 @@ func BackFromWechat(ctx *gin.Context) {
 
 	content := util.Get(domain + url2)
 	fmt.Println()
-	fmt.Printf("token--------: s%", content)
+	fmt.Printf("token--------: %s", content)
 	var wechatToken model.WechatToken
 
 	err2 := json.Unmarshal([]byte(content), &wechatToken)
@@ -572,7 +730,32 @@ func BackFromWechat(ctx *gin.Context) {
 	}
 	fmt.Printf("%+v", wechatToken)
 
-	model.Success(ctx, wechatToken, "")
+	DB := sqls.DB()
+	var user model.User
+	DB.Where("openid = ?", wechatToken.Openid).First(&user)
+
+	if user.UserId != "" {
+
+		userBytes, _ := json.Marshal(user)
+		redis.Set("qrcode"+uuid, "done", 5000)
+		redis.SetBytes("qrcode"+uuid+"user", userBytes, 5000)
+
+		mycode := util.RandomString(10)
+		redis.Set("code"+mycode, user.UserId, 300)
+
+		fmt.Println("qrcode" + uuid + "redirectUrl")
+		redirectUrl := redis.Get("qrcode"+uuid+"redirectUrl") + "?code=" + mycode
+
+		fmt.Println(redirectUrl)
+
+		ctx.Redirect(http.StatusFound, redirectUrl)
+		return
+	}
+	redis.Set("qrcode"+uuid+"openid", wechatToken.Openid, 6000)
+
+	var loginUrl = fmt.Sprintf("https://sso.punengshuo.com/wechat?uuid=%s", uuid)
+
+	ctx.Redirect(http.StatusFound, loginUrl)
 }
 
 func BackFromUnsplash(ctx *gin.Context) {
@@ -611,15 +794,17 @@ func GetByCodeForPuzzle(ctx *gin.Context) {
 	jsonStr := []byte(`{ "client_id": "puzzle_xxx", "client_secret": "bbbbb", 
              "code": "` + code + `", "grant_type": "authorization_code" }`)
 	content := util.Post(posturl, jsonStr, "application/json")
-
+	fmt.Printf("data: %s", content)
 	var result model.ResultVO
 
 	err2 := json.Unmarshal([]byte(content), &result)
 	if err2 != nil {
 		fmt.Println("error:", err2)
 	}
-
-	fmt.Printf("data: s%", content)
+	if result.Code != 200 {
+		model.Fail(ctx, gin.H{}, "")
+		return
+	}
 	model.Success(ctx, result.Data, "")
 }
 
@@ -666,6 +851,108 @@ func GetToken(ctx *gin.Context) {
 	}
 
 	model.Success(ctx, token, "")
+}
+
+func GetQrcode(c *gin.Context) {
+
+	width, _ := strconv.Atoi(c.Query("width"))
+	height, _ := strconv.Atoi(c.Query("height"))
+	uuid := c.Query("uuid")
+	var url = fmt.Sprintf("https://clock.cuiyi.club/api/auth/redirectW?uuid=%s", uuid)
+
+	qrCode, err := GenerateQRCode(url, width, height)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	redis.Set("qrcode"+uuid, "init", 3000)
+
+	c.Header("Content-Type", "image/png")
+	c.Writer.Write(qrCode)
+}
+
+func GetUUID(ctx *gin.Context) {
+
+	// 获取参数
+	var userLoginDTO = model.UserLoginDTO{}
+	ctx.Bind(&userLoginDTO)
+	fmt.Printf("userLoginDTO：%+v", userLoginDTO)
+	// 输出换行符
+	fmt.Printf("\n")
+
+	redirectUrl := userLoginDTO.RedirectUrl
+
+	uuid := util.Myuuid()
+	ctx.SetCookie("uuid", uuid, 0, "/", "", false, false)
+	var url = fmt.Sprintf("https://clock.cuiyi.club/api/auth/redirectW?uuid=%s", uuid)
+	redis.Set("qrcode"+uuid, "init", 3000)
+	redis.Set("qrcode"+uuid+"redirectUrl", redirectUrl, 3000)
+	model.Success(ctx, url, "success")
+}
+
+func CheckQrcode(c *gin.Context) {
+
+	// 获取参数
+	var userLoginDTO = model.UserLoginDTO{}
+	c.Bind(&userLoginDTO)
+	fmt.Printf("userLoginDTO：%+v", userLoginDTO)
+	// 输出换行符
+	fmt.Printf("\n")
+
+	uuid := userLoginDTO.Uuid
+
+	status := redis.Get("qrcode" + uuid)
+	if status == "done" {
+
+		userBytes := redis.GetBytes("qrcode" + uuid + "user")
+
+		user := model.User{}
+		err := json.Unmarshal(userBytes, &user)
+		if err != nil {
+			model.Response(c, http.StatusInternalServerError, 500, nil, "系统异常")
+			log.Printf("json generate error : %v", err)
+			return
+		}
+
+		// 发放token
+		token, err := util.ReleaseToken(user)
+		if err != nil {
+			model.Response(c, http.StatusInternalServerError, 500, nil, "系统异常")
+			log.Printf("token generate error : %v", err)
+			return
+		}
+
+		uservo := model.UserVO{}
+
+		util.SimpleCopyProperties(&uservo, &user)
+		uservo.AccessToken = token
+		code := util.RandomString(10)
+		redis.Set("code"+code, uservo.UserId, 300)
+		redirectUrl := redis.Get("qrcode"+uuid+"redirectUrl") + "?code=" + code
+		fmt.Println("CheckQrcode " + redirectUrl)
+		uservo.RedirectUrl = redirectUrl
+		uservo.Pwd = ""
+		model.Success(c, uservo, "登录成功")
+		return
+	}
+
+	model.Response(c, http.StatusOK, 201, nil, "还未扫码")
+}
+
+// GenerateQRCode generates QR code and returns the image buffer
+func GenerateQRCode(data string, width, height int) ([]byte, error) {
+	qr, err := qrcode.New(data, qrcode.Medium)
+	if err != nil {
+		return nil, err
+	}
+	img := qr.Image(width)
+
+	buf := new(bytes.Buffer)
+	if err := png.Encode(buf, img); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
 }
 
 // RequestInputs 获取所有参数
